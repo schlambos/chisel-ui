@@ -239,7 +239,7 @@
   }
 
   /* Person's conversations (expandable) */
-  .person-convs { padding: 2px 0 6px 64px; }
+  .person-convs { padding: 2px 0 6px 32px; }
   .person-convs .pconv {
     display: flex; align-items: center; gap: 6px;
     padding: 6px 12px; margin: 1px 8px 1px 0; border-radius: 6px;
@@ -292,7 +292,11 @@
   }
   .conv-item .c-actions .act-btn:hover { background: rgba(0,0,0,.06); color: var(--text-secondary); }
   .conv-item.active { background: var(--bg-active); color: var(--text-primary); }
-  .new-message-row { padding: 10px 20px; font-size: 13px; }
+  .new-message-row {
+    margin: 8px 16px 0; padding: 6px 10px; font-size: 13px;
+    border-radius: 8px; background: var(--bg-hover);
+  }
+  .new-message-row:hover { background: var(--bg-active); }
   .new-message-row.active { background: var(--accent-light); color: var(--accent); }
   .panel-search {
     display: flex; align-items: center; gap: 8px;
@@ -1770,7 +1774,7 @@
         <div class="section-label">助手 <span class="section-add" onclick="event.stopPropagation(); openCreateAssistant();" title="创建助手">＋</span></div>
 
         <!-- AionCLI (秘书，始终第一位) -->
-        <div class="person-item" onclick="togglePerson(this)" style="background:var(--accent-light);">
+        <div class="person-item" onclick="togglePerson(this)">
           <div class="p-avatar cli-logo" style="box-shadow:0 0 0 2px var(--accent);"><img src="../../src/renderer/assets/logos/brand/aion.svg"></div>
           <div class="p-info">
             <div class="p-name">AionCLI <span style="font-size:10px; color:var(--accent); font-weight:500; background:#fff; padding:1px 6px; border-radius:4px; margin-left:4px;">秘书</span></div>
@@ -3019,6 +3023,10 @@
 
 <script>
   var panelTitles = { chat: '工作区', people: '通讯录', cron: '定时任务', settings: '设置' };
+
+  // Per-tab last selected view state: { viewName, restoreFn }
+  var tabLastView = {};
+
   function switchRail(name) {
     document.querySelectorAll('.icon-rail .rail-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.remove('active'));
@@ -3030,6 +3038,10 @@
     if (panel) panel.classList.add('active');
     var title = document.getElementById('panel-title');
     if (title) title.textContent = panelTitles[name] || name;
+    // Restore last view for this tab (if any)
+    if (tabLastView[name] && tabLastView[name].restoreFn) {
+      tabLastView[name].restoreFn();
+    }
   }
   // Backward compat alias
   function switchTab(name) {
@@ -3322,6 +3334,12 @@
     setTimeout(() => document.addEventListener('click', closePopup), 0);
   }
 
+  function getTabForElement(el) {
+    if (el.closest('#panel-chat')) return 'chat';
+    if (el.closest('#panel-people')) return 'people';
+    return null;
+  }
+
   // Click conv-item → chat or group view (skip new-message-row, handled by onclick)
   document.querySelectorAll('.conv-item:not(.new-message-row)').forEach(el => {
     el.addEventListener('click', function(e) {
@@ -3329,7 +3347,15 @@
       document.querySelectorAll('.conv-item.active').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.pconv.active').forEach(p => p.classList.remove('active'));
       el.classList.add('active');
-      showView(isGroupConv(el) ? 'group' : 'chat');
+      var viewName = isGroupConv(el) ? 'group' : 'chat';
+      showView(viewName);
+      var tab = getTabForElement(el);
+      if (tab) tabLastView[tab] = { restoreFn: function() {
+        document.querySelectorAll('.conv-item.active').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.pconv.active').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        showView(viewName);
+      }};
     });
   });
   // Click pconv (people tab conversation) → chat or group view
@@ -3338,11 +3364,49 @@
       if (e.target.closest('.act-btn')) return;
       document.querySelectorAll('.conv-item.active').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.pconv.active').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.conv-item.active').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
-      showView(isGroupPconv(el) ? 'group' : 'chat');
+      var viewName = isGroupPconv(el) ? 'group' : 'chat';
+      showView(viewName);
+      var tab = getTabForElement(el);
+      if (tab) tabLastView[tab] = { restoreFn: function() {
+        document.querySelectorAll('.conv-item.active').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.pconv.active').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        showView(viewName);
+      }};
     });
   });
+
+  /* ---- Initialize default tab selections ---- */
+  (function initTabDefaults() {
+    // Chat tab: select "首页改版讨论" (first conv-item in panel-chat)
+    var chatConv = document.querySelector('#panel-chat .conv-item:not(.new-message-row)');
+    if (chatConv) {
+      var chatViewName = isGroupConv(chatConv) ? 'group' : 'chat';
+      tabLastView['chat'] = { restoreFn: function() {
+        document.querySelectorAll('.conv-item.active').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.pconv.active').forEach(p => p.classList.remove('active'));
+        chatConv.classList.add('active');
+        showView(chatViewName);
+      }};
+    }
+    // People tab: select "帮我规划下周工作" (first pconv under AionCLI)
+    var aionCLI = document.querySelector('#panel-people .person-item');
+    var aionConvs = aionCLI ? aionCLI.nextElementSibling : null;
+    if (aionConvs && aionConvs.classList.contains('person-convs')) {
+      var firstPconv = aionConvs.querySelector('.pconv');
+      if (firstPconv) {
+        var pViewName = isGroupPconv(firstPconv) ? 'group' : 'chat';
+        tabLastView['people'] = { restoreFn: function() {
+          document.querySelectorAll('.conv-item.active').forEach(c => c.classList.remove('active'));
+          document.querySelectorAll('.pconv.active').forEach(p => p.classList.remove('active'));
+          aionConvs.style.display = 'block';
+          firstPconv.classList.add('active');
+          showView(pViewName);
+        }};
+      }
+    }
+  })();
 
   /* Stop all act-btn clicks from bubbling to parent toggles */
   document.addEventListener('click', function(e) {
