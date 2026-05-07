@@ -8,8 +8,8 @@ import { app } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ProcessConfig } from './initStorage';
-import { startWebServerWithInstance } from '../webserver';
-import { SERVER_CONFIG } from '../webserver/config/constants';
+import { startWebHost } from '@aionui/web-host';
+import { resolveBinaryPath } from '../backend';
 
 const WEBUI_CONFIG_FILE = 'webui.config.json';
 const DESKTOP_WEBUI_ENABLED_KEY = 'webui.desktop.enabled';
@@ -60,6 +60,8 @@ export const loadUserWebUIConfig = (): { config: WebUIUserConfig; path: string |
   }
 };
 
+const DEFAULT_WEBUI_PORT = 33000;
+
 export const resolveWebUIPort = (
   config: WebUIUserConfig,
   getSwitchValue: (flag: string) => string | undefined
@@ -73,7 +75,7 @@ export const resolveWebUIPort = (
   const configPort = parsePortValue(config.port);
   if (configPort) return configPort;
 
-  return SERVER_CONFIG.DEFAULT_PORT;
+  return DEFAULT_WEBUI_PORT;
 };
 
 export const resolveRemoteAccess = (config: WebUIUserConfig, isRemoteMode: boolean): boolean => {
@@ -95,10 +97,27 @@ export const restoreDesktopWebUIFromPreferences = async (): Promise<void> => {
       ProcessConfig.get(DESKTOP_WEBUI_PORT_KEY),
     ]);
     const allowRemote = allowRemotePref === true;
-    const preferredPort = typeof portPref === 'number' && portPref > 0 ? portPref : SERVER_CONFIG.DEFAULT_PORT;
+    const preferredPort = typeof portPref === 'number' && portPref > 0 ? portPref : DEFAULT_WEBUI_PORT;
 
-    const instance = await startWebServerWithInstance(preferredPort, allowRemote);
-    console.log(`[WebUI] Auto-restored from desktop preferences (port=${instance.port}, allowRemote=${allowRemote})`);
+    // M6: Switch to @aionui/web-host
+    const handle = await startWebHost({
+      app: {
+        version: app.getVersion(),
+        isPackaged: app.isPackaged,
+        resourcesPath: app.getAppPath(),
+        userDataPath: app.getPath('userData'),
+      },
+      staticDir: path.join(__dirname, '../../renderer'),
+      port: preferredPort,
+      allowRemote,
+      dataDir: app.getPath('userData'),
+      logDir: path.join(app.getPath('userData'), 'logs'),
+      backend: {
+        kind: 'ownBackend',
+        resolveBackend: resolveBinaryPath,
+      },
+    });
+    console.log(`[WebUI] Auto-restored from desktop preferences (port=${handle.port}, backendPort=${handle.backendPort}, allowRemote=${allowRemote})`);
   } catch (error) {
     console.error('[WebUI] Failed to auto-restore from desktop preferences:', error);
   }
