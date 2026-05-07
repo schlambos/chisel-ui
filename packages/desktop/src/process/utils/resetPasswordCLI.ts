@@ -106,7 +106,7 @@ export async function resetPasswordCLI(username: string): Promise<void> {
       if (allUsers.length === 0) {
         log.info('  (no users found)');
       } else {
-        allUsers.forEach((entry) => log.info(`  - ${entry.username}`));
+        allUsers.forEach((entry: { username: string }) => log.info(`  - ${entry.username}`));
       }
       process.exit(1);
     }

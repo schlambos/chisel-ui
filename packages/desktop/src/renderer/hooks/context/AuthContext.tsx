@@ -1,6 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { withCsrfToken, hasValidCsrfToken, clearCookie } from '@process/webserver/middleware/csrfClient';
-import { CSRF_COOKIE_NAME } from '@process/webserver/config/constants';
+// M6: CSRF removed with legacy webserver — stub functions for compatibility, re-implement in M7
+const withCsrfToken = <T extends Record<string, unknown>>(data: T): T => data;
+const hasValidCsrfToken = (): boolean => true;
+const clearCookie = (_name: string, _path?: string): void => {};
+const CSRF_COOKIE_NAME = 'csrf-token';
 
 type AuthStatus = 'checking' | 'authenticated' | 'unauthenticated';
 
