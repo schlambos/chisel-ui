@@ -175,6 +175,8 @@ const ChatLayout: React.FC<{
     dynamicChatMaxRatio,
   });
 
+  const headerPaddingLeft = isMacRuntime && !isMobile && layout?.siderCollapsed ? '120px' : undefined;
+
   const headerBlock = (
     <>
       <ArcoLayout.Header
@@ -182,6 +184,7 @@ const ChatLayout: React.FC<{
           'min-h-44px flex items-center justify-between px-16px pt-8px pb-10px gap-16px !bg-1 chat-layout-header chat-layout-header--glass overflow-hidden',
           layout?.isMobile && 'chat-layout-header--mobile-unified'
         )}
+        style={headerPaddingLeft ? { paddingLeft: headerPaddingLeft } : undefined}
       >
         <div className='shrink-0'>{props.headerLeft}</div>
         <FlexFullContainer className='h-full min-w-0' containerClassName='flex items-center gap-16px'>
@@ -212,7 +215,7 @@ const ChatLayout: React.FC<{
               assistantId={presetAssistant?.id}
             />
           )}
-          {isWindowsRuntime && workspaceEnabled && (
+          {isDesktop && workspaceEnabled && (
             <button
               type='button'
               className='workspace-header__toggle'
@@ -331,7 +334,7 @@ const ChatLayout: React.FC<{
         )}
         {workspaceEnabled && !layout?.isMobile && (
           <div
-            className={classNames('!bg-1 relative chat-layout-right-sider layout-sider')}
+            className='relative chat-layout-right-sider-outer'
             style={{
               flexGrow: isPreviewOpen ? 0 : workspaceFlex,
               flexShrink: 0,
@@ -339,24 +342,26 @@ const ChatLayout: React.FC<{
               width: rightSiderCollapsed ? '0px' : isPreviewOpen ? `${Math.round(workspaceWidthPx)}px` : undefined,
               minWidth: rightSiderCollapsed ? '0px' : '220px',
               overflow: 'hidden',
-              borderLeft: rightSiderCollapsed ? 'none' : '1px solid var(--bg-3)',
+              padding: rightSiderCollapsed ? '0' : '8px 8px 8px 5px',
             }}
           >
-            {isDesktop &&
-              !rightSiderCollapsed &&
-              createWorkspaceDragHandle({ className: 'absolute left-0 top-0 bottom-0', style: {}, reverse: true })}
-            <WorkspacePanelHeader
-              showToggle={!isMacRuntime && !isWindowsRuntime}
-              collapsed={rightSiderCollapsed}
-              onToggle={() => dispatchWorkspaceToggleEvent()}
-              togglePlacement={layout?.isMobile ? 'left' : 'right'}
-              workspacePath={workspacePath}
+            <div
+              className='chat-layout-right-sider h-full flex flex-col'
+              style={{
+                borderRadius: '14px',
+                outline: '1px solid var(--bg-3)',
+                boxShadow: '0 2px 8px 0 rgba(0,0,0,0.06)',
+                backgroundColor: 'var(--bg-2)',
+                overflow: 'hidden',
+              }}
             >
-              {props.siderTitle}
-            </WorkspacePanelHeader>
-            <ArcoLayout.Content style={{ height: `calc(100% - ${WORKSPACE_HEADER_HEIGHT}px)` }}>
-              {props.sider}
-            </ArcoLayout.Content>
+              {isDesktop &&
+                !rightSiderCollapsed &&
+                createWorkspaceDragHandle({ className: 'absolute left-0 top-0 bottom-0', style: {}, reverse: true })}
+              <ArcoLayout.Content className='h-full'>
+                {props.sider}
+              </ArcoLayout.Content>
+            </div>
           </div>
         )}
 
@@ -373,10 +378,6 @@ const ChatLayout: React.FC<{
           />
         )}
 
-        {/* Desktop expand button when workspace is collapsed */}
-        {!isMacRuntime && !isWindowsRuntime && workspaceEnabled && rightSiderCollapsed && !layout?.isMobile && (
-          <DesktopWorkspaceToggle />
-        )}
       </div>
     </ArcoLayout>
   );

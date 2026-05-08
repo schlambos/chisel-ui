@@ -103,8 +103,8 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   const isMacRuntime = isDesktopRuntime && isMacOS();
   // Windows/Linux 显示自定义窗口按钮；macOS 在标题栏给工作区一个切换入口
   const showWindowControls = isDesktopRuntime && !isMacRuntime;
-  // WebUI 和 macOS 桌面都需要在标题栏放工作区开关
-  const showWorkspaceButton = workspaceAvailable && (!isDesktopRuntime || isMacRuntime);
+  // Titlebar 现在在侧边栏内，工作空间切换由 ChatLayout header 统一处理
+  const showWorkspaceButton = workspaceAvailable && !isDesktopRuntime;
 
   const workspaceTooltip = workspaceCollapsed
     ? t('common.expandMore', { defaultValue: 'Expand workspace' })
@@ -275,7 +275,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
     <div
       ref={containerRef}
       style={mobileCenterStyle}
-      className={classNames('flex items-center gap-8px app-titlebar bg-2 border-b border-[var(--border-base)]', {
+      className={classNames('flex items-center gap-8px app-titlebar', {
         'app-titlebar--mobile': layout?.isMobile,
         'app-titlebar--mobile-conversation': layout?.isMobile && workspaceAvailable,
         'app-titlebar--desktop': isDesktopRuntime,
@@ -336,20 +336,14 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
           </>
         )}
       </div>
-      <div
-        className='app-titlebar__brand'
-        aria-label={layout?.isMobile ? mobileCenterTitle : appTitle}
-        title={layout?.isMobile ? mobileCenterTitle : appTitle}
-      >
-        {layout?.isMobile ? (
+      {layout?.isMobile && (
+        <div className='app-titlebar__brand' aria-label={mobileCenterTitle} title={mobileCenterTitle}>
           <span className='app-titlebar__brand-mobile'>
             <AionLogoMark />
             <span className='app-titlebar__brand-text'>{mobileCenterTitle}</span>
           </span>
-        ) : (
-          appTitle
-        )}
-      </div>
+        </div>
+      )}
       <div ref={toolbarRef} className='app-titlebar__toolbar'>
         {showNewConversationButton && (
           <button

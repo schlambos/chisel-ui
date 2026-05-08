@@ -1,10 +1,49 @@
 /* Layout-level styles: sidebar, sider animations, message positioning */
 
+/* Floating expand button shown when sider is fully collapsed on desktop */
+.layout-sider-expand-btn {
+  position: absolute;
+  /* macOS traffic lights occupy ~70px from left; sit right after them */
+  top: 8px;
+  left: 76px;
+  z-index: 20;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.layout-sider-expand-btn:hover {
+  background-color: var(--bg-3);
+  color: var(--text-1);
+}
+
+/* Kill Arco's default width transition — instant collapse/expand */
+.arco-layout-sider {
+  transition: none !important;
+}
+
 /* Layout sider base styles */
 .layout-sider {
   overflow-x: hidden;
   box-shadow: none !important;
-  border-right: 1px solid var(--border-base);
+  border-right: none !important;
+  background-color: var(--bg-2) !important;
+  /* Card feel */
+  margin: 8px 5px 8px 8px;
+  border-radius: 14px;
+  outline: 1px solid var(--bg-3);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Arco Layout inner container needs flex layout so Header + Content + Footer
@@ -16,6 +55,8 @@
   flex: 1 !important;
   min-height: 0 !important;
   height: 100% !important;
+  border-radius: inherit;
+  overflow: hidden;
 }
 
 .layout-sider-header {
@@ -26,6 +67,17 @@
   flex: 1 !important;
   min-height: 0 !important;
   height: auto !important;
+}
+
+/* Collapsed state: strip card styling, show only as a thin strip for traffic lights */
+.layout-sider.collapsed,
+.layout-sider.arco-layout-sider-collapsed {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  border-right: none !important;
 }
 
 .layout-sider.collapsed .arco-layout-sider-children,
@@ -172,6 +224,10 @@
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     box-sizing: border-box !important;
+    background-color: var(--bg-2) !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    outline: none !important;
   }
 
   .layout-sider-header--mobile {

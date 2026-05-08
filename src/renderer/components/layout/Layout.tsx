@@ -60,8 +60,8 @@ const useDebug = () => {
 const UpdateModal = React.lazy(() => import('@/renderer/components/settings/UpdateModal'));
 
 const DEFAULT_SIDER_WIDTH = 250;
-const DESKTOP_COLLAPSED_WIDTH = 64;
-const SIDER_DRAG_SNAP_THRESHOLD = Math.round((DEFAULT_SIDER_WIDTH + DESKTOP_COLLAPSED_WIDTH) / 2);
+const DESKTOP_COLLAPSED_WIDTH = 0;
+const SIDER_DRAG_SNAP_THRESHOLD = Math.round(DEFAULT_SIDER_WIDTH / 2);
 const SIDER_DRAG_HYSTERESIS = 6;
 const MOBILE_SIDER_WIDTH_RATIO = 0.67;
 const MOBILE_SIDER_MIN_WIDTH = 260;
@@ -421,23 +421,23 @@ const Layout: React.FC<{
   return (
     <LayoutContext.Provider value={{ isMobile, siderCollapsed: collapsed, setSiderCollapsed: setCollapsed }}>
       <NavigationHistoryProvider>
-        <div className='app-shell flex flex-col size-full min-h-0'>
-          <Titlebar workspaceAvailable={workspaceAvailable} />
+        <div className='app-shell flex size-full min-h-0 bg-1'>
           {/* 移动端左侧边栏蒙板 / Mobile left sider backdrop */}
           {isMobile && !collapsed && (
             <div className='fixed inset-0 bg-black/30 z-90' onClick={() => setCollapsed(true)} aria-hidden='true' />
           )}
 
-          <ArcoLayout className={'size-full layout flex-1 min-h-0'}>
+          <ArcoLayout className={'size-full layout'}>
             <ArcoLayout.Sider
-              collapsedWidth={isMobile ? 0 : 64}
+              collapsedWidth={isMobile ? 0 : 0}
               collapsed={collapsed}
               width={siderWidth}
-              className={classNames('!bg-2 layout-sider', {
+              className={classNames('layout-sider flex flex-col', {
                 collapsed: collapsed,
               })}
               style={siderStyle}
             >
+              {!collapsed && <Titlebar workspaceAvailable={workspaceAvailable} />}
               <ArcoLayout.Header
                 className={classNames(
                   'flex items-center justify-start py-8px px-16px pl-20px gap-12px layout-sider-header',
@@ -491,7 +491,6 @@ const Layout: React.FC<{
                     )}
                   </button>
                 )}
-                {/* 侧栏折叠改由标题栏统一控制 / Sidebar folding handled by Titlebar toggle */}
               </ArcoLayout.Header>
               <ArcoLayout.Content className='pt-8px px-8px pb-0 layout-sider-content'>
                 {React.isValidElement(sider)
@@ -517,7 +516,7 @@ const Layout: React.FC<{
             </ArcoLayout.Sider>
 
             <ArcoLayout.Content
-              className={'bg-1 layout-content flex flex-col min-h-0'}
+              className={'bg-1 layout-content flex flex-col min-h-0 relative'}
               onClick={() => {
                 if (isMobile && !collapsed) setCollapsed(true);
               }}
@@ -529,6 +528,16 @@ const Layout: React.FC<{
                   : undefined
               }
             >
+              {!isMobile && collapsed && (
+                <button
+                  type='button'
+                  className='layout-sider-expand-btn'
+                  onClick={() => setCollapsed(false)}
+                  aria-label='Expand sidebar'
+                >
+                  <MenuUnfold theme='outline' size='16' fill='currentColor' />
+                </button>
+              )}
               <Outlet />
               {multiAgentContextHolder}
               {directorySelectionContextHolder}

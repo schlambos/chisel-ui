@@ -11,6 +11,10 @@
   user-select: none;
   position: relative;
   z-index: 10;
+  flex-shrink: 0;
+  /* Transparent — sits above the window bg, no visual separation */
+  background: transparent;
+  border-bottom: none;
 }
 
 .app-titlebar--desktop {
@@ -24,7 +28,6 @@
 }
 
 .app-titlebar--mobile-conversation {
-  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%) !important;
   border-bottom: none !important;
 }
 
