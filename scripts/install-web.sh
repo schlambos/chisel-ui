@@ -311,12 +311,12 @@ extract_tarball() {
 
     success "Extracted to $INSTALL_DIR"
 
-    # Set executable permission
-    chmod +x "${INSTALL_DIR}/bin/aionui-web.js" 2>/dev/null || true
+    # Set executable permission on the bun-compiled standalone binary
+    chmod +x "${INSTALL_DIR}/aionui-web" 2>/dev/null || true
 
     # Verify installation
-    if [[ ! -f "${INSTALL_DIR}/bin/aionui-web.js" ]]; then
-        die "Installation failed: ${INSTALL_DIR}/bin/aionui-web.js not found"
+    if [[ ! -x "${INSTALL_DIR}/aionui-web" ]]; then
+        die "Installation failed: ${INSTALL_DIR}/aionui-web not found or not executable"
     fi
 
     success "Installation completed"
@@ -327,7 +327,7 @@ extract_tarball() {
 
 create_symlink() {
     local symlink_path="${BIN_DIR}/aionui-web"
-    local target_path="${INSTALL_DIR}/bin/aionui-web.js"
+    local target_path="${INSTALL_DIR}/aionui-web"
 
     info "Creating symlink: ${BOLD}${symlink_path}${NC} -> ${target_path}"
 
@@ -426,13 +426,13 @@ print_summary() {
         echo "    aionui-web version"
     else
         echo "    # Start AionUi WebUI (using full path)"
-        echo "    ${INSTALL_DIR}/bin/aionui-web.js start"
+        echo "    ${INSTALL_DIR}/aionui-web start"
         echo ""
         echo "    # Or add symlink to PATH:"
         if [[ "$CREATE_SYMLINK" == "1" ]]; then
             echo "    export PATH=\"${BIN_DIR}:\$PATH\""
         else
-            echo "    ln -s ${INSTALL_DIR}/bin/aionui-web.js ~/.local/bin/aionui-web"
+            echo "    ln -s ${INSTALL_DIR}/aionui-web ~/.local/bin/aionui-web"
             echo "    export PATH=\"~/.local/bin:\$PATH\""
         fi
     fi

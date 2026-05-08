@@ -36,22 +36,8 @@ prepareAionuiBackend({
 
 // 2. bundled-bun step skipped — backend ships its own bun runtime.
 
-// 3. Build web-cli TypeScript
-console.log('3. Building web-cli...');
-execSync('bun run build', { cwd: path.join(projectRoot, 'packages/web-cli'), stdio: 'inherit' });
-
-// 4. Copy static files from desktop renderer build output
-console.log('4. Copying static files...');
-const rendererOutDir = path.join(projectRoot, 'packages/desktop/out/renderer');
-const staticDir = path.join(projectRoot, 'packages/web-cli/static');
-if (fs.existsSync(rendererOutDir)) {
-  fs.cpSync(rendererOutDir, staticDir, { recursive: true });
-} else {
-  console.warn('⚠️ Desktop renderer build output not found, skipping static files');
-}
-
-// 5. Create tarball structure
-console.log('5. Creating tarball...');
+// 3. Create staging dir
+console.log('3. Creating staging dir...');
 const stagingDir = path.join(distDir, 'staging');
 fs.rmSync(stagingDir, { recursive: true, force: true });
 fs.mkdirSync(stagingDir, { recursive: true });
@@ -59,25 +45,51 @@ fs.mkdirSync(stagingDir, { recursive: true });
 const tarballContentDir = path.join(stagingDir, 'aionui-web');
 fs.mkdirSync(tarballContentDir, { recursive: true });
 
-// Copy web-cli dist
-fs.cpSync(path.join(projectRoot, 'packages/web-cli/dist'), path.join(tarballContentDir, 'dist'), { recursive: true });
-fs.cpSync(path.join(projectRoot, 'packages/web-cli/bin'), path.join(tarballContentDir, 'bin'), { recursive: true });
+// 4. Compile web-cli into a standalone executable with bun
+// Produces a single binary (~100MB) that bundles bun runtime + all deps, so
+// the tarball has no node_modules and the user needs no Node installation.
+console.log('4. Compiling web-cli into standalone executable...');
+// Map our platform/arch to bun's --target naming
+const bunTargetPlatform = { darwin: 'darwin', linux: 'linux', win32: 'windows' }[platform] || platform;
+const bunTargetArch = { arm64: 'arm64', x64: 'x64', ia32: 'x64' }[arch] || arch;
+const bunTarget = `bun-${bunTargetPlatform}-${bunTargetArch}`;
+const executableName = platform === 'win32' ? 'aionui-web.exe' : 'aionui-web';
+const executablePath = path.join(tarballContentDir, executableName);
+const webCliEntry = path.join(projectRoot, 'packages/web-cli/src/index.ts');
+execSync(`bun build --compile --target=${bunTarget} --outfile="${executablePath}" "${webCliEntry}"`, {
+  cwd: projectRoot,
+  stdio: 'inherit',
+});
+console.log(`  → ${executablePath}`);
+
+// 5. Copy package.json (for version lookup at runtime) and README
 fs.cpSync(path.join(projectRoot, 'packages/web-cli/package.json'), path.join(tarballContentDir, 'package.json'));
 
-// Copy bundled-aionui-backend
+// 6. Copy static files (SPA) from desktop renderer build output
+// Note: electron-vite writes to the repo-root `out/`, NOT packages/desktop/out/
+console.log('6. Copying static files...');
+const rendererOutDir = path.join(projectRoot, 'out/renderer');
+const staticDest = path.join(tarballContentDir, 'static');
+if (fs.existsSync(rendererOutDir)) {
+  fs.cpSync(rendererOutDir, staticDest, { recursive: true });
+} else {
+  throw new Error(`Desktop renderer output not found at ${rendererOutDir}. Run bunx electron-vite build first.`);
+}
+
+// 7. Copy bundled-aionui-backend (may be an empty manifest when ALLOW_MISSING)
 const backendSrc = path.join(projectRoot, 'resources/bundled-aionui-backend', `${platform}-${arch}`);
 const backendDest = path.join(tarballContentDir, 'bundled-aionui-backend', `${platform}-${arch}`);
 fs.mkdirSync(path.dirname(backendDest), { recursive: true });
-fs.cpSync(backendSrc, backendDest, { recursive: true });
+if (fs.existsSync(backendSrc)) {
+  fs.cpSync(backendSrc, backendDest, { recursive: true });
+} else {
+  console.warn(`⚠️ Backend bundle dir missing at ${backendSrc}, creating empty placeholder`);
+  fs.mkdirSync(backendDest, { recursive: true });
+}
 
 // bundled-bun no longer copied — backend ships its own bun runtime.
 
-// Copy static files
-if (fs.existsSync(staticDir)) {
-  fs.cpSync(staticDir, path.join(tarballContentDir, 'static'), { recursive: true });
-}
-
-// 6. Create tarball
+// 8. Create tarball
 fs.mkdirSync(distDir, { recursive: true });
 execSync(`tar -czf ${path.basename(tarballPath)} -C ${stagingDir} aionui-web`, {
   cwd: path.dirname(tarballPath),
@@ -86,7 +98,7 @@ execSync(`tar -czf ${path.basename(tarballPath)} -C ${stagingDir} aionui-web`, {
 
 console.log(`✅ Tarball created: ${tarballPath}`);
 
-// 7. Generate SHA256 checksum (cross-platform: use Node's crypto, not `shasum`)
+// 9. Generate SHA256 checksum (cross-platform: use Node's crypto, not `shasum`)
 const checksumPath = `${tarballPath}.sha256`;
 const hash = crypto.createHash('sha256');
 hash.update(fs.readFileSync(tarballPath));
