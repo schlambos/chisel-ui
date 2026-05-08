@@ -52,16 +52,16 @@ export * as ipcBridge from './adapter/ipcBridge';
 本次清理聚焦在以下 7 个领域 + file preview,这些都是用户在 `feat/backend-migration`
 期间已完成迁移的模块:
 
-| 前端领域 | 对应 backend crate | adapter 路由 |
-|---|---|---|
-| assistants | aionui-assistant | `/api/assistants/*` |
-| skills | aionui-extension/hub | `/api/skills/*` |
-| extension | aionui-extension | `/api/extension/*` |
-| providers | aionui-system/provider + bedrock_probe + model_fetcher | `/api/providers/*` + `/api/bedrock/test-connection` |
-| system(client-pref / language) | aionui-system/settings + client_pref | `/api/settings/client` |
-| cron | aionui-cron | `/api/cron/jobs/*` |
-| assets | aionui-assets | (static) |
-| file preview(office watch / preview history / document convert) | aionui-office(含 `watch_manager.rs`) | `/api/ppt-preview/*`、`/api/word-preview/*`、`/api/excel-preview/*`、`/api/preview-history/*`、`/api/document/convert` |
+| 前端领域                                                        | 对应 backend crate                                     | adapter 路由                                                                                                           |
+| --------------------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| assistants                                                      | aionui-assistant                                       | `/api/assistants/*`                                                                                                    |
+| skills                                                          | aionui-extension/hub                                   | `/api/skills/*`                                                                                                        |
+| extension                                                       | aionui-extension                                       | `/api/extension/*`                                                                                                     |
+| providers                                                       | aionui-system/provider + bedrock_probe + model_fetcher | `/api/providers/*` + `/api/bedrock/test-connection`                                                                    |
+| system(client-pref / language)                                  | aionui-system/settings + client_pref                   | `/api/settings/client`                                                                                                 |
+| cron                                                            | aionui-cron                                            | `/api/cron/jobs/*`                                                                                                     |
+| assets                                                          | aionui-assets                                          | (static)                                                                                                               |
+| file preview(office watch / preview history / document convert) | aionui-office(含 `watch_manager.rs`)                   | `/api/ppt-preview/*`、`/api/word-preview/*`、`/api/excel-preview/*`、`/api/preview-history/*`、`/api/document/convert` |
 
 backend `aionui-office::watch_manager` 提供 `OfficecliWatchManager` +
 `DefaultProcessSpawner`,已经在 backend 端 spawn `officecli watch` 子进程,
@@ -101,13 +101,13 @@ backend `aionui-office::watch_manager` 提供 `OfficecliWatchManager` +
 
 以下文件**明确保留**,即使乍看像死代码也不删:
 
-| 文件 | 理由 |
-|---|---|
-| `packages/desktop/src/process/utils/migrateAssistants.ts` | 一次性迁移 bootstrap,老用户从 electron local storage 升级到 backend 首启需要 |
-| `packages/desktop/src/process/utils/runBackendMigrations.ts` | 同上,是 migrateAssistants 的 orchestrator |
-| `packages/desktop/src/process/bridge/systemSettingsBridge.ts` | 整文件保留:内含 close-to-tray / keep-awake / pet-size / cronNotificationEnabled / language 等 Electron-only 或本地副作用逻辑,adapter 已迁走的部分在 adapter 里直接走 HTTP,本文件保留不动 |
-| `packages/desktop/src/process/utils/previewUtils.ts` | 二次 grep 发现仍被 `task/AcpAgentManager.ts:25`(`handlePreviewOpenEvent`)使用,task 不在 UC-A 范围内 |
-| `packages/desktop/src/process/services/ccSwitchModelSource.ts` | 二次 grep 发现被 `process/agent/acp/*` 和 `process/acp/compat/AcpAgentV2.ts` 使用,acp 不在 UC-A 范围内 |
+| 文件                                                           | 理由                                                                                                                                                                                     |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/desktop/src/process/utils/migrateAssistants.ts`      | 一次性迁移 bootstrap,老用户从 electron local storage 升级到 backend 首启需要                                                                                                             |
+| `packages/desktop/src/process/utils/runBackendMigrations.ts`   | 同上,是 migrateAssistants 的 orchestrator                                                                                                                                                |
+| `packages/desktop/src/process/bridge/systemSettingsBridge.ts`  | 整文件保留:内含 close-to-tray / keep-awake / pet-size / cronNotificationEnabled / language 等 Electron-only 或本地副作用逻辑,adapter 已迁走的部分在 adapter 里直接走 HTTP,本文件保留不动 |
+| `packages/desktop/src/process/utils/previewUtils.ts`           | 二次 grep 发现仍被 `task/AcpAgentManager.ts:25`(`handlePreviewOpenEvent`)使用,task 不在 UC-A 范围内                                                                                      |
+| `packages/desktop/src/process/services/ccSwitchModelSource.ts` | 二次 grep 发现被 `process/agent/acp/*` 和 `process/acp/compat/AcpAgentV2.ts` 使用,acp 不在 UC-A 范围内                                                                                   |
 
 ### UC-C:测试布局
 
@@ -122,7 +122,7 @@ backend `aionui-office::watch_manager` 提供 `OfficecliWatchManager` +
   - `tests/vitest.setup.ts`
   - `tests/vitest.dom.setup.ts`
 - `vitest.config.ts` 的 `include` 配置**保持现状不改**(现有 `tests/unit/**/*.test.ts`
-  + `tests/unit/**/*.dom.test.ts` 的 glob 对新布局天然适配)
+  - `tests/unit/**/*.dom.test.ts` 的 glob 对新布局天然适配)
 
 ### UC-D:测试覆盖最低清单
 
@@ -185,12 +185,12 @@ $ echo $?
 
 本仓库 CI 触发条件实测:
 
-| Workflow | 触发 | 说明 |
-|---|---|---|
-| `pr-checks.yml` | `pull_request` 到 `main/dev` + 手动 `workflow_dispatch` | feature 分支 push 不会直接触发 |
-| `build-and-release.yml` | `push: branches: [dev]` + tags | **push 到 dev 会触发完整 build/release CI** |
-| `_build-reusable.yml` | `workflow_call` | 被上面两个调用 |
-| `pack-web-cli.yml` | `workflow_call` | 同上 |
+| Workflow                | 触发                                                    | 说明                                        |
+| ----------------------- | ------------------------------------------------------- | ------------------------------------------- |
+| `pr-checks.yml`         | `pull_request` 到 `main/dev` + 手动 `workflow_dispatch` | feature 分支 push 不会直接触发              |
+| `build-and-release.yml` | `push: branches: [dev]` + tags                          | **push 到 dev 会触发完整 build/release CI** |
+| `_build-reusable.yml`   | `workflow_call`                                         | 被上面两个调用                              |
+| `pack-web-cli.yml`      | `workflow_call`                                         | 同上                                        |
 
 **本链策略:整条 N1-N5 在 feature 分支链上完成后,由 team-lead(或人类
 协调者)把最终成果一次性合入 `dev`,借此触发一次 `build-and-release.yml`
@@ -213,6 +213,7 @@ N5 executor 完成并 handoff 后:
 
 1. team-lead 确认 N1-N5 所有 handoff 的 UC-F-1..5 证据齐全
 2. team-lead(或人类,按分支权限决定)把**整条链**合入 `dev`:
+
    ```bash
    # 选一(推荐):本地完整 merge 链路
    git fetch origin
@@ -225,6 +226,7 @@ N5 executor 完成并 handoff 后:
    # 选二:让 `feat/backend-migration` 先把链吃进来,再让 dev 吃 `feat/backend-migration`
    #      (若团队习惯是通过 feat/backend-migration 中转)
    ```
+
 3. push 到 dev 触发 `build-and-release.yml`;team-lead **必须等 run 跑完**并
    `gh run watch` 观察 `conclusion`
 4. **接受条件**:该次 CI run `conclusion: success`
@@ -475,13 +477,13 @@ N5 恢复 CI + 最终校验            ← 整条链终点
 
 ### 里程碑清单
 
-| # | 里程碑 | 动什么 | 验证证据 |
-|---|---|---|---|
-| **N1** | 前端死代码清理 | 删 7 文件(bedrockBridge / previewHistoryBridge / previewHistoryService / pptPreviewBridge / officeWatchBridge / documentBridge / conversionService);bridge/index.ts 移除对应 5 个 init 调用和 import | `bunx tsc --noEmit` 绿;`bun run dev` 能启动;ppt/word/excel preview 从 UI 打开正常(backend 接管);`bun run build-mac:arm64` 绿 |
-| **N2** | 旧测试清理 + 新布局骨架 | 删 `tests/unit/**`、`tests/integration/**`、`tests/regression/**`、`tests/bench/**`、`packages/desktop/src/process/bridge/__tests__/`;新建 `tests/unit/<module>/` 占位目录(镜像 `tests/e2e/features/`) | `bunx vitest run` 绿(0 tests);目录结构镜像 `tests/e2e/features/` |
-| **N3** | adapter/common 测试重写 | 写 `tests/unit/common-adapter/` 和 `tests/unit/common-config/` 约 6 个测试文件;同时沉淀 `tests/unit/_helpers/mockHttpBridge.ts` 供后续复用 | 这 6 个测试全绿;helper 可被其它测试 import;`bunx vitest run` 统计 ≥6 tests passed |
-| **N4** | 领域层测试重写 | 写 `tests/unit/assistants/` / `skills/` / `extension/` / `providers/` / `cron/` / `previews/` / `assets/` / `bootstrap/` 约 54 个测试文件 | 所有测试全绿;`bunx vitest run` 统计 ≥60 tests passed |
-| **N5** | 恢复 CI + 最终校验 | 取消 3 个 workflow 的 `bunx vitest run` 注释;更新 handoff 文档把 TODO 标为 DONE | `prek run --from-ref origin/feat/backend-migration --to-ref HEAD` 绿;3 个 workflow 的 diff 符合 UC-E;本地全量门禁绿 |
+| #      | 里程碑                  | 动什么                                                                                                                                                                                                 | 验证证据                                                                                                                     |
+| ------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| **N1** | 前端死代码清理          | 删 7 文件(bedrockBridge / previewHistoryBridge / previewHistoryService / pptPreviewBridge / officeWatchBridge / documentBridge / conversionService);bridge/index.ts 移除对应 5 个 init 调用和 import   | `bunx tsc --noEmit` 绿;`bun run dev` 能启动;ppt/word/excel preview 从 UI 打开正常(backend 接管);`bun run build-mac:arm64` 绿 |
+| **N2** | 旧测试清理 + 新布局骨架 | 删 `tests/unit/**`、`tests/integration/**`、`tests/regression/**`、`tests/bench/**`、`packages/desktop/src/process/bridge/__tests__/`;新建 `tests/unit/<module>/` 占位目录(镜像 `tests/e2e/features/`) | `bunx vitest run` 绿(0 tests);目录结构镜像 `tests/e2e/features/`                                                             |
+| **N3** | adapter/common 测试重写 | 写 `tests/unit/common-adapter/` 和 `tests/unit/common-config/` 约 6 个测试文件;同时沉淀 `tests/unit/_helpers/mockHttpBridge.ts` 供后续复用                                                             | 这 6 个测试全绿;helper 可被其它测试 import;`bunx vitest run` 统计 ≥6 tests passed                                            |
+| **N4** | 领域层测试重写          | 写 `tests/unit/assistants/` / `skills/` / `extension/` / `providers/` / `cron/` / `previews/` / `assets/` / `bootstrap/` 约 54 个测试文件                                                              | 所有测试全绿;`bunx vitest run` 统计 ≥60 tests passed                                                                         |
+| **N5** | 恢复 CI + 最终校验      | 取消 3 个 workflow 的 `bunx vitest run` 注释;更新 handoff 文档把 TODO 标为 DONE                                                                                                                        | `prek run --from-ref origin/feat/backend-migration --to-ref HEAD` 绿;3 个 workflow 的 diff 符合 UC-E;本地全量门禁绿          |
 
 ### 每个里程碑 handoff 的共用基线
 
@@ -499,28 +501,28 @@ N5 恢复 CI + 最终校验            ← 整条链终点
 
 ### 会话独立性
 
-| 里程碑 | 会话独立性 | 起会话只需读 |
-|---|---|---|
-| **N1** | ✅ 完全独立 | 本总设计 + N1 requirements |
-| **N2** | ✅ 完全独立 | 本总设计 + N1 handoff + N2 requirements |
-| **N3** | ⚠️ 需少量上游 | 本总设计 + N2 handoff + N3 requirements |
-| **N4** | ⚠️ 需少量上游 | 本总设计 + N3 handoff + N4 requirements(含 mock 模板路径) |
-| **N5** | ✅ 完全独立 | 本总设计 + N4 handoff + N5 requirements + ci-web-cli-release-outcome.md 的 TODO 节 |
+| 里程碑 | 会话独立性    | 起会话只需读                                                                       |
+| ------ | ------------- | ---------------------------------------------------------------------------------- |
+| **N1** | ✅ 完全独立   | 本总设计 + N1 requirements                                                         |
+| **N2** | ✅ 完全独立   | 本总设计 + N1 handoff + N2 requirements                                            |
+| **N3** | ⚠️ 需少量上游 | 本总设计 + N2 handoff + N3 requirements                                            |
+| **N4** | ⚠️ 需少量上游 | 本总设计 + N3 handoff + N4 requirements(含 mock 模板路径)                          |
+| **N5** | ✅ 完全独立   | 本总设计 + N4 handoff + N5 requirements + ci-web-cli-release-outcome.md 的 TODO 节 |
 
 ## 文件清单(N1)
 
 N1 要删的**7 个文件 / 1748 行**,证据:`bunx tsc --noEmit` 删除后仍绿 +
 adapter 已走 HTTP/WS:
 
-| 绝对路径 | 行数 | adapter 等价路由 | backend 实现位置 |
-|---|---:|---|---|
-| `packages/desktop/src/process/bridge/bedrockBridge.ts` | 94 | `/api/bedrock/test-connection` | `aionui-system/src/bedrock_probe/` |
-| `packages/desktop/src/process/bridge/previewHistoryBridge.ts` | 30 | `/api/preview-history/*` | `aionui-office/src/routes.rs` |
-| `packages/desktop/src/process/services/previewHistoryService.ts` | 210 | 同上 | 同上 |
-| `packages/desktop/src/process/bridge/pptPreviewBridge.ts` | 331 | `/api/ppt-preview/*` | `aionui-office/src/watch_manager.rs` |
-| `packages/desktop/src/process/bridge/officeWatchBridge.ts` | 331 | `/api/word-preview/*` + `/api/excel-preview/*` | 同上 |
-| `packages/desktop/src/process/bridge/documentBridge.ts` | 105 | `/api/document/convert` | `aionui-office/src/conversion.rs` |
-| `packages/desktop/src/process/services/conversionService.ts` | 647 | 同上 | 同上 |
+| 绝对路径                                                         | 行数 | adapter 等价路由                               | backend 实现位置                     |
+| ---------------------------------------------------------------- | ---: | ---------------------------------------------- | ------------------------------------ |
+| `packages/desktop/src/process/bridge/bedrockBridge.ts`           |   94 | `/api/bedrock/test-connection`                 | `aionui-system/src/bedrock_probe/`   |
+| `packages/desktop/src/process/bridge/previewHistoryBridge.ts`    |   30 | `/api/preview-history/*`                       | `aionui-office/src/routes.rs`        |
+| `packages/desktop/src/process/services/previewHistoryService.ts` |  210 | 同上                                           | 同上                                 |
+| `packages/desktop/src/process/bridge/pptPreviewBridge.ts`        |  331 | `/api/ppt-preview/*`                           | `aionui-office/src/watch_manager.rs` |
+| `packages/desktop/src/process/bridge/officeWatchBridge.ts`       |  331 | `/api/word-preview/*` + `/api/excel-preview/*` | 同上                                 |
+| `packages/desktop/src/process/bridge/documentBridge.ts`          |  105 | `/api/document/convert`                        | `aionui-office/src/conversion.rs`    |
+| `packages/desktop/src/process/services/conversionService.ts`     |  647 | 同上                                           | 同上                                 |
 
 **需要同步更新的文件**:
 
@@ -591,16 +593,16 @@ feat/cleanup-and-test-rewrite            ← N1 分支名等于总工作分支
 
 ## 风险与应对
 
-| 风险 | 应对 |
-|---|---|
-| 团队协作中其它 agent 同时改了 bridge/index.ts 或相关 bridge 文件 | 每个里程碑 push 前先 `git fetch origin feat/backend-migration`,确认无竞争;merge 冲突按 playbook 规范处理,复杂冲突 escalate |
-| previewUtils.ts / ccSwitchModelSource.ts 二次 grep 结果与预期不符(见已做的 grep:task 和 acp 仍在使用)→ 这两个文件不能删 | 已在 UC-B 明确保留;若未来 task / acp 也迁走,另立里程碑清理 |
-| N4 的 60+ 测试里对 ipcBridge 的 HTTP mock 方式不统一 | N3 强制先产出 `tests/unit/_helpers/mockHttpBridge.ts`,N4 所有测试复用;N4 requirements 明确要求:不得自写一份新 mock 体系 |
-| Vitest 4 fake timers + async 导致的 flaky | 已有记忆教训("先吃透源码的异步链路再写测试"),在 N3 helper 里提供 `await vi.advanceTimersByTimeAsync()` 等标准推进 API 的 wrapper |
-| 子 agent 写复杂 mock 测试的质量风险 | 已有记忆教训("不要过早委托子 agent 写复杂 mock 测试");N4 内部并行仍以人工主导,即使派 agent 也要基于 N3 沉淀的模板 |
-| N5 CI 恢复后出现本地未复现的失败 | N5 requirements 要求先在 N4 分支 `prek run` 绿才 push 改 workflow 的 commit |
-| 里程碑链过长(5 个串行)导致基线同步次数多 | 每个里程碑预计 1-5 天,总体 1-2 周完成;与 `feat/backend-migration` 的冲突概率受 UC-A(范围锁定)压制 |
-| N2 删 `packages/desktop/src/process/bridge/__tests__/webuiQR.test.ts`,但 webuiQR 模块仍存在 | webuiQR 仍是 Electron-only 能力(M 系列遗留),本次只删测试文件、不删源码;后续若需要 webuiQR 测试,在 N4 按新布局重写到 `tests/unit/webui/webuiQR.test.ts` |
+| 风险                                                                                                                    | 应对                                                                                                                                                   |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 团队协作中其它 agent 同时改了 bridge/index.ts 或相关 bridge 文件                                                        | 每个里程碑 push 前先 `git fetch origin feat/backend-migration`,确认无竞争;merge 冲突按 playbook 规范处理,复杂冲突 escalate                             |
+| previewUtils.ts / ccSwitchModelSource.ts 二次 grep 结果与预期不符(见已做的 grep:task 和 acp 仍在使用)→ 这两个文件不能删 | 已在 UC-B 明确保留;若未来 task / acp 也迁走,另立里程碑清理                                                                                             |
+| N4 的 60+ 测试里对 ipcBridge 的 HTTP mock 方式不统一                                                                    | N3 强制先产出 `tests/unit/_helpers/mockHttpBridge.ts`,N4 所有测试复用;N4 requirements 明确要求:不得自写一份新 mock 体系                                |
+| Vitest 4 fake timers + async 导致的 flaky                                                                               | 已有记忆教训("先吃透源码的异步链路再写测试"),在 N3 helper 里提供 `await vi.advanceTimersByTimeAsync()` 等标准推进 API 的 wrapper                       |
+| 子 agent 写复杂 mock 测试的质量风险                                                                                     | 已有记忆教训("不要过早委托子 agent 写复杂 mock 测试");N4 内部并行仍以人工主导,即使派 agent 也要基于 N3 沉淀的模板                                      |
+| N5 CI 恢复后出现本地未复现的失败                                                                                        | N5 requirements 要求先在 N4 分支 `prek run` 绿才 push 改 workflow 的 commit                                                                            |
+| 里程碑链过长(5 个串行)导致基线同步次数多                                                                                | 每个里程碑预计 1-5 天,总体 1-2 周完成;与 `feat/backend-migration` 的冲突概率受 UC-A(范围锁定)压制                                                      |
+| N2 删 `packages/desktop/src/process/bridge/__tests__/webuiQR.test.ts`,但 webuiQR 模块仍存在                             | webuiQR 仍是 Electron-only 能力(M 系列遗留),本次只删测试文件、不删源码;后续若需要 webuiQR 测试,在 N4 按新布局重写到 `tests/unit/webui/webuiQR.test.ts` |
 
 ## 非目标(明确排除)
 
@@ -684,13 +686,13 @@ grep -rn 'previewHistoryService' packages/desktop/src --include='*.ts' --include
 
 ## 附录 B:adapter HTTP 路由对照表(本次清理相关)
 
-| 前端要删的 bridge | adapter 路由(HTTP) | 事件通道(WS) |
-|---|---|---|
-| bedrockBridge | `/api/bedrock/test-connection` | - |
-| previewHistoryBridge | `/api/preview-history/list` `/api/preview-history/save` `/api/preview-history/get-content` | - |
-| pptPreviewBridge | `/api/ppt-preview/start` `/api/ppt-preview/stop` | `ppt-preview.status` |
-| officeWatchBridge | `/api/word-preview/start` `/api/word-preview/stop` `/api/excel-preview/start` `/api/excel-preview/stop` | `word-preview.status` `excel-preview.status` |
-| documentBridge | `/api/document/convert` | - |
+| 前端要删的 bridge    | adapter 路由(HTTP)                                                                                      | 事件通道(WS)                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| bedrockBridge        | `/api/bedrock/test-connection`                                                                          | -                                            |
+| previewHistoryBridge | `/api/preview-history/list` `/api/preview-history/save` `/api/preview-history/get-content`              | -                                            |
+| pptPreviewBridge     | `/api/ppt-preview/start` `/api/ppt-preview/stop`                                                        | `ppt-preview.status`                         |
+| officeWatchBridge    | `/api/word-preview/start` `/api/word-preview/stop` `/api/excel-preview/start` `/api/excel-preview/stop` | `word-preview.status` `excel-preview.status` |
+| documentBridge       | `/api/document/convert`                                                                                 | -                                            |
 
 adapter 引用位置:`packages/desktop/src/common/adapter/ipcBridge.ts`:
 

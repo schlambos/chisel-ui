@@ -53,16 +53,16 @@ CI run 的 N5 handoff 不予接受**(见 UC-F-2)。
 
 ## 已定决策
 
-| 决策点 | 结论 | 理由 |
-|---|---|---|
-| 是否保留被注释掉的 "# Unit tests temporarily disabled" 注释行 | **删除**,回到 M8 之前的形态 | 这个临时状态的目的达成后,保留注释只会误导未来 reader;commit message + handoff 足够留存历史 |
-| 取消注释 vs 重写整个 step | **仅取消注释**(diff 尽可能小) | M 系列的 `2cae1bc19` commit 里格式就是 `- name: Run unit tests\n  run: bunx vitest run`,恢复到原样即可 |
-| 触发 CI 的方式 | **push 到 `feat/n5-restore-ci` 分支**,让 `pr-checks.yml` 和 `_build-reusable.yml` 自然触发 | 不需要开 PR;分支推送 workflow 就跑 |
-| CI 真跑的责任 | **整链末端由 team-lead 合入 dev 一次性验证**;N5 executor 本身不触发 CI | 避免 dev 被频繁扰动 + 保持粒度清晰;见总设计 UC-F-2 |
-| N5 executor 的门禁 | 本地 `lint + tsc + vitest + prek` 绿 + 基线同步后复跑 PASS | 与 N1-N4 一致;不因 N5 改 workflow 就额外要求 feature 分支真跑 CI |
-| 跨平台验证 | 由 team-lead 在 dev 整链合入后的 `build-and-release.yml` 里观察;N5 executor 本身不承担跨平台验证 | matrix 在 dev CI 已覆盖 |
-| CI 失败时的行为 | **按 UC-F-2 处理**:不得 push 基线后 "冲一冲";必须修到绿 / escalate;修需要改测试则回到 N4 分支追加 commit,rebase 到 N5 | 这是防御"偷懒"的硬约束,M 系列经验教训 |
-| 更新 ci-web-cli-release-outcome.md 的 diff 范围 | 仅改单测禁用那一段 + 加 DONE 标记 + 本 N5 CI URL | 保持 handoff 文档稳定,不做"顺手重写" |
+| 决策点                                                        | 结论                                                                                                                  | 理由                                                                                                   |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 是否保留被注释掉的 "# Unit tests temporarily disabled" 注释行 | **删除**,回到 M8 之前的形态                                                                                           | 这个临时状态的目的达成后,保留注释只会误导未来 reader;commit message + handoff 足够留存历史             |
+| 取消注释 vs 重写整个 step                                     | **仅取消注释**(diff 尽可能小)                                                                                         | M 系列的 `2cae1bc19` commit 里格式就是 `- name: Run unit tests\n  run: bunx vitest run`,恢复到原样即可 |
+| 触发 CI 的方式                                                | **push 到 `feat/n5-restore-ci` 分支**,让 `pr-checks.yml` 和 `_build-reusable.yml` 自然触发                            | 不需要开 PR;分支推送 workflow 就跑                                                                     |
+| CI 真跑的责任                                                 | **整链末端由 team-lead 合入 dev 一次性验证**;N5 executor 本身不触发 CI                                                | 避免 dev 被频繁扰动 + 保持粒度清晰;见总设计 UC-F-2                                                     |
+| N5 executor 的门禁                                            | 本地 `lint + tsc + vitest + prek` 绿 + 基线同步后复跑 PASS                                                            | 与 N1-N4 一致;不因 N5 改 workflow 就额外要求 feature 分支真跑 CI                                       |
+| 跨平台验证                                                    | 由 team-lead 在 dev 整链合入后的 `build-and-release.yml` 里观察;N5 executor 本身不承担跨平台验证                      | matrix 在 dev CI 已覆盖                                                                                |
+| CI 失败时的行为                                               | **按 UC-F-2 处理**:不得 push 基线后 "冲一冲";必须修到绿 / escalate;修需要改测试则回到 N4 分支追加 commit,rebase 到 N5 | 这是防御"偷懒"的硬约束,M 系列经验教训                                                                  |
+| 更新 ci-web-cli-release-outcome.md 的 diff 范围               | 仅改单测禁用那一段 + 加 DONE 标记 + 本 N5 CI URL                                                                      | 保持 handoff 文档稳定,不做"顺手重写"                                                                   |
 
 ## 验收标准
 
@@ -140,13 +140,13 @@ prek run --from-ref origin/feat/backend-migration --to-ref HEAD
 
 ## 关键风险
 
-| 风险 | 缓解 |
-|---|---|
-| N4 的测试在本地绿但 CI 因为环境差异失败(path / timer / 文件锁 / DPI) | 本需求 UC-F-2 明确:失败必须回 N4 修;执行者**不得**在 N5 commit 里改测试"兼容 CI" —— 那只会掩盖问题。若真需要,回 N4 分支追加 commit 再 rebase N5 |
-| 3 个 workflow 中的某个没被分支 push 触发 | `pr-checks.yml` 在分支 push 上触发;`build-and-release.yml` 是 `workflow_call`,需从 pr-checks 链路进入;`pack-web-cli.yml` 同理。若某个 workflow 结构上无法通过分支 push 触发,handoff 必须写清"用 `gh workflow run <name> --ref <branch>` 手动触发,URL 贴出",不得跳过 |
-| CI run 因 npm/bun registry 临时抖动 flaky | 本里程碑允许 `gh run rerun <id>` 一次,但必须在 handoff 写明"第 1 次 fail 是 registry timeout(非测试问题),rerun 后绿";多次 flaky(≥2)必须 escalate 并调查根因 |
-| 某平台(如 Windows)特有失败 | 不得 platform-skip;回 N4 分支修到跨平台绿 |
-| 基线同步引入的新破坏 | 按 UC-F-5 处理,基线带来的破坏性变更 escalate(不是本里程碑的范围) |
+| 风险                                                                 | 缓解                                                                                                                                                                                                                                                                |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| N4 的测试在本地绿但 CI 因为环境差异失败(path / timer / 文件锁 / DPI) | 本需求 UC-F-2 明确:失败必须回 N4 修;执行者**不得**在 N5 commit 里改测试"兼容 CI" —— 那只会掩盖问题。若真需要,回 N4 分支追加 commit 再 rebase N5                                                                                                                     |
+| 3 个 workflow 中的某个没被分支 push 触发                             | `pr-checks.yml` 在分支 push 上触发;`build-and-release.yml` 是 `workflow_call`,需从 pr-checks 链路进入;`pack-web-cli.yml` 同理。若某个 workflow 结构上无法通过分支 push 触发,handoff 必须写清"用 `gh workflow run <name> --ref <branch>` 手动触发,URL 贴出",不得跳过 |
+| CI run 因 npm/bun registry 临时抖动 flaky                            | 本里程碑允许 `gh run rerun <id>` 一次,但必须在 handoff 写明"第 1 次 fail 是 registry timeout(非测试问题),rerun 后绿";多次 flaky(≥2)必须 escalate 并调查根因                                                                                                         |
+| 某平台(如 Windows)特有失败                                           | 不得 platform-skip;回 N4 分支修到跨平台绿                                                                                                                                                                                                                           |
+| 基线同步引入的新破坏                                                 | 按 UC-F-5 处理,基线带来的破坏性变更 escalate(不是本里程碑的范围)                                                                                                                                                                                                    |
 
 ## 依赖上游
 
@@ -186,6 +186,7 @@ prek run --from-ref origin/feat/backend-migration --to-ref HEAD
 - 3 个 workflow 的 diff(vs `origin/feat/n4-test-rewrite-domains`)
 - `ci-web-cli-release-outcome.md` 的 diff
 - **预留"整链合入 dev 验证"节**(留白给 team-lead 回填):
+
   ```markdown
   ## 整链合入 dev 验证(team-lead 回填)
 
@@ -194,5 +195,6 @@ prek run --from-ref origin/feat/backend-migration --to-ref HEAD
   - `build-and-release.yml` conclusion: success URL: _待回填_
   - 是否有 rerun 及原因: _待回填_
   ```
+
 - 最后一节:"**整条链已就绪,请 team-lead 按 playbook '整链合入 dev' 节把
   整链合入 dev 并回填本 handoff 的整链合入 dev 验证节**"

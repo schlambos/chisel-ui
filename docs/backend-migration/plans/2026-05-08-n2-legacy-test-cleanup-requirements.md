@@ -69,13 +69,13 @@
 
 ## 已定决策
 
-| 决策点 | 结论 | 理由 |
-|---|---|---|
-| 删除方式 | `git rm -rf tests/unit tests/integration tests/regression` + 手动删其它零散测试,**一次性结**(不分批) | 分批没有技术收益,review 时 diff 巨大但语义单一 |
-| 是否保留 `tests/bench/` | **无需处理**(grep 未发现该目录存在) | `vitest.config.ts` 中 benchmark.include 指向 `tests/bench/**`,目录不存在时 vitest bench 不跑,不影响 `vitest run`;如有该目录一并删除 |
-| 是否在 `.gitkeep` 里写占位文本 | **否**,空文件即可 | M 系列惯例 |
-| commit 粒度 | **1 个 commit** 同时完成"删老测试 + 建骨架目录" | 两步语义紧耦合,拆开后中间态的 `bunx vitest run` 也是 0 tests,拆 commit 没有额外信息 |
-| N2 后 `bunx vitest run` 的预期 | **0 tests passed / 0 tests failed / exit code 0**(vitest 4 对空 include 默认为成功) | N2 完成 = "测试基础设施干净",不是"测试覆盖有意义";覆盖由 N3/N4 建立 |
+| 决策点                         | 结论                                                                                                 | 理由                                                                                                                                |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 删除方式                       | `git rm -rf tests/unit tests/integration tests/regression` + 手动删其它零散测试,**一次性结**(不分批) | 分批没有技术收益,review 时 diff 巨大但语义单一                                                                                      |
+| 是否保留 `tests/bench/`        | **无需处理**(grep 未发现该目录存在)                                                                  | `vitest.config.ts` 中 benchmark.include 指向 `tests/bench/**`,目录不存在时 vitest bench 不跑,不影响 `vitest run`;如有该目录一并删除 |
+| 是否在 `.gitkeep` 里写占位文本 | **否**,空文件即可                                                                                    | M 系列惯例                                                                                                                          |
+| commit 粒度                    | **1 个 commit** 同时完成"删老测试 + 建骨架目录"                                                      | 两步语义紧耦合,拆开后中间态的 `bunx vitest run` 也是 0 tests,拆 commit 没有额外信息                                                 |
+| N2 后 `bunx vitest run` 的预期 | **0 tests passed / 0 tests failed / exit code 0**(vitest 4 对空 include 默认为成功)                  | N2 完成 = "测试基础设施干净",不是"测试覆盖有意义";覆盖由 N3/N4 建立                                                                 |
 
 ## 验收标准
 
@@ -144,14 +144,14 @@ prek run --from-ref origin/feat/backend-migration --to-ref HEAD
 
 ## 关键风险
 
-| 风险 | 缓解 |
-|---|---|
-| 有测试被其它脚本 `require`(如 `package.json` scripts 里的 `bun test src/process/...`) | 先 grep `package.json` / `.github/workflows/` / `scripts/` 确认无硬路径引用(已在自动化门禁 5 覆盖);有引用 escalate 给 team-lead |
-| `vitest.config.ts` 的 `benchmark.include` 指向不存在的 `tests/bench/**` | 该字段对 `vitest run` 无影响,仅 `vitest bench` 会读;本里程碑不动它;N5 最终校验仍通过 |
-| `tests/fixtures/fake-extension.zip` 之类资产被老测试依赖,删测试后 fixtures 变成孤儿 | fixtures 不在本次范围;即使变孤儿也不影响 CI(它们是静态文件不会被自动引用);follow-up 里处理 |
-| 其它并行 agent 在 `tests/unit/` 加了新测试 | push 前 `git fetch origin feat/backend-migration` + 比较 `git diff origin/feat/backend-migration -- tests/`,若有意外新增 escalate |
-| `.gitkeep` 被 `.gitignore` 忽略 | 仓内 `.gitignore` 全仓搜 `.gitkeep` 确认无忽略规则(M 系列已用过 `.gitkeep`,应该安全) |
-| 删除后同步基线引入冲突 | 基线同步环节若有 `tests/unit/` 下的新 commit,按 UC-F-5 处理:隐性冲突修之 + 写 Deviations;破坏性变更 escalate |
+| 风险                                                                                  | 缓解                                                                                                                              |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 有测试被其它脚本 `require`(如 `package.json` scripts 里的 `bun test src/process/...`) | 先 grep `package.json` / `.github/workflows/` / `scripts/` 确认无硬路径引用(已在自动化门禁 5 覆盖);有引用 escalate 给 team-lead   |
+| `vitest.config.ts` 的 `benchmark.include` 指向不存在的 `tests/bench/**`               | 该字段对 `vitest run` 无影响,仅 `vitest bench` 会读;本里程碑不动它;N5 最终校验仍通过                                              |
+| `tests/fixtures/fake-extension.zip` 之类资产被老测试依赖,删测试后 fixtures 变成孤儿   | fixtures 不在本次范围;即使变孤儿也不影响 CI(它们是静态文件不会被自动引用);follow-up 里处理                                        |
+| 其它并行 agent 在 `tests/unit/` 加了新测试                                            | push 前 `git fetch origin feat/backend-migration` + 比较 `git diff origin/feat/backend-migration -- tests/`,若有意外新增 escalate |
+| `.gitkeep` 被 `.gitignore` 忽略                                                       | 仓内 `.gitignore` 全仓搜 `.gitkeep` 确认无忽略规则(M 系列已用过 `.gitkeep`,应该安全)                                              |
+| 删除后同步基线引入冲突                                                                | 基线同步环节若有 `tests/unit/` 下的新 commit,按 UC-F-5 处理:隐性冲突修之 + 写 Deviations;破坏性变更 escalate                      |
 
 ## 依赖上游
 

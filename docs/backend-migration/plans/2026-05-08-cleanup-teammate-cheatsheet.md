@@ -132,9 +132,9 @@ Step 4 新失败:基线引入的破坏 → escalate;本里程碑隐性冲突 →
 
 ## 你是谁
 
-| 角色 | 产出 | 读什么 |
-|---|---|---|
-| **executor-N{x}** | 代码 + 测试 + handoff | 本 cheatsheet + 总设计对应节 + 自己 requirements + (N3/N4 还要读 detailed plan) + 上游 handoff |
+| 角色                      | 产出                                           | 读什么                                                                                                                 |
+| ------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **executor-N{x}**         | 代码 + 测试 + handoff                          | 本 cheatsheet + 总设计对应节 + 自己 requirements + (N3/N4 还要读 detailed plan) + 上游 handoff                         |
 | **plan-writer-N{3 或 4}** | `2026-05-08-n{x}-{name}.md` detailed plan 文件 | 本 cheatsheet + 总设计 + 自己 requirements + M1 plan(格式参考 `2026-05-07-m1-monorepo-skeleton.md`) + 已完成的 handoff |
 
 **N1 / N2 / N5 不派 plan-writer**(纯机械清理/配置,requirements 已经够 executor 执行)。
@@ -235,22 +235,27 @@ git push -u origin feat/n{x}-{name}
 # N{x} <名称> - 交付摘要
 
 ## 已交付
+
 - 新建 / 删除 / 修改文件清单
 - 新增的对外 API / 配置项
 
 ## 与计划的偏离
+
 - <改动点> —— 原因 —— 对后续影响
 
 ## 给下一个里程碑的提醒
+
 - <警示>
 
 ## 验证证据(UC-F-1,贴原始输出)
+
 - 分支名 + 最新 SHA
 - 基线同步状态(基线 SHA + merge commit SHA)
 - tsc / lint / vitest / prek 的头 10 尾 10 + 总行数 + 退出码
 - 本里程碑对应的 checkpoint 命令输出
 
 ## Backend 修改(UC-G,必填,没改写"无")
+
 - 仓库 / 分支 / 最新 SHA
 - 修改文件(file + 变更行数)
 - 一句话理由
@@ -258,6 +263,7 @@ git push -u origin feat/n{x}-{name}
 - 待办(人类 PR+merge)
 
 ## Backend 问题发现(UC-G 必 escalate 的情况,无则不写)
+
 - 问题描述 + 位置 + 为什么本里程碑不能自行改
 - 建议的后续 issue / 修复方向
 
@@ -489,34 +495,34 @@ git push -u origin feat/n{x}-{name}
 
 ## 遇到状况怎么办
 
-| 状况 | 做法 |
-|---|---|
-| checkpoint 失败 | 不 push,escalate,handoff 里列诊断 + 尝试过的修复 |
-| 基线合并冲突复杂 | 不硬改,escalate |
-| requirements 的决策和 UC 冲突 | 以 UC 为准,escalate 让人类改 requirements |
-| plan 里某条验证需要人眼判断 | 改进验证命令,不能打"manual verify" |
-| 发现上游里程碑遗留 bug | 不自主修,escalate;该补丁应在新的 commit 而非 amend 里解决 |
-| 写测试发现 backend 行为有 bug | **UC-G**:判断 scope,在 scope 内就在本地 backend 仓同名分支改、cargo test 验证、handoff 记录;scope 外 escalate |
-| 发现 backend 缺 route / 数据库 schema 不对 | 按 UC-G 必 escalate 的 5 种情况判定,DB / 破坏性变更一律 escalate |
-| 发现 UC-B 保留文件实际可删 / 或"可删"文件实际不能删 | 立即 escalate,**不得**自主扩大或缩小删除清单 |
-| 需要的工具没装(`prek` / `bunx @electron/asar` / `gh`) | 装上;若不能装 escalate |
-| CI flaky(网络 / registry / 偶发) | 允许 `gh run rerun <id>` 一次并在 handoff 说明;≥ 2 次 escalate 调查根因 |
-| N4 三个并行 teammate 撞了同一文件 | **不能撞**(目录零重叠);如发生一定是有人越界,escalate |
-| N3 的 `mockHttpBridge.ts` 不够用 | escalate,由 team-lead 决定是否扩展 helper 签名 + 更新 N3 handoff |
+| 状况                                                  | 做法                                                                                                          |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| checkpoint 失败                                       | 不 push,escalate,handoff 里列诊断 + 尝试过的修复                                                              |
+| 基线合并冲突复杂                                      | 不硬改,escalate                                                                                               |
+| requirements 的决策和 UC 冲突                         | 以 UC 为准,escalate 让人类改 requirements                                                                     |
+| plan 里某条验证需要人眼判断                           | 改进验证命令,不能打"manual verify"                                                                            |
+| 发现上游里程碑遗留 bug                                | 不自主修,escalate;该补丁应在新的 commit 而非 amend 里解决                                                     |
+| 写测试发现 backend 行为有 bug                         | **UC-G**:判断 scope,在 scope 内就在本地 backend 仓同名分支改、cargo test 验证、handoff 记录;scope 外 escalate |
+| 发现 backend 缺 route / 数据库 schema 不对            | 按 UC-G 必 escalate 的 5 种情况判定,DB / 破坏性变更一律 escalate                                              |
+| 发现 UC-B 保留文件实际可删 / 或"可删"文件实际不能删   | 立即 escalate,**不得**自主扩大或缩小删除清单                                                                  |
+| 需要的工具没装(`prek` / `bunx @electron/asar` / `gh`) | 装上;若不能装 escalate                                                                                        |
+| CI flaky(网络 / registry / 偶发)                      | 允许 `gh run rerun <id>` 一次并在 handoff 说明;≥ 2 次 escalate 调查根因                                       |
+| N4 三个并行 teammate 撞了同一文件                     | **不能撞**(目录零重叠);如发生一定是有人越界,escalate                                                          |
+| N3 的 `mockHttpBridge.ts` 不够用                      | escalate,由 team-lead 决定是否扩展 helper 签名 + 更新 N3 handoff                                              |
 
 ---
 
 ## 查详情
 
-| 主题 | 去 playbook 的哪节 |
-|---|---|
-| 完整角色模型、派发流程 | "用户操作" / "Team-lead 调度规则" |
+| 主题                                    | 去 playbook 的哪节                                 |
+| --------------------------------------- | -------------------------------------------------- |
+| 完整角色模型、派发流程                  | "用户操作" / "Team-lead 调度规则"                  |
 | 完整 executor / plan-writer prompt 模板 | "Executor Prompt 模板" / "Plan-Writer Prompt 模板" |
-| 简单 vs 复杂里程碑判定 | "里程碑复杂度与派发策略" |
-| Checkpoint 清单(每个里程碑) | "Checkpoint 规范" |
-| N4 内部并行的 team-lead 视角 | "N4 并行派发" |
-| 分支协作模型全貌 | "分支协作模型" |
-| 基线同步的冲突处理 | "基线同步规范" |
-| UC-F 违反了怎么办 | "UC-F 违反的处理" |
+| 简单 vs 复杂里程碑判定                  | "里程碑复杂度与派发策略"                           |
+| Checkpoint 清单(每个里程碑)             | "Checkpoint 规范"                                  |
+| N4 内部并行的 team-lead 视角            | "N4 并行派发"                                      |
+| 分支协作模型全貌                        | "分支协作模型"                                     |
+| 基线同步的冲突处理                      | "基线同步规范"                                     |
+| UC-F 违反了怎么办                       | "UC-F 违反的处理"                                  |
 
 **手头事有明确做法就直接做;规则不清才去查 playbook**。

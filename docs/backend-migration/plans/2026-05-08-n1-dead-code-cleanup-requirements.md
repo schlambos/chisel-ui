@@ -68,12 +68,12 @@
 
 ## 已定决策
 
-| 决策点 | 结论 | 理由 |
-|---|---|---|
-| 7 个文件一次性删还是拆 commit | **拆 commit**:按"bridge 层"和"service 层"各 1 commit,清理 index.ts 单独 1 commit,共约 3 个 commit | 便于 review;每个 commit 都能独立 `bunx tsc --noEmit` 绿 |
-| 删 `conversionService.ts`(647 行)时是否保留"通用转换接口"抽象 | **否,整体删** | 它只被 documentBridge 用;backend `aionui-office::conversion` 已覆盖 word→md / excel→json / ppt→json;保留抽象只是形式主义的"万一以后用得上" |
-| 是否在 `bridge/index.ts` 写过渡注释 | **否** | M 系列的其它清理(如 aionrs)没写,保持一致;git blame 可追溯 |
-| 是否验证 renderer 端 `ipcBridge.pptPreview.*` / `wordPreview.*` / `excelPreview.*` / `bedrock.*` / `previewHistory.*` / `document.*` 调用能继续工作 | **是** | 手动启动 dev,实际打开一个 pptx / docx / xlsx 预览,确认 backend spawn 生效;测 test-connection 走 bedrock provider 创建流程 |
+| 决策点                                                                                                                                              | 结论                                                                                              | 理由                                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 7 个文件一次性删还是拆 commit                                                                                                                       | **拆 commit**:按"bridge 层"和"service 层"各 1 commit,清理 index.ts 单独 1 commit,共约 3 个 commit | 便于 review;每个 commit 都能独立 `bunx tsc --noEmit` 绿                                                                                    |
+| 删 `conversionService.ts`(647 行)时是否保留"通用转换接口"抽象                                                                                       | **否,整体删**                                                                                     | 它只被 documentBridge 用;backend `aionui-office::conversion` 已覆盖 word→md / excel→json / ppt→json;保留抽象只是形式主义的"万一以后用得上" |
+| 是否在 `bridge/index.ts` 写过渡注释                                                                                                                 | **否**                                                                                            | M 系列的其它清理(如 aionrs)没写,保持一致;git blame 可追溯                                                                                  |
+| 是否验证 renderer 端 `ipcBridge.pptPreview.*` / `wordPreview.*` / `excelPreview.*` / `bedrock.*` / `previewHistory.*` / `document.*` 调用能继续工作 | **是**                                                                                            | 手动启动 dev,实际打开一个 pptx / docx / xlsx 预览,确认 backend spawn 生效;测 test-connection 走 bedrock provider 创建流程                  |
 
 ## 验收标准
 
@@ -155,14 +155,14 @@ bunx vitest run tests/e2e  # 本里程碑不新增 e2e,但已有 e2e 不能断
 
 ## 关键风险
 
-| 风险 | 缓解 |
-|---|---|
-| renderer 某处仍在调 `ipcBridge.pptPreview.*.provider(...)` 这种老形态(而不是 `.invoke()` / `.on()`) | plan-writer 先 grep `packages/desktop/src/renderer -rn 'provider\(' --include='*.ts' --include='*.tsx'` 确认无 provider 调用;有的话报给 team-lead |
-| `document.convert` 在 renderer 的调用点较零散,回归验证容易遗漏 | plan-writer 写 plan 时提供 grep 命令和明确的触发 UI 路径;必要时在 plan 附录列举完整调用点 |
-| `bedrockBridge.ts` 删除会影响 provider 管理页的"测试连接"按钮 | adapter 已路由到 `/api/bedrock/test-connection`,backend `aionui-system::bedrock_probe` 覆盖;手动验收会复现 |
+| 风险                                                                                                                             | 缓解                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------------------ | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| renderer 某处仍在调 `ipcBridge.pptPreview.*.provider(...)` 这种老形态(而不是 `.invoke()` / `.on()`)                              | plan-writer 先 grep `packages/desktop/src/renderer -rn 'provider\(' --include='*.ts' --include='*.tsx'` 确认无 provider 调用;有的话报给 team-lead                                       |
+| `document.convert` 在 renderer 的调用点较零散,回归验证容易遗漏                                                                   | plan-writer 写 plan 时提供 grep 命令和明确的触发 UI 路径;必要时在 plan 附录列举完整调用点                                                                                               |
+| `bedrockBridge.ts` 删除会影响 provider 管理页的"测试连接"按钮                                                                    | adapter 已路由到 `/api/bedrock/test-connection`,backend `aionui-system::bedrock_probe` 覆盖;手动验收会复现                                                                              |
 | `officeWatchBridge.ts` / `pptPreviewBridge.ts` 的 spawn 动作移到 backend 后,开发机上的 `officecli --version` / PATH 查找逻辑消失 | backend 的 `watch_manager` + `DefaultProcessSpawner` 自带 officecli 查找(和原前端逻辑等价);在开发机上先 `which officecli` 确认可用,没有就先 `officecli --install`(按总设计"关键事实 B") |
-| `bridge/index.ts` 的 re-export 段如果有外部 import(如 preload) | grep `initBedrockBridge|initPreviewHistoryBridge|initDocumentBridge|initPptPreviewBridge|initOfficeWatchBridge` 在 `packages/desktop/src/preload/` 和 `packages/desktop/src/renderer/` 中的引用,若有则保留对应 re-export 形式,但不导出函数(或改为 no-op 占位 + 文档说明)。**实测没有就直接删净** |
-| 同团队其他 agent 并行动了 bridge 目录 | push 前必须 `git fetch origin feat/backend-migration`,merge 最新基线再验证 |
+| `bridge/index.ts` 的 re-export 段如果有外部 import(如 preload)                                                                   | grep `initBedrockBridge                                                                                                                                                                 | initPreviewHistoryBridge | initDocumentBridge | initPptPreviewBridge | initOfficeWatchBridge`在`packages/desktop/src/preload/`和`packages/desktop/src/renderer/` 中的引用,若有则保留对应 re-export 形式,但不导出函数(或改为 no-op 占位 + 文档说明)。**实测没有就直接删净** |
+| 同团队其他 agent 并行动了 bridge 目录                                                                                            | push 前必须 `git fetch origin feat/backend-migration`,merge 最新基线再验证                                                                                                              |
 
 ## 依赖上游
 

@@ -32,37 +32,37 @@ N4 整体可**内部并行**为 N4a / N4b / N4c 三路(参见"并行化"节),但
 
 #### Assistants(12 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| A1 | `tests/unit/assistants/useAssistantList.dom.test.ts` | `renderer/hooks/assistant/useAssistantList.ts` | L2 |
-| A2 | `tests/unit/assistants/useAssistantEditor.dom.test.ts` | `renderer/hooks/assistant/useAssistantEditor.ts` | L2 |
-| A3 | `tests/unit/assistants/useAssistantSkills.dom.test.ts` | `renderer/hooks/assistant/useAssistantSkills.ts` | L2 |
-| A4 | `tests/unit/assistants/useDetectedAgents.dom.test.ts` | `renderer/hooks/assistant/useDetectedAgents.ts` | L2 |
-| A5 | `tests/unit/assistants/assistantUtils.test.ts` | `renderer/pages/settings/AssistantSettings/assistantUtils.ts` | L1 |
-| A6 | `tests/unit/assistants/AssistantListPanel.dom.test.tsx` | `renderer/pages/settings/AssistantSettings/AssistantListPanel.tsx` | L3 |
-| A7 | `tests/unit/assistants/AssistantEditDrawer.dom.test.tsx` | `renderer/pages/settings/AssistantSettings/AssistantEditDrawer.tsx` | L3 |
-| A8 | `tests/unit/assistants/DeleteAssistantModal.dom.test.tsx` | `renderer/pages/settings/AssistantSettings/DeleteAssistantModal.tsx` | L3 |
-| A9 | `tests/unit/assistants/AddSkillsModal.dom.test.tsx` | `renderer/pages/settings/AssistantSettings/AddSkillsModal.tsx` | L3 |
-| A10 | `tests/unit/assistants/SkillConfirmModals.dom.test.tsx` | `renderer/pages/settings/AssistantSettings/SkillConfirmModals.tsx` | L3 |
-| A11 | `tests/unit/assistants/migrateAssistants.test.ts` | `process/utils/migrateAssistants.ts` | L4 |
-| A12 | `tests/unit/assistants/runBackendMigrations.test.ts` | `process/utils/runBackendMigrations.ts` | L4 |
+| #   | 路径                                                      | 被测对象                                                             | 层次 |
+| --- | --------------------------------------------------------- | -------------------------------------------------------------------- | ---- |
+| A1  | `tests/unit/assistants/useAssistantList.dom.test.ts`      | `renderer/hooks/assistant/useAssistantList.ts`                       | L2   |
+| A2  | `tests/unit/assistants/useAssistantEditor.dom.test.ts`    | `renderer/hooks/assistant/useAssistantEditor.ts`                     | L2   |
+| A3  | `tests/unit/assistants/useAssistantSkills.dom.test.ts`    | `renderer/hooks/assistant/useAssistantSkills.ts`                     | L2   |
+| A4  | `tests/unit/assistants/useDetectedAgents.dom.test.ts`     | `renderer/hooks/assistant/useDetectedAgents.ts`                      | L2   |
+| A5  | `tests/unit/assistants/assistantUtils.test.ts`            | `renderer/pages/settings/AssistantSettings/assistantUtils.ts`        | L1   |
+| A6  | `tests/unit/assistants/AssistantListPanel.dom.test.tsx`   | `renderer/pages/settings/AssistantSettings/AssistantListPanel.tsx`   | L3   |
+| A7  | `tests/unit/assistants/AssistantEditDrawer.dom.test.tsx`  | `renderer/pages/settings/AssistantSettings/AssistantEditDrawer.tsx`  | L3   |
+| A8  | `tests/unit/assistants/DeleteAssistantModal.dom.test.tsx` | `renderer/pages/settings/AssistantSettings/DeleteAssistantModal.tsx` | L3   |
+| A9  | `tests/unit/assistants/AddSkillsModal.dom.test.tsx`       | `renderer/pages/settings/AssistantSettings/AddSkillsModal.tsx`       | L3   |
+| A10 | `tests/unit/assistants/SkillConfirmModals.dom.test.tsx`   | `renderer/pages/settings/AssistantSettings/SkillConfirmModals.tsx`   | L3   |
+| A11 | `tests/unit/assistants/migrateAssistants.test.ts`         | `process/utils/migrateAssistants.ts`                                 | L4   |
+| A12 | `tests/unit/assistants/runBackendMigrations.test.ts`      | `process/utils/runBackendMigrations.ts`                              | L4   |
 
 #### Skills(4 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| SK1 | `tests/unit/skills/skillSuggestParser.test.ts` | `renderer/utils/chat/skillSuggestParser.ts` | L1 |
-| SK2 | `tests/unit/skills/AddCustomPathModal.dom.test.tsx` | `renderer/pages/settings/AssistantSettings/AddCustomPathModal.tsx`(属于 skill 外部路径配置) | L3 |
-| SK3 | `tests/unit/skills/useAssistantSkillsIntegration.dom.test.ts` | `useAssistantSkills` + `AddSkillsModal` 组合(使用 mockHttpBridge 拉 skill detection 接口) | L4 |
-| SK4 | `tests/unit/skills/SkillsHubSettings.dom.test.tsx` | `renderer/pages/settings/SkillsHubSettings.tsx`(Skills Hub 入口页) | L3 |
+| #   | 路径                                                          | 被测对象                                                                                    | 层次 |
+| --- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---- |
+| SK1 | `tests/unit/skills/skillSuggestParser.test.ts`                | `renderer/utils/chat/skillSuggestParser.ts`                                                 | L1   |
+| SK2 | `tests/unit/skills/AddCustomPathModal.dom.test.tsx`           | `renderer/pages/settings/AssistantSettings/AddCustomPathModal.tsx`(属于 skill 外部路径配置) | L3   |
+| SK3 | `tests/unit/skills/useAssistantSkillsIntegration.dom.test.ts` | `useAssistantSkills` + `AddSkillsModal` 组合(使用 mockHttpBridge 拉 skill detection 接口)   | L4   |
+| SK4 | `tests/unit/skills/SkillsHubSettings.dom.test.tsx`            | `renderer/pages/settings/SkillsHubSettings.tsx`(Skills Hub 入口页)                          | L3   |
 
 #### Extension(3 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| E1 | `tests/unit/extension/ExtensionSettingsPage.dom.test.tsx` | `renderer/pages/settings/ExtensionSettingsPage.tsx` | L3 |
-| E2 | `tests/unit/extension/ExtensionSettingsTabContent.dom.test.tsx` | `renderer/components/settings/SettingsModal/contents/ExtensionSettingsTabContent.tsx` | L3 |
-| E3 | `tests/unit/extension/extensionMapperIntegration.test.ts` | Extension 相关 ipcBridge 调用序列(mock httpBridge 模拟 `/api/extension/*`) | L4 |
+| #   | 路径                                                            | 被测对象                                                                              | 层次 |
+| --- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ---- |
+| E1  | `tests/unit/extension/ExtensionSettingsPage.dom.test.tsx`       | `renderer/pages/settings/ExtensionSettingsPage.tsx`                                   | L3   |
+| E2  | `tests/unit/extension/ExtensionSettingsTabContent.dom.test.tsx` | `renderer/components/settings/SettingsModal/contents/ExtensionSettingsTabContent.tsx` | L3   |
+| E3  | `tests/unit/extension/extensionMapperIntegration.test.ts`       | Extension 相关 ipcBridge 调用序列(mock httpBridge 模拟 `/api/extension/*`)            | L4   |
 
 ---
 
@@ -70,36 +70,36 @@ N4 整体可**内部并行**为 N4a / N4b / N4c 三路(参见"并行化"节),但
 
 #### Providers(8 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| P1 | `tests/unit/providers/useModelProviderList.dom.test.ts` | `renderer/hooks/agent/useModelProviderList.ts` | L2 |
-| P2 | `tests/unit/providers/useConfigModelListWithImage.dom.test.ts` | `renderer/hooks/agent/useConfigModelListWithImage.ts` | L2 |
-| P3 | `tests/unit/providers/useGoogleAuthModels.dom.test.ts` | `renderer/hooks/agent/useGoogleAuthModels.ts` | L2 |
-| P4 | `tests/unit/providers/ModelModalContent.dom.test.tsx` | `renderer/components/settings/SettingsModal/contents/ModelModalContent.tsx` | L3 |
-| P5 | `tests/unit/providers/RotatingApiClient.test.ts` | `common/api/RotatingApiClient.ts` + `AnthropicRotatingClient` + `OpenAIRotatingClient` | L1 |
-| P6 | `tests/unit/providers/ApiKeyManager.test.ts` | `common/api/ApiKeyManager.ts` | L1 |
-| P7 | `tests/unit/providers/ClientFactory.test.ts` | `common/api/ClientFactory.ts` | L1 |
-| P8 | `tests/unit/providers/ProtocolConverter.test.ts` | `common/api/ProtocolConverter.ts` + `OpenAI2AnthropicConverter.ts` | L1 |
+| #   | 路径                                                           | 被测对象                                                                               | 层次 |
+| --- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ---- |
+| P1  | `tests/unit/providers/useModelProviderList.dom.test.ts`        | `renderer/hooks/agent/useModelProviderList.ts`                                         | L2   |
+| P2  | `tests/unit/providers/useConfigModelListWithImage.dom.test.ts` | `renderer/hooks/agent/useConfigModelListWithImage.ts`                                  | L2   |
+| P3  | `tests/unit/providers/useGoogleAuthModels.dom.test.ts`         | `renderer/hooks/agent/useGoogleAuthModels.ts`                                          | L2   |
+| P4  | `tests/unit/providers/ModelModalContent.dom.test.tsx`          | `renderer/components/settings/SettingsModal/contents/ModelModalContent.tsx`            | L3   |
+| P5  | `tests/unit/providers/RotatingApiClient.test.ts`               | `common/api/RotatingApiClient.ts` + `AnthropicRotatingClient` + `OpenAIRotatingClient` | L1   |
+| P6  | `tests/unit/providers/ApiKeyManager.test.ts`                   | `common/api/ApiKeyManager.ts`                                                          | L1   |
+| P7  | `tests/unit/providers/ClientFactory.test.ts`                   | `common/api/ClientFactory.ts`                                                          | L1   |
+| P8  | `tests/unit/providers/ProtocolConverter.test.ts`               | `common/api/ProtocolConverter.ts` + `OpenAI2AnthropicConverter.ts`                     | L1   |
 
 #### System(3 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| S1 | `tests/unit/system/SystemModalContent.dom.test.tsx` | `renderer/components/settings/SettingsModal/contents/SystemModalContent/index.tsx` | L3 |
-| S2 | `tests/unit/system/clientPrefSettings.test.ts` | language / cronNotificationEnabled 等走 `/api/settings/client` 的 hook 或 utils(从 `useSettingsModal` / `DisplayModalContent` 等找触发点) | L2 |
-| S3 | `tests/unit/system/DisplayModalContent.dom.test.tsx` | `renderer/components/settings/SettingsModal/contents/DisplayModalContent.tsx`(主题 / 字号 / 语言等 client-pref 的 UI) | L3 |
+| #   | 路径                                                 | 被测对象                                                                                                                                  | 层次 |
+| --- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| S1  | `tests/unit/system/SystemModalContent.dom.test.tsx`  | `renderer/components/settings/SettingsModal/contents/SystemModalContent/index.tsx`                                                        | L3   |
+| S2  | `tests/unit/system/clientPrefSettings.test.ts`       | language / cronNotificationEnabled 等走 `/api/settings/client` 的 hook 或 utils(从 `useSettingsModal` / `DisplayModalContent` 等找触发点) | L2   |
+| S3  | `tests/unit/system/DisplayModalContent.dom.test.tsx` | `renderer/components/settings/SettingsModal/contents/DisplayModalContent.tsx`(主题 / 字号 / 语言等 client-pref 的 UI)                     | L3   |
 
 #### Cron(7 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| C1 | `tests/unit/cron/cronUtils.test.ts` | `renderer/pages/cron/cronUtils.ts` | L1 |
-| C2 | `tests/unit/cron/useCronJobs.dom.test.ts` | `renderer/pages/cron/useCronJobs.ts` | L2 |
-| C3 | `tests/unit/cron/CreateTaskDialog.dom.test.tsx` | `renderer/pages/cron/ScheduledTasksPage/CreateTaskDialog.tsx` | L3 |
-| C4 | `tests/unit/cron/TaskDetailPage.dom.test.tsx` | `renderer/pages/cron/ScheduledTasksPage/TaskDetailPage.tsx` | L3 |
-| C5 | `tests/unit/cron/CronStatusTag.dom.test.tsx` | `renderer/pages/cron/ScheduledTasksPage/CronStatusTag.tsx` | L3 |
-| C6 | `tests/unit/cron/CronJobSiderSection.dom.test.tsx` | `renderer/components/layout/Sider/CronJobSiderSection/CronJobSiderSection.tsx` + `CronJobSiderItem.tsx` | L3 |
-| C7 | `tests/unit/cron/CronJobManager.dom.test.tsx` | `renderer/pages/cron/components/CronJobManager.tsx` | L3 |
+| #   | 路径                                               | 被测对象                                                                                                | 层次 |
+| --- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---- |
+| C1  | `tests/unit/cron/cronUtils.test.ts`                | `renderer/pages/cron/cronUtils.ts`                                                                      | L1   |
+| C2  | `tests/unit/cron/useCronJobs.dom.test.ts`          | `renderer/pages/cron/useCronJobs.ts`                                                                    | L2   |
+| C3  | `tests/unit/cron/CreateTaskDialog.dom.test.tsx`    | `renderer/pages/cron/ScheduledTasksPage/CreateTaskDialog.tsx`                                           | L3   |
+| C4  | `tests/unit/cron/TaskDetailPage.dom.test.tsx`      | `renderer/pages/cron/ScheduledTasksPage/TaskDetailPage.tsx`                                             | L3   |
+| C5  | `tests/unit/cron/CronStatusTag.dom.test.tsx`       | `renderer/pages/cron/ScheduledTasksPage/CronStatusTag.tsx`                                              | L3   |
+| C6  | `tests/unit/cron/CronJobSiderSection.dom.test.tsx` | `renderer/components/layout/Sider/CronJobSiderSection/CronJobSiderSection.tsx` + `CronJobSiderItem.tsx` | L3   |
+| C7  | `tests/unit/cron/CronJobManager.dom.test.tsx`      | `renderer/pages/cron/components/CronJobManager.tsx`                                                     | L3   |
 
 ---
 
@@ -107,36 +107,36 @@ N4 整体可**内部并行**为 N4a / N4b / N4c 三路(参见"并行化"节),但
 
 #### Previews(12 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| V1 | `tests/unit/previews/PreviewContext.dom.test.tsx` | `renderer/pages/conversation/Preview/context/PreviewContext.tsx` | L3 |
-| V2 | `tests/unit/previews/usePreviewHistory.dom.test.ts` | `renderer/pages/conversation/Preview/hooks/usePreviewHistory.ts` | L2 |
-| V3 | `tests/unit/previews/OfficeWatchViewer.dom.test.tsx` | `renderer/pages/conversation/Preview/components/viewers/OfficeWatchViewer.tsx` | L3 |
-| V4 | `tests/unit/previews/PptViewer.dom.test.tsx` | `viewers/PptViewer.tsx` | L3 |
-| V5 | `tests/unit/previews/OfficeDocViewer.dom.test.tsx` | `viewers/OfficeDocViewer.tsx` | L3 |
-| V6 | `tests/unit/previews/ExcelViewer.dom.test.tsx` | `viewers/ExcelViewer.tsx` | L3 |
-| V7 | `tests/unit/previews/MarkdownViewer.dom.test.tsx` | `viewers/MarkdownViewer.tsx` | L3 |
-| V8 | `tests/unit/previews/HTMLViewer.dom.test.tsx` | `viewers/HTMLViewer.tsx` | L3 |
-| V9 | `tests/unit/previews/PreviewPanel.dom.test.tsx` | `PreviewPanel/PreviewPanel.tsx` | L3 |
-| V10 | `tests/unit/previews/PreviewHistoryDropdown.dom.test.tsx` | `PreviewPanel/PreviewHistoryDropdown.tsx` | L3 |
-| V11 | `tests/unit/previews/fileUtils.test.ts` | `Preview/fileUtils.ts` + `previewUrls.ts` | L1 |
-| V12 | `tests/unit/previews/previewHistoryIntegration.test.ts` | Preview History 相关 ipcBridge 组合(mock `/api/preview-history/*`) | L4 |
+| #   | 路径                                                      | 被测对象                                                                       | 层次 |
+| --- | --------------------------------------------------------- | ------------------------------------------------------------------------------ | ---- |
+| V1  | `tests/unit/previews/PreviewContext.dom.test.tsx`         | `renderer/pages/conversation/Preview/context/PreviewContext.tsx`               | L3   |
+| V2  | `tests/unit/previews/usePreviewHistory.dom.test.ts`       | `renderer/pages/conversation/Preview/hooks/usePreviewHistory.ts`               | L2   |
+| V3  | `tests/unit/previews/OfficeWatchViewer.dom.test.tsx`      | `renderer/pages/conversation/Preview/components/viewers/OfficeWatchViewer.tsx` | L3   |
+| V4  | `tests/unit/previews/PptViewer.dom.test.tsx`              | `viewers/PptViewer.tsx`                                                        | L3   |
+| V5  | `tests/unit/previews/OfficeDocViewer.dom.test.tsx`        | `viewers/OfficeDocViewer.tsx`                                                  | L3   |
+| V6  | `tests/unit/previews/ExcelViewer.dom.test.tsx`            | `viewers/ExcelViewer.tsx`                                                      | L3   |
+| V7  | `tests/unit/previews/MarkdownViewer.dom.test.tsx`         | `viewers/MarkdownViewer.tsx`                                                   | L3   |
+| V8  | `tests/unit/previews/HTMLViewer.dom.test.tsx`             | `viewers/HTMLViewer.tsx`                                                       | L3   |
+| V9  | `tests/unit/previews/PreviewPanel.dom.test.tsx`           | `PreviewPanel/PreviewPanel.tsx`                                                | L3   |
+| V10 | `tests/unit/previews/PreviewHistoryDropdown.dom.test.tsx` | `PreviewPanel/PreviewHistoryDropdown.tsx`                                      | L3   |
+| V11 | `tests/unit/previews/fileUtils.test.ts`                   | `Preview/fileUtils.ts` + `previewUrls.ts`                                      | L1   |
+| V12 | `tests/unit/previews/previewHistoryIntegration.test.ts`   | Preview History 相关 ipcBridge 组合(mock `/api/preview-history/*`)             | L4   |
 
 #### Assets(2 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| X1 | `tests/unit/assets/agentLogo.test.ts` | 前端 agent logo 解析 / asset URL 构造工具(grep 找出实际文件,例如
-`renderer/utils/...` 里 logo / asset-related helper) | L1 |
-| X2 | `tests/unit/assets/presetAssistantResources.test.ts` | `renderer/utils/model/presetAssistantResources.ts` | L1 |
+| #                                                    | 路径                                                 | 被测对象                                                         | 层次 |
+| ---------------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------- | ---- |
+| X1                                                   | `tests/unit/assets/agentLogo.test.ts`                | 前端 agent logo 解析 / asset URL 构造工具(grep 找出实际文件,例如 |
+| `renderer/utils/...` 里 logo / asset-related helper) | L1                                                   |
+| X2                                                   | `tests/unit/assets/presetAssistantResources.test.ts` | `renderer/utils/model/presetAssistantResources.ts`               | L1   |
 
 #### Bootstrap(3 文件)
 
-| # | 路径 | 被测对象 | 层次 |
-|---|---|---|---|
-| B1 | `tests/unit/bootstrap/initStorage.migrations.test.ts` | `process/utils/initStorage.ts` 中与 migration 相关的分支(M1 / assistant / provider) | L4 |
-| B2 | `tests/unit/bootstrap/configMigrationIntegration.test.ts` | 跨文件:`configMigration` + `migrateAssistants` + `runBackendMigrations` 串起来的首启流程,用 `mockHttpBridge` 假 `/api/settings/client` 等接口 | L4 |
-| B3 | `tests/unit/bootstrap/migrationErrorRecovery.test.ts` | 某一步 migration 失败时的降级行为(从 `runBackendMigrations.ts` 的 `allSucceeded` 分支反推) | L4 |
+| #   | 路径                                                      | 被测对象                                                                                                                                      | 层次 |
+| --- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| B1  | `tests/unit/bootstrap/initStorage.migrations.test.ts`     | `process/utils/initStorage.ts` 中与 migration 相关的分支(M1 / assistant / provider)                                                           | L4   |
+| B2  | `tests/unit/bootstrap/configMigrationIntegration.test.ts` | 跨文件:`configMigration` + `migrateAssistants` + `runBackendMigrations` 串起来的首启流程,用 `mockHttpBridge` 假 `/api/settings/client` 等接口 | L4   |
+| B3  | `tests/unit/bootstrap/migrationErrorRecovery.test.ts`     | 某一步 migration 失败时的降级行为(从 `runBackendMigrations.ts` 的 `allSucceeded` 分支反推)                                                    | L4   |
 
 ---
 
@@ -159,16 +159,16 @@ grep 发现再加项(例如某个 hook 拆成两个测试文件),加项要在 ha
 
 ## 已定决策
 
-| 决策点 | 结论 | 理由 |
-|---|---|---|
-| 每个测试文件的 case 数量下限 | ≥ 3(happy path / 边界 / 错误路径各至少 1 个);L3 组件 ≥ 5(渲染 / 交互 / 加载 / 错误 / 空状态) | 控制每个文件的实际价值 |
-| `.dom.test.ts` vs `.test.ts` 划分 | 涉及 React 组件 / 依赖 DOM API 的用 `.dom.test.ts(x)`(归 jsdom 项目);纯逻辑用 `.test.ts`(归 node 项目) | 与现有 `vitest.config.ts` 两个 project 对齐 |
-| migrate 类测试是否验真实 IPC | **否**,全 mock;验证点是 "正确的路由调用序列 + 正确的 payload shape" | migrate 在 CI 里真跑一次成本高、flaky;正确性靠 payload 合约断言 |
-| L3 组件测试是否触发真实 arco-design 交互 | **是**,用 `@testing-library/react` 的 `userEvent` 触发点击 / 输入;不用 `fireEvent` 低层 API | arco-design 基于 React,`userEvent` 语义更接近用户;与 `tests/vitest.dom.setup.ts` 一致 |
-| 并行子 agent 是否允许 | **允许 N4a/N4b/N4c 三个 agent 并行**,但必须基于 N3 的 mock helper;每个子 agent 提交后 rebase/merge 回 `feat/n4-test-rewrite-domains` 分支,最终只 push 一次 | 加速;减少 3 份 handoff |
-| 子 agent 间文件冲突风险 | 通过目录分区避免:N4a 只写 `tests/unit/assistants`+`skills`+`extension`,N4b 写 `providers`+`system`+`cron`,N4c 写 `previews`+`assets`+`bootstrap`,三者零重叠 | |
-| 覆盖率硬门禁 | 仍保持 `thresholds: 0`(不 gate),但 handoff 必须贴每个新测试文件的 v8 覆盖率,低于 60% 的要解释 | 逐步提高,不一次搞"达标强迫症" |
-| 发现源码 bug 怎么办 | 小 bug(typo / null-guard):测试里用 `@ts-expect-error` 或 `expect(current).toEqual(...)` 写成"文档化现状"的断言,在 handoff Deviations 说明,不改源码;大 bug:escalate 给 team-lead 走另一个 PR 修 | 保持 N4 scope 纯粹 |
+| 决策点                                   | 结论                                                                                                                                                                                           | 理由                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 每个测试文件的 case 数量下限             | ≥ 3(happy path / 边界 / 错误路径各至少 1 个);L3 组件 ≥ 5(渲染 / 交互 / 加载 / 错误 / 空状态)                                                                                                   | 控制每个文件的实际价值                                                                |
+| `.dom.test.ts` vs `.test.ts` 划分        | 涉及 React 组件 / 依赖 DOM API 的用 `.dom.test.ts(x)`(归 jsdom 项目);纯逻辑用 `.test.ts`(归 node 项目)                                                                                         | 与现有 `vitest.config.ts` 两个 project 对齐                                           |
+| migrate 类测试是否验真实 IPC             | **否**,全 mock;验证点是 "正确的路由调用序列 + 正确的 payload shape"                                                                                                                            | migrate 在 CI 里真跑一次成本高、flaky;正确性靠 payload 合约断言                       |
+| L3 组件测试是否触发真实 arco-design 交互 | **是**,用 `@testing-library/react` 的 `userEvent` 触发点击 / 输入;不用 `fireEvent` 低层 API                                                                                                    | arco-design 基于 React,`userEvent` 语义更接近用户;与 `tests/vitest.dom.setup.ts` 一致 |
+| 并行子 agent 是否允许                    | **允许 N4a/N4b/N4c 三个 agent 并行**,但必须基于 N3 的 mock helper;每个子 agent 提交后 rebase/merge 回 `feat/n4-test-rewrite-domains` 分支,最终只 push 一次                                     | 加速;减少 3 份 handoff                                                                |
+| 子 agent 间文件冲突风险                  | 通过目录分区避免:N4a 只写 `tests/unit/assistants`+`skills`+`extension`,N4b 写 `providers`+`system`+`cron`,N4c 写 `previews`+`assets`+`bootstrap`,三者零重叠                                    |                                                                                       |
+| 覆盖率硬门禁                             | 仍保持 `thresholds: 0`(不 gate),但 handoff 必须贴每个新测试文件的 v8 覆盖率,低于 60% 的要解释                                                                                                  | 逐步提高,不一次搞"达标强迫症"                                                         |
+| 发现源码 bug 怎么办                      | 小 bug(typo / null-guard):测试里用 `@ts-expect-error` 或 `expect(current).toEqual(...)` 写成"文档化现状"的断言,在 handoff Deviations 说明,不改源码;大 bug:escalate 给 team-lead 走另一个 PR 修 | 保持 N4 scope 纯粹                                                                    |
 
 ## 验收标准
 
@@ -307,15 +307,15 @@ prek run --from-ref origin/feat/backend-migration --to-ref HEAD
 
 ## 关键风险
 
-| 风险 | 缓解 |
-|---|---|
-| 54 个测试里有 test case 跑得很慢,`vitest run` 超 5 分钟 | 所有网络 / IO 全 mock(UC-F-4 硬要求);single-file timeout 维持 `vitest.config.ts` 的 `testTimeout: 10000`;若某 case 仍慢,调查是不是错用了真 http / fs |
-| L3 组件测试需要大量 arco 上下文(ConfigProvider / Locale / Modal root) | 在 `tests/vitest.dom.setup.ts` 补充全局 wrapper(类似 `<ConfigProvider componentConfig={...}>`),或为 dom 测试单独再起一个 setup 文件 |
-| `useCronJobs` 这类 hook 内部订阅 WS 事件,fake timers + async 会 flaky(记忆里踩过) | 用 N3 helper 的 sync emit 模式;必要时 `vi.advanceTimersByTimeAsync()`;不得无脑 `waitFor` + 长 timeout |
+| 风险                                                                                          | 缓解                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 54 个测试里有 test case 跑得很慢,`vitest run` 超 5 分钟                                       | 所有网络 / IO 全 mock(UC-F-4 硬要求);single-file timeout 维持 `vitest.config.ts` 的 `testTimeout: 10000`;若某 case 仍慢,调查是不是错用了真 http / fs            |
+| L3 组件测试需要大量 arco 上下文(ConfigProvider / Locale / Modal root)                         | 在 `tests/vitest.dom.setup.ts` 补充全局 wrapper(类似 `<ConfigProvider componentConfig={...}>`),或为 dom 测试单独再起一个 setup 文件                             |
+| `useCronJobs` 这类 hook 内部订阅 WS 事件,fake timers + async 会 flaky(记忆里踩过)             | 用 N3 helper 的 sync emit 模式;必要时 `vi.advanceTimersByTimeAsync()`;不得无脑 `waitFor` + 长 timeout                                                           |
 | 发现某个源文件实际已经不在代码库(被 M 系列某个里程碑顺手删了但文件名还在这个 requirements 里) | 执行 agent 在落地前先 `test -f <source>`,不存在的源码对应项从 Deviations 节列出,**保留清单总数**(用同领域其它源码文件补位),handoff 提示下一轮 requirements 修正 |
-| AssistantSettings 目录有 `types.ts`(纯 type) | 不测;但 `AddCustomPathModal.tsx` / `AssistantAvatar.tsx` 如果实际没有交互(纯展示),允许只写"渲染无报错 + props 回显"的最小测试,case 数放宽到 2 |
-| 并行 agent 互相 merge 冲突严重 | 领域目录分区 + helper 不改 + 不跨分区 import;冲突只能在 import 顺序和 vitest.config 上出现,实际极少 |
-| 写完发现 tests 真实 pass 但 `bunx vitest run --coverage` 失败(v8 插件崩) | 覆盖率展示不 gate,失败 escalate 给 team-lead(可能是 vitest 4 升级后的兼容问题,独立 issue) |
+| AssistantSettings 目录有 `types.ts`(纯 type)                                                  | 不测;但 `AddCustomPathModal.tsx` / `AssistantAvatar.tsx` 如果实际没有交互(纯展示),允许只写"渲染无报错 + props 回显"的最小测试,case 数放宽到 2                   |
+| 并行 agent 互相 merge 冲突严重                                                                | 领域目录分区 + helper 不改 + 不跨分区 import;冲突只能在 import 顺序和 vitest.config 上出现,实际极少                                                             |
+| 写完发现 tests 真实 pass 但 `bunx vitest run --coverage` 失败(v8 插件崩)                      | 覆盖率展示不 gate,失败 escalate 给 team-lead(可能是 vitest 4 升级后的兼容问题,独立 issue)                                                                       |
 
 ## 依赖上游
 

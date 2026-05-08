@@ -16,13 +16,13 @@
 
 ## 权威来源优先级(遇到冲突时按此顺序裁决)
 
-| 范围 | 权威来源 | 举例 |
-|---|---|---|
-| 公共规则、跨里程碑的统一约束 | 总设计的 **UC-A / UC-B / UC-C / UC-D / UC-E / UC-F** 节 | 删除范围、保留名单、测试布局、CI 恢复、反偷懒 |
-| 接口签名 | **N3 handoff 锁定的 `mockHttpBridge` 签名** | `createMockHttpBridge()` / `mock.onGet(...)` / `mock.emit(...)` 等 |
-| 单个里程碑的范围、边界、验收 | 对应的 `*-requirements.md` | "N1 删哪 7 文件"、"N4 的 54 文件清单" |
-| 执行步骤、逐行命令 | plan-writer 产出的 detailed plan(仅 N3/N4) | git 操作、sed 命令、具体验证脚本 |
-| 上游里程碑实际交付 | 对应的 `handoffs/N{x}-outcome.md` | "N1 实际删了哪"、"N3 helper 最终签名" |
+| 范围                         | 权威来源                                                | 举例                                                               |
+| ---------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
+| 公共规则、跨里程碑的统一约束 | 总设计的 **UC-A / UC-B / UC-C / UC-D / UC-E / UC-F** 节 | 删除范围、保留名单、测试布局、CI 恢复、反偷懒                      |
+| 接口签名                     | **N3 handoff 锁定的 `mockHttpBridge` 签名**             | `createMockHttpBridge()` / `mock.onGet(...)` / `mock.emit(...)` 等 |
+| 单个里程碑的范围、边界、验收 | 对应的 `*-requirements.md`                              | "N1 删哪 7 文件"、"N4 的 54 文件清单"                              |
+| 执行步骤、逐行命令           | plan-writer 产出的 detailed plan(仅 N3/N4)              | git 操作、sed 命令、具体验证脚本                                   |
+| 上游里程碑实际交付           | 对应的 `handoffs/N{x}-outcome.md`                       | "N1 实际删了哪"、"N3 helper 最终签名"                              |
 
 **冲突处理**:
 
@@ -34,11 +34,11 @@
 
 ## 文档命名约定
 
-| 文件名 | 用途 | 谁读 | 谁产出 |
-|---|---|---|---|
-| `2026-05-08-n{x}-{name}-requirements.md` | 需求:做什么 / 不做什么 / 已定决策 / 验收 / 风险 | plan-writer 必读 + executor 可读 | 本总设计阶段 |
-| `2026-05-08-n{x}-{name}.md` | detailed plan:阶段步骤 / 逐行命令 / 验证脚本 | executor 必读 | plan-writer(仅 N3/N4) |
-| `handoffs/N{x}-outcome.md` | ≤700 字产物摘要 | 后续 teammate 读上游 | executor 写 |
+| 文件名                                   | 用途                                            | 谁读                             | 谁产出                |
+| ---------------------------------------- | ----------------------------------------------- | -------------------------------- | --------------------- |
+| `2026-05-08-n{x}-{name}-requirements.md` | 需求:做什么 / 不做什么 / 已定决策 / 验收 / 风险 | plan-writer 必读 + executor 可读 | 本总设计阶段          |
+| `2026-05-08-n{x}-{name}.md`              | detailed plan:阶段步骤 / 逐行命令 / 验证脚本    | executor 必读                    | plan-writer(仅 N3/N4) |
+| `handoffs/N{x}-outcome.md`               | ≤700 字产物摘要                                 | 后续 teammate 读上游             | executor 写           |
 
 **N1 / N2 / N5 没有 detailed plan**:requirements 已足够具体,直接派 executor。
 
@@ -85,13 +85,13 @@ N1 requirements 已经 push 在这个分支上)。
 
 本次五个里程碑**不全是"plan-writer + executor 两步"**,按复杂度分档:
 
-| 里程碑 | 复杂度 | 是否派 plan-writer | 理由 |
-|---|---|---|---|
-| **N1** | 低(纯删代码) | ❌ 只派 executor | requirements 已列具体 7 文件 + grep 证据;detailed plan 无增量 |
-| **N2** | 低(纯清理 + 建骨架) | ❌ 只派 executor | 同 N1 |
-| **N3** | 中(有接口设计) | ✅ 派 plan-writer + executor | helper 签名要锁定,detailed plan 能帮 executor 减少接口漂移 |
-| **N4** | 高(54 文件 + 并行) | ✅ 派 plan-writer + 3 并行 executor | 清单展开到具体命令能避免风格漂移;并行派发需要 team-lead 协调 |
-| **N5** | 中(改 CI + 等 CI) | ❌ 只派 executor | 动作简单但 UC-F-2 强制要 2 次 CI success;executor 自己跑 gh 命令即可 |
+| 里程碑 | 复杂度              | 是否派 plan-writer                  | 理由                                                                 |
+| ------ | ------------------- | ----------------------------------- | -------------------------------------------------------------------- |
+| **N1** | 低(纯删代码)        | ❌ 只派 executor                    | requirements 已列具体 7 文件 + grep 证据;detailed plan 无增量        |
+| **N2** | 低(纯清理 + 建骨架) | ❌ 只派 executor                    | 同 N1                                                                |
+| **N3** | 中(有接口设计)      | ✅ 派 plan-writer + executor        | helper 签名要锁定,detailed plan 能帮 executor 减少接口漂移           |
+| **N4** | 高(54 文件 + 并行)  | ✅ 派 plan-writer + 3 并行 executor | 清单展开到具体命令能避免风格漂移;并行派发需要 team-lead 协调         |
+| **N5** | 中(改 CI + 等 CI)   | ❌ 只派 executor                    | 动作简单但 UC-F-2 强制要 2 次 CI success;executor 自己跑 gh 命令即可 |
 
 **默认按此表执行**;team-lead 若认为某个里程碑有特殊情况,可以 escalate 给
 人类临时调整,但不得单方面省略 plan-writer(N3/N4 的 plan-writer 是必需)。
@@ -719,20 +719,20 @@ git push origin feat/n{x}-{name}
 
 ## 会话独立性
 
-| 里程碑 | 会话独立性 | 起会话需要读 |
-|---|---|---|
-| **N1** | ✅ 完全独立 | cheatsheet + 总设计 + N1 requirements |
-| **N2** | ✅ 完全独立 | cheatsheet + 总设计 + N1 handoff + N2 requirements |
-| **N3** | ⚠️ 需少量上游 | cheatsheet + 总设计 + N1/N2 handoff + N3 requirements + N3 plan(plan-writer 产出) |
+| 里程碑 | 会话独立性    | 起会话需要读                                                                                     |
+| ------ | ------------- | ------------------------------------------------------------------------------------------------ |
+| **N1** | ✅ 完全独立   | cheatsheet + 总设计 + N1 requirements                                                            |
+| **N2** | ✅ 完全独立   | cheatsheet + 总设计 + N1 handoff + N2 requirements                                               |
+| **N3** | ⚠️ 需少量上游 | cheatsheet + 总设计 + N1/N2 handoff + N3 requirements + N3 plan(plan-writer 产出)                |
 | **N4** | ⚠️ 需较多上游 | cheatsheet + 总设计 + N1/N2/N3 handoff(**特别是 N3 的 helper 签名**) + N4 requirements + N4 plan |
-| **N5** | ✅ 完全独立 | cheatsheet + 总设计 + N4 handoff + N5 requirements + ci-web-cli-release-outcome.md |
+| **N5** | ✅ 完全独立   | cheatsheet + 总设计 + N4 handoff + N5 requirements + ci-web-cli-release-outcome.md               |
 
 plan-writer 的读文件范围:
 
-| 目标 plan | 读 requirements | 读总设计 | 读 M1 plan(格式参考) | 读已完成 handoff | 探查源代码 |
-|---|---|---|---|---|---|
-| N3 plan | ✅ | ✅ | ✅ | N1/N2 | 读 adapter/common 源码 |
-| N4 plan | ✅ | ✅ | ✅ | N1/N2/N3 | 读各领域源码 + N3 helper 签名 |
+| 目标 plan | 读 requirements | 读总设计 | 读 M1 plan(格式参考) | 读已完成 handoff | 探查源代码                    |
+| --------- | --------------- | -------- | -------------------- | ---------------- | ----------------------------- |
+| N3 plan   | ✅              | ✅       | ✅                   | N1/N2            | 读 adapter/common 源码        |
+| N4 plan   | ✅              | ✅       | ✅                   | N1/N2/N3         | 读各领域源码 + N3 helper 签名 |
 
 ---
 
@@ -792,16 +792,16 @@ git checkout -b feat/n2-legacy-test-cleanup origin/feat/cleanup-and-test-rewrite
 
 非 team-mode 环境(人类独立执行、其他 AI)按下表翻译:
 
-| 本 playbook 的概念 | 非 team-mode 对应做法 |
-|---|---|
-| team-lead(主会话) | **协调者**:人类或常驻会话,负责读 handoff 和启动下一个 |
-| `TeamCreate` | 跳过 |
-| executor teammate | **一个独立会话 / 独立开发者** |
-| plan-writer teammate | 同上,任务是写 plan |
-| `Agent(team_name=...)` 派发 | 手动在新会话/新开发者处启动,粘贴 prompt 模板 |
-| `SendMessage` 通信 | **改为写 handoff 文件通信**;协调者定期读 handoff |
-| `TeammateIdle` 钩子 | 人类察觉 handoff 写完即启动下一个;或定时轮询 |
-| `TeamDelete` | 跳过 |
+| 本 playbook 的概念          | 非 team-mode 对应做法                                 |
+| --------------------------- | ----------------------------------------------------- |
+| team-lead(主会话)           | **协调者**:人类或常驻会话,负责读 handoff 和启动下一个 |
+| `TeamCreate`                | 跳过                                                  |
+| executor teammate           | **一个独立会话 / 独立开发者**                         |
+| plan-writer teammate        | 同上,任务是写 plan                                    |
+| `Agent(team_name=...)` 派发 | 手动在新会话/新开发者处启动,粘贴 prompt 模板          |
+| `SendMessage` 通信          | **改为写 handoff 文件通信**;协调者定期读 handoff      |
+| `TeammateIdle` 钩子         | 人类察觉 handoff 写完即启动下一个;或定时轮询          |
+| `TeamDelete`                | 跳过                                                  |
 
 **强制不变项**(任何环境都必须遵守):
 
@@ -828,11 +828,11 @@ git checkout -b feat/n2-legacy-test-cleanup origin/feat/cleanup-and-test-rewrite
 
 ## 快速索引
 
-| 文档 | 用途 | 谁读 |
-|---|---|---|
-| `2026-05-08-cleanup-and-test-rewrite-design.md` | 完整总设计,UC-A..F 硬约束 | 全体 |
-| **`2026-05-08-cleanup-teammate-cheatsheet.md`** | **精简版 teammate 硬约束(~250 行,含 UC-F 5 条)** | **executor / plan-writer** |
-| 本 playbook | 完整协作约定、角色派发、checkpoint 规范、UC-F 验收 | **team-lead / 协调者** |
-| `2026-05-08-n{x}-{name}-requirements.md` | 单个里程碑需求 | plan-writer 必读,executor 可读 |
-| `2026-05-08-n{x}-{name}.md`(N3/N4) | 单个里程碑 detailed plan | **executor 必读** |
-| `handoffs/N{x}-outcome.md` | 单个里程碑 ≤ 700 字产物摘要 | 后续 teammate 读上游 |
+| 文档                                            | 用途                                               | 谁读                           |
+| ----------------------------------------------- | -------------------------------------------------- | ------------------------------ |
+| `2026-05-08-cleanup-and-test-rewrite-design.md` | 完整总设计,UC-A..F 硬约束                          | 全体                           |
+| **`2026-05-08-cleanup-teammate-cheatsheet.md`** | **精简版 teammate 硬约束(~250 行,含 UC-F 5 条)**   | **executor / plan-writer**     |
+| 本 playbook                                     | 完整协作约定、角色派发、checkpoint 规范、UC-F 验收 | **team-lead / 协调者**         |
+| `2026-05-08-n{x}-{name}-requirements.md`        | 单个里程碑需求                                     | plan-writer 必读,executor 可读 |
+| `2026-05-08-n{x}-{name}.md`(N3/N4)              | 单个里程碑 detailed plan                           | **executor 必读**              |
+| `handoffs/N{x}-outcome.md`                      | 单个里程碑 ≤ 700 字产物摘要                        | 后续 teammate 读上游           |

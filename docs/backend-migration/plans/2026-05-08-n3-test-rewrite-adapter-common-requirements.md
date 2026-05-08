@@ -39,14 +39,14 @@
 
 ### 交付 2:N3 测试清单(最少 6 个文件,不含 helper)
 
-| # | 路径 | 被测对象 | 层次 | 关键用例 |
-|---|---|---|---|---|
-| T1 | `tests/unit/common-adapter/apiModelMapper.test.ts` | `common/adapter/apiModelMapper.ts` | L1 | `toApiModel`/`toApiModelOptional`/`fromApiConversation`/`fromApiPaginatedConversations` 前后端互转;`hasCompleteModelIdentity` 的缺失字段分支 |
-| T2 | `tests/unit/common-adapter/searchMapper.test.ts` | `common/adapter/searchMapper.ts` | L1 | `fromApiSearchResult` 对 `PaginatedResult<ApiMessageSearchItem>` 的映射;conversation 字段完整 / 缺省分支 |
-| T3 | `tests/unit/common-adapter/httpBridge.test.ts` | `common/adapter/httpBridge.ts` | L1 | `getBackendPort` 的 window / globalThis / fallback 三分支;`getBaseUrl` / `getWsUrl`;`httpGet`/`httpPost` 构造的对象 shape(带 `.provider` no-op);`stubProvider` 默认值;`wsEmitter` / `wsMappedEmitter` 的 `on` 行为 |
-| T4 | `tests/unit/common-config/configMigration.test.ts` | `common/config/configMigration.ts` | L1 | `migrateConfigStorage` / `migrateProviders`:老结构 → 新结构 diff;已迁移数据的幂等;损坏数据的兜底 |
-| T5 | `tests/unit/common-config/storage.test.ts` | `common/config/storage.ts` | L1 | `TChatConversation` / `IProvider` / 其它 type guard / helper 函数(仅测导出的 runtime 代码,不测 pure type alias) |
-| T6 | `tests/unit/_helpers/mockHttpBridge.test.ts` | 本里程碑交付的 helper | L1 | helper 自测:路由注册 / 未匹配路由报错 / WS 事件分发 / reset 后状态清空 |
+| #   | 路径                                               | 被测对象                           | 层次 | 关键用例                                                                                                                                                                                                           |
+| --- | -------------------------------------------------- | ---------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T1  | `tests/unit/common-adapter/apiModelMapper.test.ts` | `common/adapter/apiModelMapper.ts` | L1   | `toApiModel`/`toApiModelOptional`/`fromApiConversation`/`fromApiPaginatedConversations` 前后端互转;`hasCompleteModelIdentity` 的缺失字段分支                                                                       |
+| T2  | `tests/unit/common-adapter/searchMapper.test.ts`   | `common/adapter/searchMapper.ts`   | L1   | `fromApiSearchResult` 对 `PaginatedResult<ApiMessageSearchItem>` 的映射;conversation 字段完整 / 缺省分支                                                                                                           |
+| T3  | `tests/unit/common-adapter/httpBridge.test.ts`     | `common/adapter/httpBridge.ts`     | L1   | `getBackendPort` 的 window / globalThis / fallback 三分支;`getBaseUrl` / `getWsUrl`;`httpGet`/`httpPost` 构造的对象 shape(带 `.provider` no-op);`stubProvider` 默认值;`wsEmitter` / `wsMappedEmitter` 的 `on` 行为 |
+| T4  | `tests/unit/common-config/configMigration.test.ts` | `common/config/configMigration.ts` | L1   | `migrateConfigStorage` / `migrateProviders`:老结构 → 新结构 diff;已迁移数据的幂等;损坏数据的兜底                                                                                                                   |
+| T5  | `tests/unit/common-config/storage.test.ts`         | `common/config/storage.ts`         | L1   | `TChatConversation` / `IProvider` / 其它 type guard / helper 函数(仅测导出的 runtime 代码,不测 pure type alias)                                                                                                    |
+| T6  | `tests/unit/_helpers/mockHttpBridge.test.ts`       | 本里程碑交付的 helper              | L1   | helper 自测:路由注册 / 未匹配路由报错 / WS 事件分发 / reset 后状态清空                                                                                                                                             |
 
 **不计入 6 个清单的辅助测试**:允许 T1-T6 任何一个拆成多个 `.test.ts`(同目录)
 以保持单文件可读性,但**总测试文件数 ≥ 6**。
@@ -76,13 +76,13 @@ M3 的做法)。
 
 ## 已定决策
 
-| 决策点 | 结论 | 理由 |
-|---|---|---|
-| mock helper 放哪 | `tests/unit/_helpers/mockHttpBridge.ts`(与测试同根,不进 `src/`) | 只服务于测试、不上 runtime;下划线前缀规避 vitest include glob 误匹配(`_helpers/**/*.test.ts` 仍可被 glob 命中,而 helper 本身非 .test.ts) |
-| mock 基础机制 | `vi.mock('@/common/adapter/httpBridge', ...)` + 自建 registry | 纯 vitest 能力,零新依赖;配合 TypeScript 强类型更稳 |
-| WS 事件模拟 | helper 暴露 `mock.emit(eventName, payload)` + 内部 queue,测试里 await tick 后断言 | 与记忆里 "vi.advanceTimersByTimeAsync" 的 async 教训一致;真实 WS 行为(fire-and-forget + 订阅)用 queue 模拟最准 |
-| 每个被测文件单一 test 文件 | 默认 1 对 1 映射;被测超过 200 行或覆盖多个逻辑主题允许拆 | 可读性与覆盖率兼顾 |
-| 覆盖率门禁 | 维持 `thresholds: 0` 不改;N3 handoff 里单独列出 v8 报告里 6 个文件的 statement 覆盖率(仅展示,不 gate) | 减少噪声 gate;硬指标是"清单全落地 + vitest run 绿" |
+| 决策点                     | 结论                                                                                                  | 理由                                                                                                                                     |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| mock helper 放哪           | `tests/unit/_helpers/mockHttpBridge.ts`(与测试同根,不进 `src/`)                                       | 只服务于测试、不上 runtime;下划线前缀规避 vitest include glob 误匹配(`_helpers/**/*.test.ts` 仍可被 glob 命中,而 helper 本身非 .test.ts) |
+| mock 基础机制              | `vi.mock('@/common/adapter/httpBridge', ...)` + 自建 registry                                         | 纯 vitest 能力,零新依赖;配合 TypeScript 强类型更稳                                                                                       |
+| WS 事件模拟                | helper 暴露 `mock.emit(eventName, payload)` + 内部 queue,测试里 await tick 后断言                     | 与记忆里 "vi.advanceTimersByTimeAsync" 的 async 教训一致;真实 WS 行为(fire-and-forget + 订阅)用 queue 模拟最准                           |
+| 每个被测文件单一 test 文件 | 默认 1 对 1 映射;被测超过 200 行或覆盖多个逻辑主题允许拆                                              | 可读性与覆盖率兼顾                                                                                                                       |
+| 覆盖率门禁                 | 维持 `thresholds: 0` 不改;N3 handoff 里单独列出 v8 报告里 6 个文件的 statement 覆盖率(仅展示,不 gate) | 减少噪声 gate;硬指标是"清单全落地 + vitest run 绿"                                                                                       |
 
 ## 验收标准
 
@@ -153,14 +153,14 @@ handoff 里列出每个文件的 statement 覆盖率(应 ≥ 70%,若某行覆盖
 
 ## 关键风险
 
-| 风险 | 缓解 |
-|---|---|
-| helper 设计过于复杂,N4 反而不愿意用 | helper API 表面严格控制在 5 个方法以内(`createMockHttpBridge` / `mock.onGet/Post/Put/Patch/Delete` / `mock.emit` / `reset`);N3 handoff 里锁定签名后 N4 不得改 |
-| `vi.mock` 路径别名 `@/common/adapter/httpBridge` 在 vitest 4 下行为异常 | `vitest.config.ts` 的 `resolve.alias` 已配置(见文件);先写 T6 helper 自测验证,不行就用 `vi.mock('/abs/path/httpBridge', ...)` 兜底 |
-| `getBackendPort` 的 `window.__backendPort` 分支在 jsdom 环境下表现与 node 不同 | T3 用 `@vitest-environment` 指定 `node` + 手动 mock `window` 对象;dom 分支另起 `.dom.test.ts`;避免同一文件里切环境 |
-| `configMigration.ts` 涉及 electron config 存储的 IO,测试难隔离 | `vi.mock` 掉 `common/config/storage.ts` 的读写接口;T4 只测 migration 的 "transform" 部分 |
-| 记忆里的 "fake timers + async" 陷阱 | helper 的 `emit` 支持 sync / async 双模;默认 sync 路径跳过 fake timers;handoff 里写明选择理由 |
-| 已删的 M 系列测试可能"隐式"依赖了某些 common mock,新写时容易漏洞 | 仅参考 `packages/web-host/src/**/*.unit.test.ts` 的风格(它们还活着),不回读已删的 `tests/unit/` 内容 |
+| 风险                                                                           | 缓解                                                                                                                                                          |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| helper 设计过于复杂,N4 反而不愿意用                                            | helper API 表面严格控制在 5 个方法以内(`createMockHttpBridge` / `mock.onGet/Post/Put/Patch/Delete` / `mock.emit` / `reset`);N3 handoff 里锁定签名后 N4 不得改 |
+| `vi.mock` 路径别名 `@/common/adapter/httpBridge` 在 vitest 4 下行为异常        | `vitest.config.ts` 的 `resolve.alias` 已配置(见文件);先写 T6 helper 自测验证,不行就用 `vi.mock('/abs/path/httpBridge', ...)` 兜底                             |
+| `getBackendPort` 的 `window.__backendPort` 分支在 jsdom 环境下表现与 node 不同 | T3 用 `@vitest-environment` 指定 `node` + 手动 mock `window` 对象;dom 分支另起 `.dom.test.ts`;避免同一文件里切环境                                            |
+| `configMigration.ts` 涉及 electron config 存储的 IO,测试难隔离                 | `vi.mock` 掉 `common/config/storage.ts` 的读写接口;T4 只测 migration 的 "transform" 部分                                                                      |
+| 记忆里的 "fake timers + async" 陷阱                                            | helper 的 `emit` 支持 sync / async 双模;默认 sync 路径跳过 fake timers;handoff 里写明选择理由                                                                 |
+| 已删的 M 系列测试可能"隐式"依赖了某些 common mock,新写时容易漏洞               | 仅参考 `packages/web-host/src/**/*.unit.test.ts` 的风格(它们还活着),不回读已删的 `tests/unit/` 内容                                                           |
 
 ## 依赖上游
 
