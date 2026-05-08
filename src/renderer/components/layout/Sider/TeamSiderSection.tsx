@@ -154,7 +154,7 @@ const TeamSiderSection: React.FC<TeamSiderSectionProps> = ({
       ) : (
         <div className='shrink-0 flex flex-col gap-2px mb-8px'>
           <div
-            className='group flex items-center px-14px py-8px pr-22px cursor-pointer select-none sticky top-0 z-10 bg-fill-2'
+            className='group flex items-center px-14px py-8px cursor-pointer select-none sticky top-0 z-10 bg-fill-2'
             data-testid='team-section-toggle'
             aria-expanded={expanded}
             onClick={toggleExpanded}
@@ -169,7 +169,7 @@ const TeamSiderSection: React.FC<TeamSiderSectionProps> = ({
             >
               <Plus theme='outline' size='14' fill='var(--color-text-2)' style={{ lineHeight: 0 }} />
             </div>
-            <div className='ml-2px h-20px w-20px rd-4px flex items-center justify-center hover:bg-fill-3 transition-all shrink-0 text-t-secondary'>
+            <div className='ml-4px h-20px w-20px rd-4px flex items-center justify-center hover:bg-fill-3 transition-all shrink-0 text-t-secondary'>
               {expanded ? <Down theme='outline' size={12} /> : <Right theme='outline' size={12} />}
             </div>
           </div>

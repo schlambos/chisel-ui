@@ -8,6 +8,7 @@ import { ipcBridge } from '@/common';
 import { TEAM_MODE_ENABLED } from '@/common/config/constants';
 import { ConfigStorage, type ICssTheme } from '@/common/config/storage';
 import PwaPullToRefresh from '@/renderer/components/layout/PwaPullToRefresh';
+import SidebarToggleIcon from '@/renderer/components/layout/SidebarToggleIcon';
 import Titlebar from '@/renderer/components/layout/Titlebar';
 import { Layout as ArcoLayout } from '@arco-design/web-react';
 import { MenuFold, MenuUnfold } from '@icon-park/react';
@@ -535,7 +536,7 @@ const Layout: React.FC<{
                   onClick={() => setCollapsed(false)}
                   aria-label='Expand sidebar'
                 >
-                  <MenuUnfold theme='outline' size='16' fill='currentColor' />
+                  <SidebarToggleIcon size='16' />
                 </button>
               )}
               <Outlet />
