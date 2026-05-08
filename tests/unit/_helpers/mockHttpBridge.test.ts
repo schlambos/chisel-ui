@@ -215,9 +215,11 @@ describe('mockHttpBridge helper', () => {
     mock.onGet('/api/items/xyz', () => ({ item: 'xyz' }));
 
     const module = mock.asModule();
-    const result = await module.httpGet<{ item: string }, { id: string }>((params) => `/api/items/${params.id}`).invoke({
-      id: 'xyz',
-    });
+    const result = await module
+      .httpGet<{ item: string }, { id: string }>((params) => `/api/items/${params.id}`)
+      .invoke({
+        id: 'xyz',
+      });
 
     expect(result).toEqual({ item: 'xyz' });
     expect(mock.calls[0].path).toBe('/api/items/xyz');

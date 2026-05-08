@@ -123,7 +123,7 @@ $ bunx tsc --noEmit
 (无输出)
 ```
 
-总行数: 0  
+总行数: 0
 退出码: 0
 
 #### 7. Lint (bun run lint)
@@ -155,7 +155,7 @@ Found 716 warnings and 0 errors.
 Finished in 41ms on 875 files with 128 rules using 12 threads.
 ```
 
-总行数: 8625  
+总行数: 8625
 退出码: 0
 
 #### 8. Vitest (bunx vitest run)
@@ -168,18 +168,18 @@ $ bunx vitest run
 [31mNo test files found, exiting with code 1
 [39m
 
-[30m[43m node [49m[39m 
+[30m[43m node [49m[39m
 
 [2minclude: [22m[33mtests/unit/**/*.test.ts[2m, [22mtests/unit/**/test_*.ts[2m, [22mtests/integration/**/*.test.ts[2m, [22mtests/regression/**/*.test.ts[39m
 [2mexclude:  [22m[33mtests/unit/**/*.dom.test.ts[2m, [22mtests/unit/**/*.dom.test.tsx[39m
 
-[30m[45m dom [49m[39m 
+[30m[45m dom [49m[39m
 
 [2minclude: [22m[33mtests/unit/**/*.dom.test.ts[2m, [22mtests/unit/**/*.dom.test.tsx[39m
 [2mexclude:  [22m[33m**/node_modules/**[2m, [22m**/.git/**[39m
 ```
 
-总行数: 12  
+总行数: 12
 退出码: 1 (**偏离预期**,见"与计划的偏离"第 1 点)
 
 #### 9. Prek (prek run --from-ref origin/feat/backend-migration --to-ref HEAD)
@@ -214,7 +214,7 @@ Stashed changes conflicted with changes made by hook, rolling back the hook chan
 Restored working tree changes from `/Users/zhoukai/.cache/prek/patches/1778252829830-53644.patch`
 ```
 
-总行数: 24  
+总行数: 24
 退出码: 0 (Oxfmt 自动修复已在 commit 3 提交)
 
 ### 变更统计
@@ -259,7 +259,7 @@ tests/unit/system
 
 ### UC-F-5: 基线同步后复跑
 
-基线同步状态: `origin/feat/backend-migration @ e4cdff41f` 已在本地,无需 merge。  
+基线同步状态: `origin/feat/backend-migration @ e4cdff41f` 已在本地,无需 merge。
 Step 4 复跑结果:
 
 - `bun run lint`: 退出 0,716 warnings 0 errors

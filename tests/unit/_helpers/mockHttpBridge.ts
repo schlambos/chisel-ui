@@ -324,7 +324,11 @@ class MockHttpBridgeImpl implements MockHttpBridge {
           invoke: (async (params?: Params) => {
             const resolvedPath = typeof pathOrFn === 'function' ? pathOrFn(params as Params) : pathOrFn;
             const requestBody =
-              mapBody && params !== undefined ? mapBody(params as Params) : method === 'GET' || method === 'DELETE' ? undefined : params;
+              mapBody && params !== undefined
+                ? mapBody(params as Params)
+                : method === 'GET' || method === 'DELETE'
+                  ? undefined
+                  : params;
             const result = await executeRoute(method, resolvedPath, requestBody);
             return result as Data;
           }) as Params extends undefined ? () => Promise<Data> : (params: Params) => Promise<Data>,
