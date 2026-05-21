@@ -212,12 +212,10 @@ const AcpSendBox: React.FC<{
           errorMsg.includes('[ACP-AUTH-') ||
           errorMsg.includes('authentication failed') ||
           errorMsg.includes('认证失败');
-        const isBusyError =
-          errorMsg.includes('already processing') || errorMsg.includes('Conflict');
+        const isBusyError = errorMsg.includes('already processing') || errorMsg.includes('Conflict');
 
         if (isAuthError) {
           ipcBridge.acpConversation.responseStream.emit({
-            id: uuid(),
             msg_id: uuid(),
             conversation_id,
             type: 'error',
@@ -233,7 +231,6 @@ Please check your local CLI tool authentication status`,
           });
         } else if (isBusyError) {
           ipcBridge.acpConversation.responseStream.emit({
-            id: uuid(),
             msg_id: uuid(),
             conversation_id,
             type: 'error',
