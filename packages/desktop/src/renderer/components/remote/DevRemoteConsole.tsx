@@ -9,7 +9,7 @@
  * Only rendered when process.env.NODE_ENV === 'development'.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRemoteAccess, type RemoteState } from '@renderer/hooks/remote/useRemoteAccess';
 import { useAuth } from '@renderer/hooks/context/AuthContext';
 import { remoteMockStore } from '@renderer/services/remoteMock';
@@ -29,6 +29,37 @@ const DevRemoteConsole: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const isLoggedIn = status === 'authenticated';
 
+  // Draggable position — start at bottom-right
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const dragging = useRef(false);
+  const didDrag = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!dragging.current) return;
+      didDrag.current = true;
+      setPos({ x: e.clientX - dragOffset.current.x, y: e.clientY - dragOffset.current.y });
+    };
+    const onMouseUp = () => { dragging.current = false; };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
+  const onDragStart = (e: React.MouseEvent) => {
+    if (!panelRef.current) return;
+    const rect = panelRef.current.getBoundingClientRect();
+    dragging.current = true;
+    didDrag.current = false;
+    dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    e.preventDefault();
+  };
+
   if (process.env.NODE_ENV !== 'development' || !devSetState) return null;
 
   const handleStateClick = async (s: RemoteState) => {
@@ -42,12 +73,16 @@ const DevRemoteConsole: React.FC = () => {
     }
   };
 
+  const posStyle = pos
+    ? { top: pos.y, left: pos.x, bottom: 'auto', right: 'auto' }
+    : { bottom: 16, right: 16 };
+
   return (
     <div
+      ref={panelRef}
       style={{
         position: 'fixed',
-        bottom: 16,
-        right: 16,
+        ...posStyle,
         zIndex: 99999,
         background: 'rgba(20,20,25,0.92)',
         border: '1px solid rgba(255,255,255,0.12)',
@@ -64,8 +99,9 @@ const DevRemoteConsole: React.FC = () => {
       }}
     >
       <div
-        style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: collapsed ? 0 : 8, cursor: 'pointer' }}
-        onClick={() => setCollapsed((v) => !v)}
+        style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: collapsed ? 0 : 8, cursor: 'grab' }}
+        onMouseDown={onDragStart}
+        onClick={() => { if (!didDrag.current) setCollapsed((v) => !v); }}
       >
         <span
           style={{
