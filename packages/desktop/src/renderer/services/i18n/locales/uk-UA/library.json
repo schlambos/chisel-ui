@@ -1,5 +1,5 @@
 {
-  "title": "Library",
+  "title": "Бібліотека",
   "totalAssets": "{{count}} актив",
   "totalAssets_other": "{{count}} активів",
   "totalFiles": "{{count}} файл",
@@ -12,7 +12,8 @@
   "empty": "Немає активів за поточними фільтрами.",
   "view": {
     "conversation": "За розмовою",
-    "file": "За файлом"
+    "file": "За файлом",
+    "list": "Список"
   },
   "tabs": {
     "all": "Усі",
@@ -47,7 +48,9 @@
     "alsoInConversation": "Інші файли в розмові",
     "close": "Закрити",
     "viewInConversation": "Відкрити розмову",
-    "showInFinder": "Показати у Finder"
+    "showInFinder": "Показати у Finder",
+    "showInExplorer": "Показати у Провіднику",
+    "showInFileManager": "Показати у файловому менеджері"
   },
   "toast": {
     "mockJump": "mock: перехід до розмови ({{id}})",

@@ -16,8 +16,7 @@ const listeners = new Set<Listener>();
 let observer: MutationObserver | null = null;
 
 function getSnapshot(): boolean {
-  return typeof document !== 'undefined'
-    && document.documentElement.getAttribute('data-theme') === 'dark';
+  return typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
 }
 
 function subscribe(listener: Listener): () => void {

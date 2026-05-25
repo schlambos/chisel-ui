@@ -1,5 +1,5 @@
 {
-  "title": "Library",
+  "title": "Библиотека",
   "totalAssets": "{{count}} актив",
   "totalAssets_other": "{{count}} активов",
   "totalFiles": "{{count}} файл",
@@ -12,7 +12,8 @@
   "empty": "Нет активов, соответствующих фильтрам.",
   "view": {
     "conversation": "По беседе",
-    "file": "По файлу"
+    "file": "По файлу",
+    "list": "Список"
   },
   "tabs": {
     "all": "Все",
@@ -47,7 +48,9 @@
     "alsoInConversation": "Другие файлы в беседе",
     "close": "Закрыть",
     "viewInConversation": "Открыть беседу",
-    "showInFinder": "Показать в Finder"
+    "showInFinder": "Показать в Finder",
+    "showInExplorer": "Показать в Проводнике",
+    "showInFileManager": "Показать в файловом менеджере"
   },
   "toast": {
     "mockJump": "mock: переход к беседе ({{id}})",

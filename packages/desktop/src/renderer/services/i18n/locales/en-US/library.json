@@ -12,7 +12,8 @@
   "empty": "No assets match the current filters.",
   "view": {
     "conversation": "By conversation",
-    "file": "By file"
+    "file": "By file",
+    "list": "List view"
   },
   "tabs": {
     "all": "All",
@@ -52,7 +53,9 @@
     "alsoInConversation": "Also in this conversation",
     "close": "Close",
     "viewInConversation": "View in conversation",
-    "showInFinder": "Show in Finder"
+    "showInFinder": "Show in Finder",
+    "showInExplorer": "Show in Explorer",
+    "showInFileManager": "Show in File Manager"
   },
   "toast": {
     "mockJump": "Mock jump to conversation ({{id}})",

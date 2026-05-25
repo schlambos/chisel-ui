@@ -17,25 +17,43 @@ interface FileTileListProps {
 }
 
 const FILE_ICON: Record<string, string> = {
-  pptx: '🎞️', ppt: '🎞️',
-  docx: '📄', doc: '📄',
-  xlsx: '📊', xls: '📊', csv: '📊',
+  pptx: '🎞️',
+  ppt: '🎞️',
+  docx: '📄',
+  doc: '📄',
+  xlsx: '📊',
+  xls: '📊',
+  csv: '📊',
   pdf: '📑',
-  md: '📝', txt: '📝',
-  png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️', svg: '🖼️',
-  mmd: '🔀', mermaid: '🔀', mindmap: '🧠',
-  py: '</>', ts: '</>', tsx: '</>', js: '</>', jsx: '</>',
-  sh: '</>', html: '</>', css: '</>', json: '</>',
+  md: '📝',
+  txt: '📝',
+  png: '🖼️',
+  jpg: '🖼️',
+  jpeg: '🖼️',
+  gif: '🖼️',
+  webp: '🖼️',
+  svg: '🖼️',
+  mmd: '🔀',
+  mermaid: '🔀',
+  mindmap: '🧠',
+  py: '</>',
+  ts: '</>',
+  tsx: '</>',
+  js: '</>',
+  jsx: '</>',
+  sh: '</>',
+  html: '</>',
+  css: '</>',
+  json: '</>',
 };
-
 
 const EXT_BG: Record<string, string> = {
   slide: 'var(--library-cover-slide-bg)',
-  doc:   'var(--library-cover-doc-bg)',
+  doc: 'var(--library-cover-doc-bg)',
   sheet: 'var(--library-cover-sheet-bg)',
   image: 'var(--library-cover-image-bg)',
-  code:  'var(--library-cover-code-bg)',
-  html:  'var(--library-cover-html-bg)',
+  code: 'var(--library-cover-code-bg)',
+  html: 'var(--library-cover-html-bg)',
 };
 
 const FileTileList: React.FC<FileTileListProps> = ({ file, asset, onClick }) => {
@@ -56,18 +74,15 @@ const FileTileList: React.FC<FileTileListProps> = ({ file, asset, onClick }) => 
 
       {/* 文件名 */}
       <div className={styles.nameWrap}>
-        <span className={styles.name} title={file.name}>{file.name}</span>
+        <span className={styles.name} title={file.name}>
+          {file.name}
+        </span>
       </div>
 
       {/* agent */}
       <div className={styles.agentWrap}>
         {logoUrl && !imgFailed ? (
-          <img
-            src={logoUrl}
-            alt={asset.agent}
-            className={styles.agentLogo}
-            onError={() => setImgFailed(true)}
-          />
+          <img src={logoUrl} alt={asset.agent} className={styles.agentLogo} onError={() => setImgFailed(true)} />
         ) : (
           <span className={styles.agentDot} />
         )}

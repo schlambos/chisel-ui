@@ -58,29 +58,11 @@ function InternalPattern({ ext }: { ext: string }) {
     // Slide thumbnail: rect + title bar + image placeholder
     return (
       <>
-        <rect
-          x={8}
-          y={16}
-          width={44}
-          height={30}
-          rx='2.5'
-          fill='white'
-          stroke='#f4a492'
-          strokeWidth='0.8'
-        />
+        <rect x={8} y={16} width={44} height={30} rx='2.5' fill='white' stroke='#f4a492' strokeWidth='0.8' />
         <rect x={11} y={19} width={20} height={3} rx='1' fill='#ffd6cc' />
         <rect x={11} y={25} width={28} height={2} rx='1' fill='#fde8e3' />
         <rect x={11} y={29} width={22} height={2} rx='1' fill='#fde8e3' />
-        <rect
-          x={36}
-          y={22}
-          width={12}
-          height={9}
-          rx='1.5'
-          fill='#fde8e3'
-          stroke='#f4a492'
-          strokeWidth='0.6'
-        />
+        <rect x={36} y={22} width={12} height={9} rx='1.5' fill='#fde8e3' stroke='#f4a492' strokeWidth='0.6' />
         <path
           d={`M${36} ${29} L${40} ${25} L${44} ${28} L${48} ${24} L${48} ${31} L${36} ${31}z`}
           fill='#f4a492'
@@ -153,16 +135,7 @@ function InternalPattern({ ext }: { ext: string }) {
         <rect x={9} y={26} width={18} height={1.8} rx='0.9' fill='#fde8cc' />
         <rect x={9} y={30} width={20} height={1.8} rx='0.9' fill='#fde8cc' />
         <rect x={9} y={34} width={14} height={1.8} rx='0.9' fill='#fde8cc' />
-        <rect
-          x={33}
-          y={17}
-          width={20}
-          height={14}
-          rx='2'
-          fill='#fde8cc'
-          stroke='#f0c090'
-          strokeWidth='0.7'
-        />
+        <rect x={33} y={17} width={20} height={14} rx='2' fill='#fde8cc' stroke='#f0c090' strokeWidth='0.7' />
         <circle cx={37} cy={21} r='2.5' fill='#f0c090' />
         <path
           d={`M${33} ${28} L${38} ${23} L${43} ${27} L${47} ${22} L${53} ${27} L${53} ${31} L${33} ${31}z`}
@@ -178,22 +151,10 @@ function InternalPattern({ ext }: { ext: string }) {
     // Image: mountain + sun landscape
     return (
       <>
-        <rect
-          x={9}
-          y={16}
-          width={44}
-          height={30}
-          rx='2.5'
-          fill='white'
-          stroke='#c8aef0'
-          strokeWidth='0.8'
-        />
+        <rect x={9} y={16} width={44} height={30} rx='2.5' fill='white' stroke='#c8aef0' strokeWidth='0.8' />
         <rect x={9} y={16} width={44} height={10} rx='2' fill='#eef5ff' fillOpacity='0.9' />
         <circle cx={20} cy={25} r='5' fill='#fde8a0' stroke='#e8c860' strokeWidth='0.7' />
-        <path
-          d={`M${9} ${42} L${20} ${28} L${30} ${38} L${38} ${28} L${53} ${42}z`}
-          fill='#dcc8f0'
-        />
+        <path d={`M${9} ${42} L${20} ${28} L${30} ${38} L${38} ${28} L${53} ${42}z`} fill='#dcc8f0' />
         <path d={`M${9} ${42} L${20} ${28} L${30} ${38}z`} fill='#c8aee0' />
       </>
     );
@@ -203,16 +164,7 @@ function InternalPattern({ ext }: { ext: string }) {
     // HTML: browser window with traffic lights
     return (
       <>
-        <rect
-          x={9}
-          y={16}
-          width={44}
-          height={30}
-          rx='2.5'
-          fill='white'
-          stroke='#90d0f0'
-          strokeWidth='0.8'
-        />
+        <rect x={9} y={16} width={44} height={30} rx='2.5' fill='white' stroke='#90d0f0' strokeWidth='0.8' />
         <rect x={9} y={16} width={44} height={7} rx='2.5' fill='#d8f0fc' />
         <circle cx={14} cy={19.5} r='1.5' fill='#f4a8a0' />
         <circle cx={19} cy={19.5} r='1.5' fill='#f8d898' />

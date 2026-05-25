@@ -20,15 +20,34 @@ interface FileTileProps {
 }
 
 const FILE_ICON: Record<string, string> = {
-  pptx: '🎞️', ppt: '🎞️',
-  docx: '📄', doc: '📄',
-  xlsx: '📊', xls: '📊', csv: '📊',
+  pptx: '🎞️',
+  ppt: '🎞️',
+  docx: '📄',
+  doc: '📄',
+  xlsx: '📊',
+  xls: '📊',
+  csv: '📊',
   pdf: '📑',
-  md: '📝', txt: '📝',
-  png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️', svg: '🖼️',
-  mmd: '🔀', mermaid: '🔀', mindmap: '🧠',
-  py: '</>', ts: '</>', tsx: '</>', js: '</>', jsx: '</>',
-  sh: '</>', html: '</>', css: '</>', json: '</>',
+  md: '📝',
+  txt: '📝',
+  png: '🖼️',
+  jpg: '🖼️',
+  jpeg: '🖼️',
+  gif: '🖼️',
+  webp: '🖼️',
+  svg: '🖼️',
+  mmd: '🔀',
+  mermaid: '🔀',
+  mindmap: '🧠',
+  py: '</>',
+  ts: '</>',
+  tsx: '</>',
+  js: '</>',
+  jsx: '</>',
+  sh: '</>',
+  html: '</>',
+  css: '</>',
+  json: '</>',
 };
 
 const LEFT_BG: Record<string, string> = {
@@ -63,16 +82,25 @@ const FileTile: React.FC<FileTileProps> = ({ file, asset, onClick, onContextMenu
 
   return (
     <Tooltip
-      content={<span className={styles.tooltipContent}>{t('library.tooltip.from')}{asset.conversationName}</span>}
+      content={
+        <span className={styles.tooltipContent}>
+          {t('library.tooltip.from')}
+          {asset.conversationName}
+        </span>
+      }
       position='bottom'
       mini
     >
       <div className={styles.tile} onClick={onClick} onContextMenu={onContextMenu}>
         <div className={styles.cover} style={{ background: leftBg }}>
           <span className={isCode ? styles.iconCode : styles.iconEmoji}>{icon}</span>
-          <span className={styles.extBadge} style={{ background: extColor }}>{extLabel}</span>
+          <span className={styles.extBadge} style={{ background: extColor }}>
+            {extLabel}
+          </span>
         </div>
-        <div className={styles.name} title={file.name}>{file.name}</div>
+        <div className={styles.name} title={file.name}>
+          {file.name}
+        </div>
         <div className={styles.agentRow}>
           {logoUrl && !imgFailed ? (
             <img src={logoUrl} alt={asset.agent} className={styles.agentLogo} onError={() => setImgFailed(true)} />

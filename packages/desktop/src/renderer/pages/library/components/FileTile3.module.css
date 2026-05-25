@@ -122,7 +122,9 @@
   padding: 0 2px;
 }
 
-.tooltip { font-size: 12px; }
+.tooltip {
+  font-size: 12px;
+}
 
 [data-theme='dark'] .tile {
   --library-cover-slide-bg: rgba(176, 90, 61, 0.18);
@@ -138,4 +140,3 @@
   --library-cover-html-bg: rgba(44, 110, 150, 0.18);
   --library-cover-html: #5aaed4;
 }
-

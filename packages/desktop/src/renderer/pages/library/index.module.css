@@ -61,7 +61,9 @@
   border-right: 1px solid var(--color-border-2);
   background: transparent;
   cursor: pointer;
-  transition: color 0.12s, background 0.12s;
+  transition:
+    color 0.12s,
+    background 0.12s;
 }
 .modeBtn:last-child {
   border-right: 0;
@@ -71,8 +73,8 @@
   background: var(--color-fill-1);
 }
 .modeBtn.active {
-  background: var(--color-text-1);
-  color: var(--bg-1);
+  background: var(--color-fill-3);
+  color: var(--color-text-1);
 }
 
 /* ── 白色工作区容器（搜索 + tabs + 内容网格）── */
@@ -173,7 +175,9 @@
   border-radius: 6px;
   color: var(--color-text-3);
   cursor: pointer;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 .iconBtn:hover {
   background: var(--color-fill-2);

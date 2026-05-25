@@ -1,5 +1,5 @@
 {
-  "title": "Library",
+  "title": "Kütüphane",
   "totalAssets": "{{count}} varlık",
   "totalFiles": "{{count}} dosya",
   "singleFile": "Tek dosya",
@@ -9,7 +9,8 @@
   "empty": "Filtreyle eşleşen varlık yok.",
   "view": {
     "conversation": "Sohbete göre",
-    "file": "Dosyaya göre"
+    "file": "Dosyaya göre",
+    "list": "Liste görünümü"
   },
   "tabs": {
     "all": "Tümü",
@@ -44,7 +45,9 @@
     "alsoInConversation": "Bu konuşmadaki diğer dosyalar",
     "close": "Kapat",
     "viewInConversation": "Sohbette görüntüle",
-    "showInFinder": "Finder'da Göster"
+    "showInFinder": "Finder'da Göster",
+    "showInExplorer": "Dosya Gezgini'nde Göster",
+    "showInFileManager": "Dosya Yöneticisi'nde Göster"
   },
   "toast": {
     "mockJump": "mock: ({{id}}) sohbetine atla",

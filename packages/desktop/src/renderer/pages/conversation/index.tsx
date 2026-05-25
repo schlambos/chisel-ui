@@ -2,17 +2,19 @@ import { ipcBridge } from '@/common';
 import { Message, Spin } from '@arco-design/web-react';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import ChatConversation from './components/ChatConversation';
 import { usePreviewContext } from '@/renderer/pages/conversation/Preview';
+import { getContentTypeByExtension } from '@/renderer/pages/conversation/Preview/fileUtils';
 import { useAutoTitle } from '@/renderer/hooks/chat/useAutoTitle';
 
 const ChatConversationIndex: React.FC = () => {
   const { id } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { closePreview } = usePreviewContext();
+  const location = useLocation();
+  const { closePreview, openPreview } = usePreviewContext();
   const { syncTitleFromHistory } = useAutoTitle();
   const previousConversationIdRef = useRef<string | undefined>(undefined);
   const notFoundHandledIdRef = useRef<string | undefined>(undefined);
@@ -26,10 +28,42 @@ const ChatConversationIndex: React.FC = () => {
     // (component may remount via React Router, resetting the ref to undefined)
     if (previousConversationIdRef.current !== id) {
       closePreview();
+
+      // 从 Library 跳转时，state 携带目标文件路径，关闭旧预览后立即打开
+      const filePath = (location.state as { previewFilePath?: string } | null)?.previewFilePath;
+      if (filePath) {
+        const contentType = getContentTypeByExtension(filePath);
+        const fileName = filePath.split('/').pop() ?? filePath;
+        void (async () => {
+          try {
+            let content: string;
+            if (contentType === 'image') {
+              content = await ipcBridge.fs.getImageBase64.invoke({ path: filePath, workspace: undefined });
+            } else if (
+              contentType === 'pdf' ||
+              contentType === 'word' ||
+              contentType === 'excel' ||
+              contentType === 'ppt'
+            ) {
+              content = '';
+            } else {
+              content = await ipcBridge.fs.readFile.invoke({ path: filePath, workspace: undefined });
+            }
+            openPreview(content, contentType, {
+              title: fileName,
+              file_name: fileName,
+              file_path: filePath,
+              editable: false,
+            });
+          } catch {
+            // 文件读取失败时静默处理，不影响对话加载
+          }
+        })();
+      }
     }
 
     previousConversationIdRef.current = id;
-  }, [id, closePreview]);
+  }, [id, location.state, closePreview, openPreview]);
 
   // Swallow fetch errors (e.g. 404 when navigating back to a deleted conversation
   // via browser history) so they don't bubble up as unhandled promise rejections.

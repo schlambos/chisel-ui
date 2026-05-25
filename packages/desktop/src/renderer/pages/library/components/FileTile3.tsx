@@ -19,26 +19,44 @@ interface FileTile3Props {
 }
 
 const FILE_ICON: Record<string, string> = {
-  pptx: '🎞️', ppt: '🎞️',
-  docx: '📄', doc: '📄',
-  xlsx: '📊', xls: '📊', csv: '📊',
+  pptx: '🎞️',
+  ppt: '🎞️',
+  docx: '📄',
+  doc: '📄',
+  xlsx: '📊',
+  xls: '📊',
+  csv: '📊',
   pdf: '📑',
-  md: '📝', txt: '📝',
-  png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️', svg: '🖼️',
-  mmd: '🔀', mermaid: '🔀', mindmap: '🧠',
-  py: '</>', ts: '</>', tsx: '</>', js: '</>', jsx: '</>',
-  sh: '</>', html: '</>', css: '</>', json: '</>',
+  md: '📝',
+  txt: '📝',
+  png: '🖼️',
+  jpg: '🖼️',
+  jpeg: '🖼️',
+  gif: '🖼️',
+  webp: '🖼️',
+  svg: '🖼️',
+  mmd: '🔀',
+  mermaid: '🔀',
+  mindmap: '🧠',
+  py: '</>',
+  ts: '</>',
+  tsx: '</>',
+  js: '</>',
+  jsx: '</>',
+  sh: '</>',
+  html: '</>',
+  css: '</>',
+  json: '</>',
 };
 
 const EXT_COLOR: Record<string, string> = {
   slide: 'var(--library-cover-slide)',
-  doc:   'var(--library-cover-doc)',
+  doc: 'var(--library-cover-doc)',
   sheet: 'var(--library-cover-sheet)',
   image: 'var(--library-cover-image)',
-  code:  'var(--library-cover-code)',
-  html:  'var(--library-cover-html)',
+  code: 'var(--library-cover-code)',
+  html: 'var(--library-cover-html)',
 };
-
 
 const FileTile3: React.FC<FileTile3Props> = ({ file, asset, onClick }) => {
   const { t } = useTranslation();
@@ -53,26 +71,29 @@ const FileTile3: React.FC<FileTile3Props> = ({ file, asset, onClick }) => {
 
   return (
     <Tooltip
-      content={<span className={styles.tooltip}>{t('library.tooltip.from')}{asset.conversationName}</span>}
+      content={
+        <span className={styles.tooltip}>
+          {t('library.tooltip.from')}
+          {asset.conversationName}
+        </span>
+      }
       position='bottom'
       mini
     >
       <div className={styles.tile} onClick={onClick}>
         <div className={styles.iconWrap}>
           <span className={isCode ? styles.iconCode : styles.iconEmoji}>{icon}</span>
-          <span className={styles.extBadge} style={{ background: extColor }}>{extLabel}</span>
-
+          <span className={styles.extBadge} style={{ background: extColor }}>
+            {extLabel}
+          </span>
         </div>
         <div className={styles.body}>
-          <div className={styles.name} title={file.name}>{file.name}</div>
+          <div className={styles.name} title={file.name}>
+            {file.name}
+          </div>
           <div className={styles.agentRow}>
             {logoUrl && !imgFailed ? (
-              <img
-                src={logoUrl}
-                alt={asset.agent}
-                className={styles.agentLogo}
-                onError={() => setImgFailed(true)}
-              />
+              <img src={logoUrl} alt={asset.agent} className={styles.agentLogo} onError={() => setImgFailed(true)} />
             ) : (
               <span className={styles.agentDot} />
             )}

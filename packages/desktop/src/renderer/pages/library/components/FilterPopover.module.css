@@ -195,3 +195,17 @@
 .tagClose:hover {
   opacity: 1;
 }
+.tagMore {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(var(--primary-6), 0.06);
+  border: 1px solid rgba(var(--primary-6), 0.2);
+  color: rgb(var(--primary-6));
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0.8;
+  flex-shrink: 0;
+}

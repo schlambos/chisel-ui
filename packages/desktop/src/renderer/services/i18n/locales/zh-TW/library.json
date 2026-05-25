@@ -1,5 +1,5 @@
 {
-  "title": "Library",
+  "title": "資產庫",
   "totalAssets": "{{count}} 項資產",
   "totalFiles": "{{count}} 個檔案",
   "singleFile": "單一檔案",
@@ -9,7 +9,8 @@
   "empty": "沒有符合條件的資產",
   "view": {
     "conversation": "依對話",
-    "file": "依檔案"
+    "file": "依檔案",
+    "list": "列表檢視"
   },
   "tabs": {
     "all": "全部",
@@ -44,7 +45,9 @@
     "alsoInConversation": "該對話中的其他檔案",
     "close": "關閉",
     "viewInConversation": "前往對話",
-    "showInFinder": "在 Finder 中顯示"
+    "showInFinder": "在 Finder 中顯示",
+    "showInExplorer": "在檔案總管中顯示",
+    "showInFileManager": "在檔案管理器中顯示"
   },
   "toast": {
     "mockJump": "mock:跳轉至對話 ({{id}})",

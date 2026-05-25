@@ -1,5 +1,5 @@
 {
-  "title": "Library",
+  "title": "资产库",
   "totalAssets": "{{count}} 项资产",
   "totalFiles": "{{count}} 个文件",
   "singleFile": "单文件",
@@ -9,7 +9,8 @@
   "empty": "没有符合条件的资产",
   "view": {
     "conversation": "按对话",
-    "file": "按文件"
+    "file": "按文件",
+    "list": "列表视图"
   },
   "tabs": {
     "all": "全部",
@@ -44,7 +45,9 @@
     "alsoInConversation": "该对话中的其他文件",
     "close": "关闭",
     "viewInConversation": "在对话中查看",
-    "showInFinder": "在 Finder 中显示"
+    "showInFinder": "在 Finder 中显示",
+    "showInExplorer": "在文件资源管理器中显示",
+    "showInFileManager": "在文件管理器中显示"
   },
   "toast": {
     "mockJump": "mock：跳转到对话 ({{id}})",

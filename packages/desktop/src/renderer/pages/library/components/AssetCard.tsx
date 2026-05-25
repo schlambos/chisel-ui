@@ -112,7 +112,11 @@ function agentPillColor(agent: string, isDark: boolean): string {
   return isDark ? pair[1] : pair[0];
 }
 
-const AgentPill: React.FC<{ agent: string; agentBackend: string; isDark: boolean }> = ({ agent, agentBackend, isDark }) => {
+const AgentPill: React.FC<{ agent: string; agentBackend: string; isDark: boolean }> = ({
+  agent,
+  agentBackend,
+  isDark,
+}) => {
   const [imgFailed, setImgFailed] = useState(false);
   const logoUrl = getAgentLogo(agent) ?? getAgentLogo(agentBackend);
   const color = agentPillColor(agentBackend, isDark) ?? agentPillColor(agent, isDark);
@@ -158,9 +162,7 @@ const AssetCard: React.FC<AssetCardProps> = ({
   return (
     <div className={styles.card} onClick={onOpen} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       <div className={styles.left} style={{ background: leftBg }}>
-        <span className={type === 'code' || type === 'html' ? styles.leftIconCode : styles.leftIcon}>
-          {icon}
-        </span>
+        <span className={type === 'code' || type === 'html' ? styles.leftIconCode : styles.leftIcon}>{icon}</span>
         <span className={styles.extBadge} style={{ background: extColor }}>
           {extLabel}
         </span>

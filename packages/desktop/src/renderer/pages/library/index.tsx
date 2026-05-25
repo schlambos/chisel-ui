@@ -310,9 +310,9 @@ const LibraryPage: React.FC = () => {
   }, [hidePopover]);
 
   const handleJumpToConversation = useCallback(
-    (conversationId: string) => {
+    (conversationId: string, filePath?: string) => {
       setDrawerOpen(false);
-      navigate(`/conversation/${conversationId}`);
+      navigate(`/conversation/${conversationId}`, { state: filePath ? { previewFilePath: filePath } : undefined });
     },
     [navigate]
   );
@@ -547,7 +547,9 @@ const LibraryPage: React.FC = () => {
                 placeholder={t('library.searchPlaceholder')}
                 value={search}
                 onChange={setSearch}
-                onBlur={() => { if (!search) setSearchOpen(false); }}
+                onBlur={() => {
+                  if (!search) setSearchOpen(false);
+                }}
                 className={styles.searchInput}
               />
             )}
@@ -555,7 +557,11 @@ const LibraryPage: React.FC = () => {
               type='button'
               className={classNames(styles.iconBtn, (searchOpen || search) && styles.iconBtnActive)}
               onClick={() => {
-                if (searchOpen && search) { setSearch(''); setSearchOpen(false); return; }
+                if (searchOpen && search) {
+                  setSearch('');
+                  setSearchOpen(false);
+                  return;
+                }
                 setSearchOpen((v) => !v);
               }}
               title={t('library.searchPlaceholder')}
@@ -586,7 +592,7 @@ const LibraryPage: React.FC = () => {
               type='button'
               className={classNames(styles.modeBtn, viewMode === 'list' && styles.active)}
               onClick={() => setViewMode('list')}
-              title='List'
+              title={t('library.view.list')}
             >
               <svg width='14' height='14' viewBox='0 0 14 14' fill='none'>
                 <rect x='1' y='2' width='3' height='3' rx='1' fill='currentColor' />

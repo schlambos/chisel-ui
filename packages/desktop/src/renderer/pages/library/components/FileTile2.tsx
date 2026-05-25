@@ -43,11 +43,15 @@ const FileTile2: React.FC<FileTile2Props> = ({ file, asset, onClick }) => {
         {icon.emoji ? (
           <div className={`${styles.icon} ${styles.iconEmoji}`}>{icon.emoji}</div>
         ) : (
-          <div className={`${styles.icon} ${icon.variant ? styles[icon.variant as keyof typeof styles] : ''} ${icon.text === '</>' ? styles.codeSymbol : ''}`}>
+          <div
+            className={`${styles.icon} ${icon.variant ? styles[icon.variant as keyof typeof styles] : ''} ${icon.text === '</>' ? styles.codeSymbol : ''}`}
+          >
             {icon.text}
           </div>
         )}
-        <div className={styles.name} title={file.name}>{file.name}</div>
+        <div className={styles.name} title={file.name}>
+          {file.name}
+        </div>
         <div className={styles.agent}>{asset.agent}</div>
       </div>
     </Tooltip>

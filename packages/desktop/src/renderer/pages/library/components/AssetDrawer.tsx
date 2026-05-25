@@ -15,27 +15,53 @@ import { fileTypeOf } from '../libraryService';
 import { formatDateTime, formatRelativeTime } from '../utils';
 import { useLayoutContext } from '@renderer/hooks/context/LayoutContext';
 import { getAgentLogo } from '@renderer/utils/model/agentLogo';
+import { isWindows, isLinux } from '@renderer/utils/platform';
 import styles from './AssetDrawer.module.css';
 
+function showInFolderKey(): string {
+  if (isWindows()) return 'library.drawer.showInExplorer';
+  if (isLinux()) return 'library.drawer.showInFileManager';
+  return 'library.drawer.showInFinder';
+}
+
 const FILE_ICON: Record<string, string> = {
-  pptx: '🎞️', ppt: '🎞️',
-  docx: '📄', doc: '📄',
-  xlsx: '📊', xls: '📊', csv: '📊',
+  pptx: '🎞️',
+  ppt: '🎞️',
+  docx: '📄',
+  doc: '📄',
+  xlsx: '📊',
+  xls: '📊',
+  csv: '📊',
   pdf: '📑',
-  md: '📝', txt: '📝',
-  png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🖼️', webp: '🖼️', svg: '🖼️',
-  mmd: '🔀', mermaid: '🔀', mindmap: '🧠',
-  py: '</>', ts: '</>', tsx: '</>', js: '</>', jsx: '</>',
-  sh: '</>', html: '</>', css: '</>', json: '</>',
+  md: '📝',
+  txt: '📝',
+  png: '🖼️',
+  jpg: '🖼️',
+  jpeg: '🖼️',
+  gif: '🖼️',
+  webp: '🖼️',
+  svg: '🖼️',
+  mmd: '🔀',
+  mermaid: '🔀',
+  mindmap: '🧠',
+  py: '</>',
+  ts: '</>',
+  tsx: '</>',
+  js: '</>',
+  jsx: '</>',
+  sh: '</>',
+  html: '</>',
+  css: '</>',
+  json: '</>',
 };
 
 const EXT_COLOR: Record<string, string> = {
   slide: '#c0522a',
-  doc:   '#2e6abf',
+  doc: '#2e6abf',
   sheet: '#227a40',
   image: '#5838a0',
-  code:  '#445566',
-  html:  '#1a6e96',
+  code: '#445566',
+  html: '#1a6e96',
 };
 
 const AgentBadge: React.FC<{ agent: string; agentBackend: string }> = ({ agent, agentBackend }) => {
@@ -58,7 +84,7 @@ interface AssetDrawerProps {
   file: LibraryFile | null;
   visible: boolean;
   onClose: () => void;
-  onJumpToConversation: (conversationId: string) => void;
+  onJumpToConversation: (conversationId: string, filePath?: string) => void;
 }
 
 const AssetDrawer: React.FC<AssetDrawerProps> = ({ asset, file, visible, onClose, onJumpToConversation }) => {
@@ -87,17 +113,14 @@ const AssetDrawer: React.FC<AssetDrawerProps> = ({ asset, file, visible, onClose
       className={styles.drawer}
       footer={
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-          <Button
-            disabled={!file}
-            onClick={() => file && ipcBridge.shell.showItemInFolder.invoke(file.path)}
-          >
-            {t('library.drawer.showInFinder')}
+          <Button disabled={!file} onClick={() => file && ipcBridge.shell.showItemInFolder.invoke(file.path)}>
+            {t(showInFolderKey())}
           </Button>
           <Button
             type='primary'
             disabled={!asset}
             icon={<Right theme='outline' size='14' fill='currentColor' />}
-            onClick={() => asset && onJumpToConversation(asset.conversationId)}
+            onClick={() => asset && onJumpToConversation(asset.conversationId, file?.path)}
           >
             {t('library.drawer.viewInConversation')}
           </Button>
@@ -110,10 +133,14 @@ const AssetDrawer: React.FC<AssetDrawerProps> = ({ asset, file, visible, onClose
           <div className={styles.fileHero}>
             <div className={styles.fileHeroIcon}>
               <span className={isCode ? styles.heroIconCode : styles.heroIconEmoji}>{icon}</span>
-              <span className={styles.heroExtBadge} style={{ background: extColor }}>{extLabel}</span>
+              <span className={styles.heroExtBadge} style={{ background: extColor }}>
+                {extLabel}
+              </span>
             </div>
             <div className={styles.fileHeroMeta}>
-              <div className={styles.fileHeroName} title={file.name}>{file.name}</div>
+              <div className={styles.fileHeroName} title={file.name}>
+                {file.name}
+              </div>
               <div className={styles.fileHeroSub}>
                 {file.size} · {formatRelativeTime(t, asset.updatedAt)}
               </div>
@@ -151,11 +178,7 @@ const AssetDrawer: React.FC<AssetDrawerProps> = ({ asset, file, visible, onClose
             <>
               <div className={styles.divider} />
               <div className={styles.section}>
-                <button
-                  type='button'
-                  className={styles.collapseToggle}
-                  onClick={() => setOtherFilesOpen((v) => !v)}
-                >
+                <button type='button' className={styles.collapseToggle} onClick={() => setOtherFilesOpen((v) => !v)}>
                   <span className={styles.sectionLabel} style={{ margin: 0 }}>
                     {t('library.drawer.alsoInConversation')}
                     <span className={styles.otherCount}>{otherFiles.length}</span>
@@ -175,9 +198,13 @@ const AssetDrawer: React.FC<AssetDrawerProps> = ({ asset, file, visible, onClose
                         <div key={f.path} className={styles.otherFileRow}>
                           <div className={styles.otherFileIcon}>
                             <span className={fIsCode ? styles.otherIconCode : styles.otherIconEmoji}>{fIcon}</span>
-                            <span className={styles.otherExtBadge} style={{ background: fColor }}>{fLabel}</span>
+                            <span className={styles.otherExtBadge} style={{ background: fColor }}>
+                              {fLabel}
+                            </span>
                           </div>
-                          <span className={styles.otherFileName} title={f.name}>{f.name}</span>
+                          <span className={styles.otherFileName} title={f.name}>
+                            {f.name}
+                          </span>
                         </div>
                       );
                     })}

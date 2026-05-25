@@ -69,9 +69,7 @@ const SiderLibraryEntry: React.FC<SiderLibraryEntryProps> = ({
             style={{ lineHeight: 0 }}
           />
         </span>
-        <span className='collapsed-hidden text-t-primary text-14px font-[500] leading-24px'>
-          {t('library.title')}
-        </span>
+        <span className='collapsed-hidden text-t-primary text-14px font-[500] leading-24px'>{t('library.title')}</span>
       </div>
     </Tooltip>
   );

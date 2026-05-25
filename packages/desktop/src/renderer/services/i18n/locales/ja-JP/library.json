@@ -1,5 +1,5 @@
 {
-  "title": "Library",
+  "title": "ライブラリ",
   "totalAssets": "{{count}} 件のアセット",
   "totalFiles": "{{count}} 件のファイル",
   "singleFile": "ファイル 1 件",
@@ -9,7 +9,8 @@
   "empty": "条件に一致するアセットはありません",
   "view": {
     "conversation": "会話別",
-    "file": "ファイル別"
+    "file": "ファイル別",
+    "list": "リスト表示"
   },
   "tabs": {
     "all": "すべて",
@@ -44,7 +45,9 @@
     "alsoInConversation": "この会話の他のファイル",
     "close": "閉じる",
     "viewInConversation": "会話を開く",
-    "showInFinder": "Finderで表示"
+    "showInFinder": "Finderで表示",
+    "showInExplorer": "エクスプローラーで表示",
+    "showInFileManager": "ファイルマネージャーで表示"
   },
   "toast": {
     "mockJump": "mock: 会話 ({{id}}) を開く",

@@ -455,7 +455,6 @@ export async function listLibraryAssets(
   preloadedConversations: TChatConversation[],
   onIncremental?: (updated: LibraryAsset[]) => void
 ): Promise<LibraryAsset[]> {
-
   // ── Cache hit ──────────────────────────────────────────────────────────────
   if (_cache) {
     const { assets: cached, lastScanAt } = _cache;
@@ -468,9 +467,7 @@ export async function listLibraryAssets(
         assistantsApi.list.invoke().catch((): Assistant[] => []),
         extensions.getAcpAdapters.invoke().catch((): Record<string, unknown>[] => []),
       ])
-        .then(([assistantList, acpAdapters]) =>
-          scanConversations(newConvs, assistantList, acpAdapters)
-        )
+        .then(([assistantList, acpAdapters]) => scanConversations(newConvs, assistantList, acpAdapters))
         .then((newAssets) => {
           // Abort if cache was cleared (account switch) while we were scanning.
           if (_cache !== cacheAtStart) return;
