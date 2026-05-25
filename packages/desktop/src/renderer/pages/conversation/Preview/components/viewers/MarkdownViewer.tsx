@@ -334,11 +334,14 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
+    // WeakSet keyed by element identity — two distinct <img> tags pointing at
+    // the same path each get their own fetch and their own refCount.
     const seen = new WeakSet<HTMLImageElement>();
-    // Track all (conversationId, relativePath) pairs we've fed into img.src so
-    // we can release the matching refCount on unmount; otherwise each preview
-    // session leaks one Object URL per inlined image.
-    const issuedBlobs = new Set<string>();
+    // Records every (conversationId, relativePath) refCount we issued into the
+    // blob cache. Array, not Set — duplicate paths legitimately bump refCount
+    // more than once (multiple <img> tags resolving to the same blob), and
+    // cleanup must release exactly that many refs.
+    const issuedBlobs: Array<{ cid: string; rel: string }> = [];
 
     const resolveLocalImage = (img: HTMLImageElement) => {
       if (!img || seen.has(img)) return;
@@ -347,13 +350,17 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
         seen.add(img);
         return;
       }
+      // Mark BEFORE async work — otherwise the MutationObserver can re-fire
+      // (e.g. on the very `img.src = blobUrl` write below) and double-issue
+      // refCounts on the same element.
+      seen.add(img);
 
       if (conversationId) {
         const relativeSrc = rawAttr.replace(/\\/g, '/');
         void fetchFileAsBlob(conversationId, relativeSrc)
           .then((blobUrl) => {
             img.src = blobUrl;
-            issuedBlobs.add(`${conversationId} ${relativeSrc}`);
+            issuedBlobs.push({ cid: conversationId, rel: relativeSrc });
           })
           .catch(async () => {
             const normalizedBase = baseDir ? baseDir.replace(/\\/g, '/') : undefined;
@@ -367,9 +374,6 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
               const dataUrl = await ipcBridge.fs.getImageBase64.invoke({ path: absolutePath, workspace });
               if (dataUrl) img.src = dataUrl;
             }
-          })
-          .finally(() => {
-            seen.add(img);
           });
         return;
       }
@@ -381,10 +385,7 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
         : normalizedBase
           ? joinPath(normalizedBase, cleanedSrc)
           : undefined;
-      if (!absolutePath) {
-        seen.add(img);
-        return;
-      }
+      if (!absolutePath) return;
 
       void ipcBridge.fs.getImageBase64
         .invoke({ path: absolutePath, workspace })
@@ -395,9 +396,6 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
         })
         .catch((error) => {
           console.error('[MarkdownPreview] Failed to inline rendered image:', { rawAttr, absolutePath, error });
-        })
-        .finally(() => {
-          seen.add(img);
         });
     };
 
@@ -417,19 +415,18 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
 
     return () => {
       observer.disconnect();
-      // Release every blob URL the observer injected. Key format matches the
-      // `${conversationId} ${relativeSrc}` we recorded above; the space
-      // separator is safe because conversation IDs cannot contain spaces.
-      issuedBlobs.forEach((key) => {
-        const sep = key.indexOf(' ');
-        if (sep <= 0) return;
-        const cid = key.slice(0, sep);
-        const rel = key.slice(sep + 1);
+      // Release exactly the refCounts we issued. Iterate the array so duplicate
+      // (cid, rel) entries from multiple <img> tags each release one ref.
+      issuedBlobs.forEach(({ cid, rel }) => {
         revokeFileBlob(cid, rel);
       });
-      issuedBlobs.clear();
+      issuedBlobs.length = 0;
     };
-  }, [baseDir, containerRef, viewMode, displayedContent, workspace, conversationId]);
+    // `displayedContent` intentionally NOT in deps: the MutationObserver picks
+    // up new <img> tags as Streamdown renders them. Re-running on every typed
+    // character would tear down the observer and revoke blob URLs while still
+    // displayed.
+  }, [baseDir, containerRef, viewMode, workspace, conversationId]);
 
   return (
     <div className='flex flex-col w-full h-full overflow-hidden'>
