@@ -335,6 +335,10 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
     if (!container) return;
 
     const seen = new WeakSet<HTMLImageElement>();
+    // Track all (conversationId, relativePath) pairs we've fed into img.src so
+    // we can release the matching refCount on unmount; otherwise each preview
+    // session leaks one Object URL per inlined image.
+    const issuedBlobs = new Set<string>();
 
     const resolveLocalImage = (img: HTMLImageElement) => {
       if (!img || seen.has(img)) return;
@@ -349,6 +353,7 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
         void fetchFileAsBlob(conversationId, relativeSrc)
           .then((blobUrl) => {
             img.src = blobUrl;
+            issuedBlobs.add(`${conversationId} ${relativeSrc}`);
           })
           .catch(async () => {
             const normalizedBase = baseDir ? baseDir.replace(/\\/g, '/') : undefined;
@@ -412,6 +417,17 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({
 
     return () => {
       observer.disconnect();
+      // Release every blob URL the observer injected. Key format matches the
+      // `${conversationId} ${relativeSrc}` we recorded above; the space
+      // separator is safe because conversation IDs cannot contain spaces.
+      issuedBlobs.forEach((key) => {
+        const sep = key.indexOf(' ');
+        if (sep <= 0) return;
+        const cid = key.slice(0, sep);
+        const rel = key.slice(sep + 1);
+        revokeFileBlob(cid, rel);
+      });
+      issuedBlobs.clear();
     };
   }, [baseDir, containerRef, viewMode, displayedContent, workspace, conversationId]);
 
