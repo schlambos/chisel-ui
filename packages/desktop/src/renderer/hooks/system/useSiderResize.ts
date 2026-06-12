@@ -55,7 +55,8 @@ export type UseSiderResizeResult = {
   desktopSiderWidth: number;
   siderDragging: boolean;
   siderIconOnly: boolean;
-  beginSiderResizeDrag: (event: React.MouseEvent<HTMLDivElement>) => void;
+  beginSiderResizeDrag: (event: React.PointerEvent<HTMLDivElement>) => void;
+  resizeBy: (delta: number) => void;
 };
 
 export type UseSiderResizeOptions = {
@@ -76,6 +77,8 @@ export type UseSiderResizeOptions = {
  * Layout passes `setCollapsed` so the drag handler can toggle collapse when
  * crossing the collapse threshold — that behavior stays identical to before.
  */
+export const SIDER_RESIZE_STEP = 16;
+
 export const useSiderResize = ({ isMobile, collapsed, setCollapsed }: UseSiderResizeOptions): UseSiderResizeResult => {
   const [desktopSiderWidth, setDesktopSiderWidth] = useState<number>(readStoredSiderWidth);
   const [siderDragging, setSiderDragging] = useState(false);
@@ -206,6 +209,26 @@ export const useSiderResize = ({ isMobile, collapsed, setCollapsed }: UseSiderRe
     };
   }, [applySiderWidthVar, clearSiderWidthVar, setCollapsed]);
 
+  const resizeBy = useCallback(
+    (delta: number) => {
+      if (isMobile || collapsed) return;
+      const next = Math.min(SIDER_MAX_WIDTH, Math.max(SIDER_MIN_WIDTH, desktopSiderWidthRef.current + delta));
+      const clampedDelta = next - desktopSiderWidthRef.current;
+      if (clampedDelta === 0) return;
+      setDesktopSiderWidth(next);
+      persistSiderWidth(next);
+      applySiderWidthVar(next);
+      // Mirror drag behavior: update icon-only threshold if crossing it.
+      const prevWidth = prevDragWidthRef.current ?? desktopSiderWidthRef.current;
+      const prevIconOnly = prevWidth < SIDER_ICON_ONLY_THRESHOLD;
+      const currIconOnly = next < SIDER_ICON_ONLY_THRESHOLD;
+      if (prevIconOnly !== currIconOnly) {
+        prevDragWidthRef.current = next;
+      }
+    },
+    [isMobile, collapsed, applySiderWidthVar]
+  );
+
   const siderIconOnly = !isMobile && !collapsed && desktopSiderWidth < SIDER_ICON_ONLY_THRESHOLD;
 
   return {
@@ -213,5 +236,6 @@ export const useSiderResize = ({ isMobile, collapsed, setCollapsed }: UseSiderRe
     siderDragging,
     siderIconOnly,
     beginSiderResizeDrag,
+    resizeBy,
   };
 };

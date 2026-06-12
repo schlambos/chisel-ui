@@ -5,8 +5,6 @@
  */
 
 import { TEAM_MODE_ENABLED } from '@/common/config/constants';
-import { configService } from '@/common/config/configService';
-import type { ICssTheme } from '@/common/config/storage';
 import PwaPullToRefresh from '@/renderer/components/layout/PwaPullToRefresh';
 import Titlebar from '@/renderer/components/layout/Titlebar';
 import { Layout as ArcoLayout } from '@arco-design/web-react';
@@ -34,11 +32,10 @@ import {
 } from '@renderer/hooks/system/useSiderResize';
 import { useDirectorySelection } from '@renderer/hooks/file/useDirectorySelection';
 import SidebarIcon from '@renderer/components/layout/icons/SidebarIcon';
-import { processCustomCss } from '@renderer/utils/theme/customCssProcessor';
+import ResizeHandle from '@renderer/components/layout/ResizeHandle';
 import { cleanupSiderTooltips } from '@renderer/utils/ui/siderTooltip';
 import { useConversationShortcuts } from '@renderer/hooks/ui/useConversationShortcuts';
-import { computeCssSyncDecision, resolveCssByActiveTheme } from '@renderer/utils/theme/themeCssSync';
-import { DEFAULT_THEME_ID } from '@renderer/pages/settings/DisplaySettings/presets';
+import { useCustomCssInjection, useCustomCssStyleInjection } from '@renderer/hooks/system/useCustomCssInjection';
 import { dispatchConversationPaneStateEvent } from '@renderer/utils/conversationPane/events';
 import ConversationPane from '@renderer/components/layout/ConversationPane';
 import { useTerminalPanelSafe } from '@renderer/hooks/context/TerminalPanelContext';
@@ -140,7 +137,7 @@ const Layout: React.FC<{
 
   const { isMobile, viewportWidth } = useMobileViewport();
 
-  const { desktopSiderWidth, siderDragging, siderIconOnly, beginSiderResizeDrag } = useSiderResize({
+  const { desktopSiderWidth, siderDragging, siderIconOnly, resizeBy, beginSiderResizeDrag } = useSiderResize({
     isMobile,
     collapsed,
     setCollapsed,
@@ -160,166 +157,25 @@ const Layout: React.FC<{
     persistConversationPaneCollapsed(value);
   }, []);
 
-  const lastCssRef = useRef('');
-  const lastUiCssUpdateAtRef = useRef(0);
+  useCustomCssInjection({ pathname: location.pathname, customCss });
 
-  const loadAndHealCustomCss = useCallback(async () => {
-    try {
-      const [savedCssRaw, activeThemeId, savedThemes] = await Promise.all([
-        configService.get('customCss'),
-        configService.get('css.activeThemeId'),
-        configService.get('css.themes'),
-      ]);
-
-      const decision = computeCssSyncDecision({
-        savedCss: savedCssRaw || '',
-        activeThemeId: activeThemeId || '',
-        savedThemes: (savedThemes || []) as ICssTheme[],
-        currentUiCss: customCss,
-        lastUiCssUpdateAt: lastUiCssUpdateAtRef.current,
-      });
-
-      if (decision.shouldSkipApply) {
-        return;
-      }
-
-      let effectiveCss = decision.effectiveCss;
-
-      // If the active theme resolved to empty CSS and there IS a saved activeThemeId
-      // (but it no longer matches any known theme), fall back to the built-in default and persist.
-      if (!effectiveCss && activeThemeId && activeThemeId !== DEFAULT_THEME_ID) {
-        const defaultCss = resolveCssByActiveTheme(DEFAULT_THEME_ID, (savedThemes || []) as ICssTheme[]);
-        effectiveCss = defaultCss;
-        // Persist the fallback so Layout doesn't keep retrying
-        await Promise.all([
-          configService.set('css.activeThemeId', DEFAULT_THEME_ID),
-          configService.set('customCss', effectiveCss),
-        ]).catch((error) => {
-          console.warn('Failed to persist theme fallback:', error);
-        });
-      } else if (decision.shouldHealStorage) {
-        await configService.set('customCss', effectiveCss).catch((error) => {
-          console.warn('Failed to heal custom CSS from active theme:', error);
-        });
-      }
-
-      setCustomCss(effectiveCss);
-      if (lastCssRef.current !== effectiveCss) {
-        lastCssRef.current = effectiveCss;
-        window.dispatchEvent(new CustomEvent('custom-css-updated', { detail: { customCss: effectiveCss } }));
-      }
-    } catch (error) {
-      console.error('Failed to load or heal custom CSS:', error);
-    }
-  }, [customCss]);
-
-  // 加载并监听自定义 CSS 配置 / Load & watch custom CSS configuration
+  // Keep the custom-css-updated listener so the component's setCustomCss is
+  // wired (the hook only manages internal refs / load scheduling).
   useEffect(() => {
-    void loadAndHealCustomCss();
-
     const handleCssUpdate = (event: CustomEvent) => {
       if (event.detail?.customCss !== undefined) {
         const css = event.detail.customCss || '';
-        lastCssRef.current = css;
-        lastUiCssUpdateAtRef.current = Date.now();
         setCustomCss(css);
-      }
-    };
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key && (event.key.includes('customCss') || event.key.includes('css.activeThemeId'))) {
-        void loadAndHealCustomCss();
       }
     };
 
     window.addEventListener('custom-css-updated', handleCssUpdate as EventListener);
-    window.addEventListener('storage', handleStorageChange);
-
     return () => {
       window.removeEventListener('custom-css-updated', handleCssUpdate as EventListener);
-      window.removeEventListener('storage', handleStorageChange);
     };
-  }, [loadAndHealCustomCss]);
+  }, []);
 
-  // Track the previous pathname so we only re-sync on settings transitions.
-  const prevPathnameRef = useRef(location.pathname);
-  const shouldReSyncCss = (): boolean => {
-    const prev = prevPathnameRef.current;
-    const curr = location.pathname;
-    const wasSettings = prev.startsWith('/settings');
-    const isSettings = curr.startsWith('/settings');
-    // Re-sync when entering or leaving a settings route, plus the initial mount.
-    const enteringLeavingSettings = wasSettings !== isSettings;
-    prevPathnameRef.current = curr;
-    return enteringLeavingSettings;
-  };
-
-  // Re-sync theme css on route changes — only when entering/leaving settings
-  // routes, because some settings pages do not mount CssThemeSettings.
-  // Initial mount always runs (prevPathnameRef starts with the current pathname,
-  // so wasSettings===isSettings and enteringLeavingSettings is false here; we
-  // explicitly also run on mount when prevPathnameRef hasn't been set yet).
-  const isFirstMountRef = useRef(true);
-  useEffect(() => {
-    if (isFirstMountRef.current) {
-      isFirstMountRef.current = false;
-      prevPathnameRef.current = location.pathname;
-      void loadAndHealCustomCss();
-      return;
-    }
-    if (shouldReSyncCss()) {
-      void loadAndHealCustomCss();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname, location.search, location.hash, loadAndHealCustomCss]);
-
-  // 注入自定义 CSS / Inject custom CSS into document head
-  useEffect(() => {
-    const styleId = 'user-defined-custom-css';
-
-    if (!customCss) {
-      document.getElementById(styleId)?.remove();
-      return;
-    }
-
-    const wrappedCss = processCustomCss(customCss);
-
-    const ensureStyleAtEnd = () => {
-      let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
-
-      if (styleEl && styleEl.textContent === wrappedCss && styleEl === document.head.lastElementChild) {
-        return;
-      }
-
-      styleEl?.remove();
-      styleEl = document.createElement('style');
-      styleEl.id = styleId;
-      styleEl.type = 'text/css';
-      styleEl.textContent = wrappedCss;
-      document.head.appendChild(styleEl);
-    };
-
-    ensureStyleAtEnd();
-
-    const observer = new MutationObserver((mutations) => {
-      const hasNewStyle = mutations.some((mutation) =>
-        Array.from(mutation.addedNodes).some((node) => node.nodeName === 'STYLE' || node.nodeName === 'LINK')
-      );
-
-      if (hasNewStyle) {
-        const element = document.getElementById(styleId);
-        if (element && element !== document.head.lastElementChild) {
-          ensureStyleAtEnd();
-        }
-      }
-    });
-
-    observer.observe(document.head, { childList: true });
-
-    return () => {
-      observer.disconnect();
-      document.getElementById(styleId)?.remove();
-    };
-  }, [customCss]);
+  useCustomCssStyleInjection(customCss);
 
   // 进入移动端后立即折叠 / Collapse immediately when switching to mobile
   // Track previous isMobile so we only fire on the desktop→mobile transition.
@@ -466,20 +322,17 @@ const Layout: React.FC<{
                         : sider}
                     </ArcoLayout.Content>
                     {!isMobile && (
-                      <div
-                        className='absolute top-0 h-full w-12px z-20 cursor-col-resize group flex items-center justify-center'
-                        style={{ right: '-6px' }}
+                      <ResizeHandle
+                        orientation='vertical'
+                        variant='edge'
                         onMouseDown={beginSiderResizeDrag}
-                        aria-hidden='true'
-                        title='Drag to resize sidebar'
-                      >
-                        <div
-                          className={classNames(
-                            'pointer-events-none block h-full w-2px bg-bg-3 opacity-90 rd-full transition-all duration-150 group-hover:w-6px group-hover:bg-brand group-active:w-6px group-active:bg-brand',
-                            siderDragging && '!w-6px !bg-brand'
-                          )}
-                        />
-                      </div>
+                        onKeyboardResize={resizeBy}
+                        aria-label={t('common.resizeSidebar', { defaultValue: 'Resize sidebar' })}
+                        aria-valuemin={SIDER_MIN_WIDTH}
+                        aria-valuemax={SIDER_MAX_WIDTH}
+                        aria-valuenow={desktopSiderWidth}
+                        data-dragging={siderDragging ? 'true' : undefined}
+                      />
                     )}
                   </div>
                 </ArcoLayout.Sider>

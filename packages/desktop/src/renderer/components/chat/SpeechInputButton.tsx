@@ -5,7 +5,7 @@
  */
 
 import { configService } from '@/common/config/configService';
-import { Message, Button, Tooltip } from '@arco-design/web-react';
+import { Message, Tooltip } from '@arco-design/web-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -254,16 +254,15 @@ const SpeechInputButton: React.FC<SpeechInputButtonProps> = ({ disabled, locale,
           </div>
         )}
         <Tooltip content={ariaLabel} mini>
-          <Button
-            type='text'
-            size='small'
-            shape='circle'
+          <button
+            type='button'
             className={`speech-input-button ${isRecording ? 'speech-input-button--listening' : ''} ${isProcessing ? 'speech-input-button--processing' : ''}`}
             disabled={disabled || isProcessing}
             onClick={handleClick}
             aria-label={ariaLabel}
-            icon={icon}
-          />
+          >
+            {icon}
+          </button>
         </Tooltip>
       </div>
     </>

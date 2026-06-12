@@ -1332,30 +1332,30 @@ const SendBox: React.FC<{
       disabled={!isButtonDisabled}
       position='top'
     >
-      <Button
-        shape='circle'
-        type='primary'
+      <button
+        type='button'
         disabled={isButtonDisabled}
         className={`send-button-custom sendbox-send-btn ${isButtonDisabled ? 'sendbox-send-btn--disabled' : 'sendbox-send-btn--idle'}`}
-        icon={<ArrowUp theme='filled' size='14' fill='currentColor' strokeWidth={5} />}
         onClick={() => {
           sendMessageHandler();
         }}
         aria-label={t('sendbox.send', { defaultValue: 'Send message' })}
         data-testid='sendbox-send-btn'
-      />
+      >
+        <ArrowUp theme='filled' size='14' fill='currentColor' strokeWidth={5} />
+      </button>
     </Tooltip>
   );
 
   const stopButton = (
-    <Button
-      shape='circle'
-      type='secondary'
+    <button
+      type='button'
       className='bg-animate sendbox-stop-button sendbox-send-btn sendbox-send-btn--running'
-      icon={<div className='mx-auto size-10px rounded-2px bg-current'></div>}
       onClick={stopHandler}
       aria-label={t('sendbox.stop', { defaultValue: 'Stop response' })}
-    ></Button>
+    >
+      <div className='mx-auto size-10px rounded-2px bg-current'></div>
+    </button>
   );
 
   const renderActionButtons = () => {
@@ -1652,15 +1652,15 @@ const SendBox: React.FC<{
             <RailGroup className={isMobile ? 'sendbox-tools sendbox-tools-scroll-mobile' : 'sendbox-tools'}>
               {tools}
               <Tooltip content={t('sendbox.slashTooltip', { defaultValue: 'Open command menu' })} position='top'>
-                <Button
-                  type='secondary'
-                  shape='circle'
+                <button
+                  type='button'
                   className='sendbox-rail__icon-btn'
                   aria-label={t('sendbox.slashAria', { defaultValue: 'Open command menu' })}
                   onClick={handleSlashButtonClick}
                   data-testid='sendbox-slash-btn'
-                  icon={<Command theme='outline' size='14' fill='currentColor' />}
-                />
+                >
+                  <Command theme='outline' size='14' fill='currentColor' />
+                </button>
               </Tooltip>
             </RailGroup>
             <RailDivider />
@@ -1682,9 +1682,8 @@ const SendBox: React.FC<{
                   )}
                   position='top'
                 >
-                  <Button
-                    type='secondary'
-                    shape='circle'
+                  <button
+                    type='button'
                     className='sendbox-rail__icon-btn'
                     aria-label={t(
                       voiceMode.effective
@@ -1697,23 +1696,9 @@ const SendBox: React.FC<{
                     disabled={voiceMode.isToggling}
                     data-testid='sendbox-voice-mode-btn'
                     data-voice-mode-active={voiceMode.effective ? 'true' : 'false'}
-                    icon={
-                      <VoiceOne
-                        theme='outline'
-                        size='14'
-                        fill={voiceMode.effective ? 'var(--brand)' : 'currentColor'}
-                      />
-                    }
-                    style={
-                      voiceMode.effective
-                        ? {
-                            color: 'var(--brand) !important',
-                            backgroundColor: 'color-mix(in srgb, var(--brand) 6%, var(--bg-1)) !important',
-                            borderColor: 'color-mix(in srgb, var(--brand) 58%, transparent) !important',
-                          }
-                        : undefined
-                    }
-                  />
+                  >
+                    <VoiceOne theme='outline' size='14' fill={voiceMode.effective ? 'var(--brand)' : 'currentColor'} />
+                  </button>
                 </Tooltip>
               )}
               {sendButtonPrefix}

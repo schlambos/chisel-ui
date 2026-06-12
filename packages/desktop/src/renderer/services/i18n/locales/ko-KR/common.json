@@ -53,6 +53,10 @@
   "remove": "제거",
   "show": "표시",
   "hide": "숨기기",
+  "showSidebar": "사이드바 표시",
+  "hideSidebar": "사이드바 숨기기",
+  "showConversations": "대화 목록 표시",
+  "hideConversations": "대화 목록 숨기기",
   "goToSettings": "설정으로 이동",
   "forward": "앞으로",
   "historyBack": "뒤로",
@@ -92,5 +96,11 @@
     "noMatches": "일치하는 모델이 없습니다",
     "addFavorite": "즐겨찾기에 추가",
     "removeFavorite": "즐겨찾기에서 제거"
-  }
+  },
+  "unit": {
+    "minute_short": "분",
+    "second_short": "초"
+  },
+  "resizeSidebar": "사이드바 크기 조정",
+  "resizePanel": "패널 크기 조정"
 }

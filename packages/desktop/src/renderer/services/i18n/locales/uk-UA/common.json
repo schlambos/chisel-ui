@@ -53,6 +53,10 @@
   "remove": "Видалити",
   "show": "Показати",
   "hide": "Приховати",
+  "showSidebar": "Показати бічну панель",
+  "hideSidebar": "Приховати бічну панель",
+  "showConversations": "Показати розмови",
+  "hideConversations": "Приховати розмови",
   "goToSettings": "Перейти до налаштувань",
   "forward": "Вперед",
   "historyBack": "Назад",
@@ -97,5 +101,7 @@
   "unit": {
     "minute_short": "хв",
     "second_short": "с"
-  }
+  },
+  "resizeSidebar": "Змінити розмір бічної панелі",
+  "resizePanel": "Змінити розмір панелі"
 }

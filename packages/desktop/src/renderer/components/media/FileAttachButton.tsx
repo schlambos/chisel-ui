@@ -91,6 +91,7 @@ const FileAttachButton: React.FC<FileAttachButtonProps> = ({ openFileSelector, o
         icon={plusIcon}
         onClick={openFileSelector}
         data-testid='aionrs-attach-folder-btn'
+        className='sendbox-rail__icon-btn'
       />
     );
   }
@@ -189,6 +190,7 @@ const FileAttachButton: React.FC<FileAttachButtonProps> = ({ openFileSelector, o
           loading={uploading}
           disabled={uploading}
           data-testid='aionrs-attach-folder-btn'
+          className='sendbox-rail__icon-btn'
         />
       </Trigger>
       <input

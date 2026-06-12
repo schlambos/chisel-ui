@@ -71,6 +71,8 @@ pages/settings/DisplaySettings/presets/
 - `--text-primary`, `--text-secondary`, `--text-tertiary`, `--text-disabled`
 - Arco bridge (Chisl scheme): `--color-text-1` … `--color-text-4`, `--color-fill-*`, `--color-border-*`
 
+**Migration note:** Chisl semantic tokens (`--text-*`, `--bg-*`, `--border-*`) are canonical for all app CSS. `--color-*` passthroughs exist only as a bridge for Arco internal components and should not be used by new app code. Remaining `--color-*` consumers are being migrated file-by-file.
+
 ### Semantic Colors 语义色
 
 - `--primary`, `--success`, `--warning`, `--danger`, `--info`

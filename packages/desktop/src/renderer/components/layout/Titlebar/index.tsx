@@ -46,7 +46,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   // Windows/Linux 显示自定义窗口按钮；macOS 在标题栏给工作区一个切换入口
   const showWindowControls = isDesktopRuntime && !isMacRuntime;
 
-  const workspaceTooltip = conversationPaneCollapsed ? t('common.expandMore') : t('common.collapse');
+  const workspaceTooltip = conversationPaneCollapsed ? t('common.showConversations') : t('common.hideConversations');
   const backToChatTooltip = t('common.back', { defaultValue: 'Back to Chat' });
   const isSettingsRoute = location.pathname.startsWith('/settings');
   // Conversation-pane toggle: available on every route except Settings, on
@@ -59,9 +59,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   // 统一在标题栏左侧展示主侧栏开关 / Always expose sidebar toggle on titlebar left side
   const showSiderToggle = Boolean(layout?.setSiderCollapsed) && !(layout?.isMobile && isSettingsRoute);
   const showBackToChatButton = Boolean(layout?.isMobile && isSettingsRoute);
-  const siderTooltip = layout?.siderCollapsed
-    ? t('common.expandMore', { defaultValue: 'Expand sidebar' })
-    : t('common.collapse', { defaultValue: 'Collapse sidebar' });
+  const siderTooltip = layout?.siderCollapsed ? t('common.showSidebar') : t('common.hideSidebar');
   // 前进/后退仅在桌面端显示（移动端空间有限，保留原有的返回到聊天按钮）
   // Show back/forward on desktop only; mobile keeps the existing back-to-chat button.
   const showHistoryNav = Boolean(navigationHistory) && !layout?.isMobile;
@@ -213,7 +211,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
     <div
       ref={containerRef}
       style={mobileCenterStyle}
-      className={classNames('flex items-center gap-8px app-titlebar bg-2 border-b border-[var(--border-base)]', {
+      className={classNames('flex items-center gap-8px app-titlebar bg-2 border-b border-[var(--border-light)]', {
         'app-titlebar--mobile': layout?.isMobile,
         'app-titlebar--mobile-conversation': layout?.isMobile && workspaceAvailable,
         'app-titlebar--desktop': isDesktopRuntime,
@@ -237,6 +235,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
             className={classNames('app-titlebar__button', layout?.isMobile && 'app-titlebar__button--mobile')}
             onClick={handleSiderToggle}
             aria-label={siderTooltip}
+            title={siderTooltip}
           >
             <SidebarIcon size={iconSize} strokeWidth={desktopIconStroke} />
           </button>
@@ -335,6 +334,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
             className={classNames('app-titlebar__button', layout?.isMobile && 'app-titlebar__button--mobile')}
             onClick={handleWorkspaceToggle}
             aria-label={workspaceTooltip}
+            title={workspaceTooltip}
             aria-pressed={!conversationPaneCollapsed}
           >
             {conversationPaneCollapsed ? (

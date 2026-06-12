@@ -36,6 +36,7 @@ type Props = {
   children: React.ReactNode;
   height?: number;
   onHeightChange?: (height: number) => void;
+  elementRef?: (element: HTMLElement | null) => void;
   'data-testid'?: string;
 };
 
@@ -48,6 +49,7 @@ const SiderAccordionSection: React.FC<Props> = ({
   children,
   height,
   onHeightChange,
+  elementRef,
   'data-testid': testId,
 }) => {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
@@ -56,6 +58,13 @@ const SiderAccordionSection: React.FC<Props> = ({
   const bodyId = `sider-accordion-body-${reactId}`;
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const setSectionRef = useCallback(
+    (element: HTMLElement | null) => {
+      setNodeRef(element);
+      elementRef?.(element);
+    },
+    [elementRef, setNodeRef]
+  );
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -98,7 +107,7 @@ const SiderAccordionSection: React.FC<Props> = ({
 
   return (
     <section
-      ref={setNodeRef}
+      ref={setSectionRef}
       style={style}
       className={`${panelStyles.accordionSection} ${expanded ? panelStyles.accordionSectionOpen : panelStyles.accordionSectionCollapsed} ${isDragging ? 'opacity-50 shadow-lg !z-50 ring-1 ring-[var(--border-focus)]' : ''}`}
       data-testid={testId}

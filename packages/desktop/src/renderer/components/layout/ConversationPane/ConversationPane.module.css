@@ -8,7 +8,7 @@
   min-height: 0;
   flex: 0 0 auto;
   background-color: var(--bg-2);
-  border-left: 1px solid var(--bg-3);
+  border-left: 1px solid color-mix(in srgb, var(--border-base) 50%, transparent);
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -37,7 +37,7 @@
   height: 44px;
   min-height: 44px;
   padding: 0 12px;
-  border-bottom: 1px solid var(--bg-3);
+  border-bottom: 1px solid var(--border-light);
   background-color: var(--bg-2);
   flex-shrink: 0;
 }

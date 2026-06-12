@@ -53,6 +53,10 @@
   "remove": "移除",
   "show": "顯示",
   "hide": "隱藏",
+  "showSidebar": "顯示側邊欄",
+  "hideSidebar": "隱藏側邊欄",
+  "showConversations": "顯示對話列表",
+  "hideConversations": "隱藏對話列表",
   "goToSettings": "前往設定",
   "forward": "前進",
   "historyBack": "後退",
@@ -92,5 +96,11 @@
     "noMatches": "沒有符合的模型",
     "addFavorite": "加入我的最愛",
     "removeFavorite": "從我的最愛移除"
+  },
+  "resizeSidebar": "調整側邊欄大小",
+  "resizePanel": "調整面板大小",
+  "unit": {
+    "minute_short": "分",
+    "second_short": "秒"
   }
 }

@@ -211,7 +211,9 @@ body,
   background: rgba(255, 255, 255, 0.1);
 }
 
-.arco-btn:active:not(:disabled) {
+.arco-btn:active:not(:disabled):not(.composerPill):not(.app-titlebar .arco-btn):not(.chat-layout-header .arco-btn):not(
+    .sendbox-panel .arco-btn
+  ) {
   transform: scale(0.97);
   transition: transform var(--duration-instant) var(--ease-spring);
 }

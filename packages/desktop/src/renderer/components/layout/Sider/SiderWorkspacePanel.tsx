@@ -43,6 +43,7 @@ import SiderOutlineSection from './sections/SiderOutlineSection';
 import SiderTimelineSection from './sections/SiderTimelineSection';
 import SiderDiffFlyoutTrigger from './SiderDiffFlyoutTrigger';
 import SiderFilesFlyoutTrigger from './SiderFilesFlyoutTrigger';
+import ResizeHandle from '@renderer/components/layout/ResizeHandle';
 
 type SiderWorkspacePanelProps = {
   collapsed?: boolean;
@@ -53,48 +54,24 @@ const HEIGHTS_STORAGE_KEY = 'sider.section.heights';
 const DEFAULT_ORDER = ['explorer', 'diff', 'outline', 'timeline'];
 const MIN_SECTION_HEIGHT = 44; // header height
 
-// Custom resize handle between sections
-const ResizeHandle = ({ onDrag }: { onDrag: (deltaY: number) => void }) => {
-  const isDragging = useRef(false);
-  const startY = useRef(0);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    isDragging.current = true;
-    startY.current = e.clientY;
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging.current) return;
-    const deltaY = e.clientY - startY.current;
-    if (deltaY !== 0) {
-      onDrag(deltaY);
-      startY.current = e.clientY;
-    }
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    isDragging.current = false;
-    e.currentTarget.releasePointerCapture(e.pointerId);
-  };
-
-  return (
-    <div
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      className='h-[4px] -my-[2px] z-10 cursor-row-resize bg-transparent hover:bg-[var(--brand)] transition-colors duration-150 delay-100 shrink-0'
-    />
-  );
-};
-
 const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) => {
   const { t } = useTranslation();
   const [order, setOrder] = useState<string[]>(DEFAULT_ORDER);
   const [heights, setHeights] = useState<Record<string, number>>({});
   const [hydrated, setHydrated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const paneRefs = useRef<Map<string, HTMLElement>>(new Map());
+
+  const setPaneRef = useCallback(
+    (id: string) => (el: HTMLElement | null) => {
+      if (el) {
+        paneRefs.current.set(id, el);
+      } else {
+        paneRefs.current.delete(id);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     try {
@@ -146,29 +123,21 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
   };
 
   const handleResize = useCallback(
-    (index: number, deltaY: number) => {
+    (index: number, delta: number) => {
       if (!containerRef.current) return;
 
       const upperId = order[index];
       const lowerId = order[index + 1];
       if (!upperId || !lowerId) return;
 
-      const elements = containerRef.current.children;
-      let upperEl: HTMLElement | null = null;
-      let lowerEl: HTMLElement | null = null;
-
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i] as HTMLElement;
-        if (el.dataset?.testid === `sider-accordion-${upperId}`) upperEl = el;
-        if (el.dataset?.testid === `sider-accordion-${lowerId}`) lowerEl = el;
-      }
-
+      const upperEl = paneRefs.current.get(upperId);
+      const lowerEl = paneRefs.current.get(lowerId);
       if (!upperEl || !lowerEl) return;
 
       const upperCurrentHeight = heights[upperId] ?? upperEl.offsetHeight;
       const lowerCurrentHeight = heights[lowerId] ?? lowerEl.offsetHeight;
 
-      const newUpperHeight = Math.max(MIN_SECTION_HEIGHT, upperCurrentHeight + deltaY);
+      const newUpperHeight = Math.max(MIN_SECTION_HEIGHT, upperCurrentHeight + delta);
       const actualDelta = newUpperHeight - upperCurrentHeight;
       const newLowerHeight = Math.max(MIN_SECTION_HEIGHT, lowerCurrentHeight - actualDelta);
 
@@ -202,6 +171,7 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         defaultExpanded
         storageKey='sider.section.explorer'
         height={heights['explorer']}
+        elementRef={setPaneRef('explorer')}
         data-testid='sider-accordion-explorer'
         actions={<SiderFilesFlyoutTrigger />}
       >
@@ -216,6 +186,7 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         defaultExpanded
         storageKey='sider.section.diff'
         height={heights['diff']}
+        elementRef={setPaneRef('diff')}
         data-testid='sider-accordion-diff'
         actions={<SiderDiffFlyoutTrigger />}
       >
@@ -230,6 +201,7 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         defaultExpanded={false}
         storageKey='sider.section.outline'
         height={heights['outline']}
+        elementRef={setPaneRef('outline')}
         data-testid='sider-accordion-outline'
       >
         <SiderOutlineSection />
@@ -243,6 +215,7 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         defaultExpanded={false}
         storageKey='sider.section.timeline'
         height={heights['timeline']}
+        elementRef={setPaneRef('timeline')}
         data-testid='sider-accordion-timeline'
       >
         <SiderTimelineSection />
@@ -261,7 +234,14 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
           {order.map((id, index) => (
             <React.Fragment key={id}>
               {sections[id]}
-              {index < order.length - 1 && <ResizeHandle onDrag={(deltaY) => handleResize(index, deltaY)} />}
+              {index < order.length - 1 && (
+                <ResizeHandle
+                  orientation='horizontal'
+                  onDrag={(delta) => handleResize(index, delta)}
+                  onKeyboardResize={(delta) => handleResize(index, delta)}
+                  aria-label={t('common.resizePanel', { defaultValue: 'Resize panel' })}
+                />
+              )}
             </React.Fragment>
           ))}
         </SortableContext>
