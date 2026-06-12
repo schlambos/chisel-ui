@@ -53,6 +53,10 @@
   "remove": "Remove",
   "show": "Show",
   "hide": "Hide",
+  "showSidebar": "Show sidebar",
+  "hideSidebar": "Hide sidebar",
+  "showConversations": "Show conversations",
+  "hideConversations": "Hide conversations",
   "goToSettings": "Go to Settings",
   "forward": "Forward",
   "historyBack": "Back",
@@ -96,5 +100,7 @@
   "unit": {
     "minute_short": "m",
     "second_short": "s"
-  }
+  },
+  "resizeSidebar": "Resize sidebar",
+  "resizePanel": "Resize panel"
 }

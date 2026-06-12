@@ -53,6 +53,10 @@
   "remove": "Kaldır",
   "show": "Göster",
   "hide": "Gizle",
+  "showSidebar": "Kenar çubuğunu göster",
+  "hideSidebar": "Kenar çubuğunu gizle",
+  "showConversations": "Konuşmaları göster",
+  "hideConversations": "Konuşmaları gizle",
   "goToSettings": "Ayarlara Git",
   "forward": "İleri",
   "historyBack": "Geri",
@@ -92,5 +96,11 @@
     "noMatches": "Eşleşen model yok",
     "addFavorite": "Favorilere ekle",
     "removeFavorite": "Favorilerden kaldır"
-  }
+  },
+  "unit": {
+    "minute_short": "dk",
+    "second_short": "sn"
+  },
+  "resizeSidebar": "Kenar çubuğunu yeniden boyutlandır",
+  "resizePanel": "Paneli yeniden boyutlandır"
 }

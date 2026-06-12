@@ -1,0 +1,65 @@
+.handle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+/* Comfortable hit area (12px) with centered line */
+.vertical {
+  width: 12px;
+  height: 100%;
+  cursor: col-resize;
+}
+
+/* Edge handles overlay pane boundaries and must not participate in parent
+   layout. The main sidebar handle used to be absolutely positioned; keeping
+   it in flex flow with `height: 100%` collapses the sider content. */
+.edge.vertical {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  z-index: 20;
+}
+
+.horizontal {
+  width: 100%;
+  height: 12px;
+  cursor: row-resize;
+}
+
+.line {
+  pointer-events: none;
+  border-radius: 9999px;
+  background: var(--border-light);
+  transition:
+    background-color 0.15s ease,
+    width 0.15s ease,
+    height 0.15s ease;
+}
+
+.vertical .line {
+  width: 2px;
+  height: 100%;
+}
+
+.horizontal .line {
+  width: 100%;
+  height: 2px;
+}
+
+/* Hover / drag / focus-visible: brand-colored, slightly wider */
+.vertical:hover .line,
+.vertical:focus-visible .line,
+.vertical[data-dragging='true'] .line {
+  width: 6px;
+  background: var(--brand);
+}
+
+.horizontal:hover .line,
+.horizontal:focus-visible .line,
+.horizontal[data-dragging='true'] .line {
+  height: 6px;
+  background: var(--brand);
+}

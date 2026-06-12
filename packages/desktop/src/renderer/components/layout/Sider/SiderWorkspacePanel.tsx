@@ -43,6 +43,7 @@ import SiderOutlineSection from './sections/SiderOutlineSection';
 import SiderTimelineSection from './sections/SiderTimelineSection';
 import SiderDiffFlyoutTrigger from './SiderDiffFlyoutTrigger';
 import SiderFilesFlyoutTrigger from './SiderFilesFlyoutTrigger';
+import ResizeHandle from '@renderer/components/layout/ResizeHandle';
 
 type SiderWorkspacePanelProps = {
   collapsed?: boolean;
@@ -51,50 +52,44 @@ type SiderWorkspacePanelProps = {
 const ORDER_STORAGE_KEY = 'sider.section.order';
 const HEIGHTS_STORAGE_KEY = 'sider.section.heights';
 const DEFAULT_ORDER = ['explorer', 'diff', 'outline', 'timeline'];
-const MIN_SECTION_HEIGHT = 44; // header height
-
-// Custom resize handle between sections
-const ResizeHandle = ({ onDrag }: { onDrag: (deltaY: number) => void }) => {
-  const isDragging = useRef(false);
-  const startY = useRef(0);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    isDragging.current = true;
-    startY.current = e.clientY;
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging.current) return;
-    const deltaY = e.clientY - startY.current;
-    if (deltaY !== 0) {
-      onDrag(deltaY);
-      startY.current = e.clientY;
-    }
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    isDragging.current = false;
-    e.currentTarget.releasePointerCapture(e.pointerId);
-  };
-
-  return (
-    <div
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      className='h-[4px] -my-[2px] z-10 cursor-row-resize bg-transparent hover:bg-[var(--brand)] transition-colors duration-150 delay-100 shrink-0'
-    />
-  );
+const MIN_SECTION_HEIGHT = 30; // compact header height; body may shrink to zero
+const SECTION_HEADER_HEIGHT = 30;
+const RESIZE_HANDLE_HEIGHT = 12;
+const MIN_EXPANDED_BODY_HEIGHT = 96;
+const SECTION_STORAGE_KEYS: Record<string, string> = {
+  explorer: 'sider.section.explorer',
+  diff: 'sider.section.diff',
+  outline: 'sider.section.outline',
+  timeline: 'sider.section.timeline',
+};
+const DEFAULT_EXPANDED: Record<string, boolean> = {
+  explorer: true,
+  diff: true,
+  outline: false,
+  timeline: false,
 };
 
 const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) => {
   const { t } = useTranslation();
   const [order, setOrder] = useState<string[]>(DEFAULT_ORDER);
   const [heights, setHeights] = useState<Record<string, number>>({});
+  const heightsRef = useRef(heights);
+  heightsRef.current = heights;
+  const [expandedById, setExpandedById] = useState<Record<string, boolean>>(DEFAULT_EXPANDED);
   const [hydrated, setHydrated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const paneRefs = useRef<Map<string, HTMLElement>>(new Map());
+
+  const setPaneRef = useCallback(
+    (id: string) => (el: HTMLElement | null) => {
+      if (el) {
+        paneRefs.current.set(id, el);
+      } else {
+        paneRefs.current.delete(id);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     try {
@@ -110,6 +105,15 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
       if (storedHeights) {
         setHeights(JSON.parse(storedHeights));
       }
+
+      const nextExpanded = { ...DEFAULT_EXPANDED };
+      for (const id of DEFAULT_ORDER) {
+        const stored = window.localStorage.getItem(SECTION_STORAGE_KEYS[id]);
+        if (stored === 'true' || stored === 'false') {
+          nextExpanded[id] = stored === 'true';
+        }
+      }
+      setExpandedById(nextExpanded);
     } catch {
       // Ignore
     }
@@ -145,32 +149,116 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
     }
   };
 
+  const persistExpanded = useCallback((state: Record<string, boolean>) => {
+    try {
+      for (const id of DEFAULT_ORDER) {
+        window.localStorage.setItem(SECTION_STORAGE_KEYS[id], state[id] ? 'true' : 'false');
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const getRequiredHeight = useCallback(
+    (state: Record<string, boolean>) => {
+      const expandedCount = order.filter((id) => state[id]).length;
+      return (
+        order.length * SECTION_HEADER_HEIGHT +
+        Math.max(0, order.length - 1) * RESIZE_HANDLE_HEIGHT +
+        expandedCount * MIN_EXPANDED_BODY_HEIGHT
+      );
+    },
+    [order]
+  );
+
+  const collapseToFit = useCallback(
+    (state: Record<string, boolean>, protectedId?: string) => {
+      const containerHeight = containerRef.current?.clientHeight ?? 0;
+      if (containerHeight <= 0) return state;
+
+      let next = state;
+      const cloneIfNeeded = () => {
+        if (next === state) next = { ...state };
+      };
+
+      const pickCandidate = () => {
+        const expandedIds = order.filter((id) => next[id]);
+        if (expandedIds.length <= 1) return undefined;
+
+        // If the user explicitly opens the bottom-most section while all
+        // sections above it are already open, keep that intent and collapse
+        // the top-most expanded section instead.
+        if (protectedId === order[order.length - 1]) {
+          return expandedIds.find((id) => id !== protectedId);
+        }
+
+        return [...expandedIds].toReversed().find((id) => id !== protectedId) ?? expandedIds[expandedIds.length - 1];
+      };
+
+      while (getRequiredHeight(next) > containerHeight) {
+        const candidate = pickCandidate();
+        if (!candidate) break;
+        cloneIfNeeded();
+        next[candidate] = false;
+      }
+
+      return next;
+    },
+    [getRequiredHeight, order]
+  );
+
+  const handleExpandedChange = useCallback(
+    (id: string, expanded: boolean) => {
+      setExpandedById((prev) => {
+        const requested = { ...prev, [id]: expanded };
+        const next = expanded ? collapseToFit(requested, id) : requested;
+        persistExpanded(next);
+        return next;
+      });
+    },
+    [collapseToFit, persistExpanded]
+  );
+
+  useEffect(() => {
+    if (!hydrated || collapsed || !containerRef.current) return;
+
+    const enforce = () => {
+      setExpandedById((prev) => {
+        const next = collapseToFit(prev);
+        if (next === prev) return prev;
+        persistExpanded(next);
+        return next;
+      });
+    };
+
+    enforce();
+    const observer = new ResizeObserver(enforce);
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [collapseToFit, collapsed, hydrated, persistExpanded]);
+
   const handleResize = useCallback(
-    (index: number, deltaY: number) => {
+    (index: number, delta: number) => {
       if (!containerRef.current) return;
 
       const upperId = order[index];
       const lowerId = order[index + 1];
       if (!upperId || !lowerId) return;
 
-      const elements = containerRef.current.children;
-      let upperEl: HTMLElement | null = null;
-      let lowerEl: HTMLElement | null = null;
-
-      for (let i = 0; i < elements.length; i++) {
-        const el = elements[i] as HTMLElement;
-        if (el.dataset?.testid === `sider-accordion-${upperId}`) upperEl = el;
-        if (el.dataset?.testid === `sider-accordion-${lowerId}`) lowerEl = el;
-      }
-
+      const upperEl = paneRefs.current.get(upperId);
+      const lowerEl = paneRefs.current.get(lowerId);
       if (!upperEl || !lowerEl) return;
 
       const upperCurrentHeight = heights[upperId] ?? upperEl.offsetHeight;
       const lowerCurrentHeight = heights[lowerId] ?? lowerEl.offsetHeight;
 
-      const newUpperHeight = Math.max(MIN_SECTION_HEIGHT, upperCurrentHeight + deltaY);
-      const actualDelta = newUpperHeight - upperCurrentHeight;
-      const newLowerHeight = Math.max(MIN_SECTION_HEIGHT, lowerCurrentHeight - actualDelta);
+      const maxGrow = Math.max(0, lowerCurrentHeight - MIN_SECTION_HEIGHT);
+      const maxShrink = Math.max(0, upperCurrentHeight - MIN_SECTION_HEIGHT);
+      const actualDelta = Math.max(-maxShrink, Math.min(maxGrow, delta));
+      if (actualDelta === 0) return;
+
+      const newUpperHeight = upperCurrentHeight + actualDelta;
+      const newLowerHeight = lowerCurrentHeight - actualDelta;
 
       setHeights((prev) => {
         const newHeights = {
@@ -200,8 +288,11 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         id='explorer'
         title={t('conversation.sider.explorer')}
         defaultExpanded
+        expanded={expandedById['explorer']}
+        onExpandedChange={(expanded) => handleExpandedChange('explorer', expanded)}
         storageKey='sider.section.explorer'
         height={heights['explorer']}
+        elementRef={setPaneRef('explorer')}
         data-testid='sider-accordion-explorer'
         actions={<SiderFilesFlyoutTrigger />}
       >
@@ -214,8 +305,11 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         id='diff'
         title={t('conversation.workspace.changes.diff')}
         defaultExpanded
+        expanded={expandedById['diff']}
+        onExpandedChange={(expanded) => handleExpandedChange('diff', expanded)}
         storageKey='sider.section.diff'
         height={heights['diff']}
+        elementRef={setPaneRef('diff')}
         data-testid='sider-accordion-diff'
         actions={<SiderDiffFlyoutTrigger />}
       >
@@ -228,8 +322,11 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         id='outline'
         title={t('conversation.sider.outline')}
         defaultExpanded={false}
+        expanded={expandedById['outline']}
+        onExpandedChange={(expanded) => handleExpandedChange('outline', expanded)}
         storageKey='sider.section.outline'
         height={heights['outline']}
+        elementRef={setPaneRef('outline')}
         data-testid='sider-accordion-outline'
       >
         <SiderOutlineSection />
@@ -241,8 +338,11 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
         id='timeline'
         title={t('conversation.sider.timeline')}
         defaultExpanded={false}
+        expanded={expandedById['timeline']}
+        onExpandedChange={(expanded) => handleExpandedChange('timeline', expanded)}
         storageKey='sider.section.timeline'
         height={heights['timeline']}
+        elementRef={setPaneRef('timeline')}
         data-testid='sider-accordion-timeline'
       >
         <SiderTimelineSection />
@@ -261,7 +361,14 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
           {order.map((id, index) => (
             <React.Fragment key={id}>
               {sections[id]}
-              {index < order.length - 1 && <ResizeHandle onDrag={(deltaY) => handleResize(index, deltaY)} />}
+              {index < order.length - 1 && (
+                <ResizeHandle
+                  orientation='horizontal'
+                  onDrag={(delta) => handleResize(index, delta)}
+                  onKeyboardResize={(delta) => handleResize(index, delta)}
+                  aria-label={t('common.resizePanel', { defaultValue: 'Resize panel' })}
+                />
+              )}
             </React.Fragment>
           ))}
         </SortableContext>

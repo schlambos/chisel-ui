@@ -8,7 +8,7 @@
   min-height: 0;
   flex: 0 0 auto;
   background-color: var(--bg-2);
-  border-left: 1px solid var(--bg-3);
+  border-left: 1px solid color-mix(in srgb, var(--border-base) 50%, transparent);
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -18,9 +18,9 @@
    toggling collapsed state; resize-dragging runs without it (instant). */
 .paneAnimating {
   transition:
-    width var(--duration-slow) var(--ease-out-expo),
-    flex-basis var(--duration-slow) var(--ease-out-expo),
-    border-left-width var(--duration-slow) var(--ease-out-expo);
+    width var(--motion-slow) var(--ease-out-expo),
+    flex-basis var(--motion-slow) var(--ease-out-expo),
+    border-left-width var(--motion-slow) var(--ease-out-expo);
 }
 
 /* Fully collapsed: clip content and drop the divider so no 1px seam shows. */
@@ -37,7 +37,7 @@
   height: 44px;
   min-height: 44px;
   padding: 0 12px;
-  border-bottom: 1px solid var(--bg-3);
+  border-bottom: 1px solid var(--border-light);
   background-color: var(--bg-2);
   flex-shrink: 0;
 }
@@ -74,25 +74,22 @@
   color: var(--text-secondary);
   cursor: pointer;
   transition:
-    background-color 0.18s ease,
-    color 0.18s ease;
+    background-color var(--motion-fast) var(--motion-ease-standard),
+    color var(--motion-fast) var(--motion-ease-standard);
 }
 
 .actionBtn:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: var(--bg-hover);
   color: var(--text-primary);
 }
 
 .actionBtn:active {
-  background-color: rgba(0, 0, 0, 0.14);
+  background-color: var(--bg-active);
 }
 
-[data-theme='dark'] .actionBtn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme='dark'] .actionBtn:active {
-  background-color: rgba(255, 255, 255, 0.16);
+.actionBtn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
 }
 
 .actionBtnActive {
@@ -142,7 +139,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  animation: slideInFromRight 180ms ease-out;
+  animation: slideInFromRight var(--motion-slow) var(--motion-ease-emphasized);
 }
 
 @keyframes slideInFromRight {

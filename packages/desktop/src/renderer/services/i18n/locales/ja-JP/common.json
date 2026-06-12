@@ -53,6 +53,10 @@
   "remove": "削除",
   "show": "表示",
   "hide": "非表示",
+  "showSidebar": "サイドバーを表示",
+  "hideSidebar": "サイドバーを非表示",
+  "showConversations": "会話一覧を表示",
+  "hideConversations": "会話一覧を非表示",
   "goToSettings": "設定に移動",
   "forward": "進む",
   "historyBack": "戻る",
@@ -92,5 +96,11 @@
     "noMatches": "一致するモデルがありません",
     "addFavorite": "お気に入りに追加",
     "removeFavorite": "お気に入りから削除"
-  }
+  },
+  "unit": {
+    "minute_short": "分",
+    "second_short": "秒"
+  },
+  "resizeSidebar": "サイドバーのサイズを変更",
+  "resizePanel": "パネルのサイズを変更"
 }

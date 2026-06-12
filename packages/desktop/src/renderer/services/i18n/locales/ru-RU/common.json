@@ -53,6 +53,10 @@
   "remove": "Удалить",
   "show": "Показать",
   "hide": "Скрыть",
+  "showSidebar": "Показать боковую панель",
+  "hideSidebar": "Скрыть боковую панель",
+  "showConversations": "Показать беседы",
+  "hideConversations": "Скрыть беседы",
   "goToSettings": "Перейти к настройкам",
   "forward": "Вперёд",
   "more": "Ещё",
@@ -92,5 +96,11 @@
     "noMatches": "Совпадающих моделей нет",
     "addFavorite": "Добавить в избранное",
     "removeFavorite": "Убрать из избранного"
-  }
+  },
+  "unit": {
+    "minute_short": "мин",
+    "second_short": "сек"
+  },
+  "resizeSidebar": "Изменить размер боковой панели",
+  "resizePanel": "Изменить размер панели"
 }

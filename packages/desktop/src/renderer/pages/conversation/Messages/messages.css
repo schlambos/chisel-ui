@@ -1,13 +1,14 @@
 /* ─────────────────────── Phase 4: Message Surface Rhythm ─────────────────────── */
 
-/* Agent message: 2px left-edge accent, persistent author label, no card.
- * The edge is the only frame; padding leaves an 8px gap to content. */
+/* Agent message: transparent field with a 2px left-edge accent, persistent
+ * author label, and no card. The edge is the only frame; padding leaves an
+ * 8px gap to content. */
 .message-agent {
   position: relative;
   width: 100%;
   padding-left: 16px;
   border-left: 2px solid var(--msg-agent-edge, var(--brand));
-  background: var(--bg-base);
+  background: transparent;
   color: var(--text-primary);
 }
 
@@ -44,9 +45,9 @@
   padding: 4px 0 6px;
   background: linear-gradient(
     to bottom,
-    var(--bg-base) 0%,
-    var(--bg-base) 70%,
-    color-mix(in srgb, var(--bg-base) 0%, transparent) 100%
+    var(--bg-1) 0%,
+    var(--bg-1) 70%,
+    color-mix(in srgb, var(--bg-1) 0%, transparent) 100%
   );
   user-select: none;
 }
@@ -172,7 +173,10 @@
 }
 
 .status-pill__dot--running {
-  animation: status-pill-breathe 1.6s ease-in-out infinite;
+  --status-pill-breathe-duration: calc(
+    var(--motion-slow) + var(--motion-slow) + var(--motion-slow) + var(--motion-slow) + var(--motion-slow)
+  );
+  animation: status-pill-breathe var(--status-pill-breathe-duration) var(--motion-ease-standard) infinite;
   box-shadow: 0 0 4px color-mix(in srgb, var(--brand) 50%, transparent);
 }
 
@@ -193,7 +197,7 @@
  * values, so the dim tracks the active theme. */
 .message-item--inactive {
   opacity: 0.5;
-  transition: opacity var(--motion-fast, 120ms) var(--motion-ease-standard, ease);
+  transition: opacity var(--motion-fast) var(--motion-ease-standard);
 }
 
 /* The horizontal divider + pill rendered immediately before the first

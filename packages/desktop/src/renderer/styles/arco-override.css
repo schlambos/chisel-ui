@@ -92,6 +92,28 @@ body {
   padding: 4px 8px;
 }
 
+/* Default background for select and input components */
+.arco-select-view,
+.arco-select-addbefore,
+.arco-input,
+.arco-input-inner-wrapper,
+.arco-input-group-addafter,
+.arco-input-group-addbefore {
+  background-color: var(--fill-0) !important;
+}
+
+/* Grouped inputs should share one surface across the field and its add-ons. */
+.arco-input-inner-wrapper > .arco-input,
+.arco-input-group-addafter .arco-input,
+.arco-input-group-addbefore .arco-input,
+.arco-input-inner-wrapper .arco-input-group-prefix,
+.arco-input-inner-wrapper .arco-input-group-suffix,
+.arco-select-suffix,
+.arco-input-group-addafter .arco-select .arco-select-view,
+.arco-input-group-addbefore .arco-select .arco-select-view {
+  background-color: transparent !important;
+}
+
 /* Selects */
 .arco-select-size-default .arco-select-view,
 .arco-select-view-size-default {
@@ -227,30 +249,6 @@ body {
   margin: 10px 0;
 }
 
-/* Override Arco Design component backgrounds to white in light mode */
-/* 覆盖 Arco Design 组件背景色为白色（浅色模式） */
-/* .arco-input,
-.arco-textarea,
-.arco-select-view,
-.arco-picker,
-.arco-input-number,
-.arco-cascader-view,
-.arco-tree-select-view,
-.arco-auto-complete-view,
-.arco-mentions-view {
-  background-color: #ffffff !important;
-}
-
-.arco-input-wrapper {
-  background-color: #ffffff !important;
-}
-
-.arco-select-popup .arco-select-option {
-  &:hover {
-    background-color: #fafafa !important;
-  }
-} */
-
 .arco-btn {
   &.arco-btn-outline {
     border-color: var(--bg-5);
@@ -274,28 +272,28 @@ body {
 /* Arco Tag dark mode styles - enhance contrast with semi-transparent backgrounds */
 /* Arco Tag 深色模式样式 - 使用半透明背景增强对比度 */
 body[arco-theme='dark'] .arco-tag-checked.arco-tag-blue {
-  background-color: rgba(59, 130, 246, 0.2) !important;
-  color: rgb(96, 165, 250) !important;
+  background-color: color-mix(in srgb, var(--info) 22%, transparent) !important;
+  color: color-mix(in srgb, var(--info) 86%, var(--text-primary)) !important;
 }
 
 body[arco-theme='dark'] .arco-tag-checked.arco-tag-green {
-  background-color: rgba(34, 197, 94, 0.2) !important;
-  color: rgb(74, 222, 128) !important;
+  background-color: color-mix(in srgb, var(--success) 22%, transparent) !important;
+  color: color-mix(in srgb, var(--success) 86%, var(--text-primary)) !important;
 }
 
 body[arco-theme='dark'] .arco-tag-checked.arco-tag-red {
-  background-color: rgba(239, 68, 68, 0.2) !important;
-  color: rgb(248, 113, 113) !important;
+  background-color: color-mix(in srgb, var(--danger) 22%, transparent) !important;
+  color: color-mix(in srgb, var(--danger) 86%, var(--text-primary)) !important;
 }
 
 body[arco-theme='dark'] .arco-tag-checked.arco-tag-orange {
-  background-color: rgba(245, 158, 11, 0.2) !important;
-  color: rgb(251, 191, 36) !important;
+  background-color: color-mix(in srgb, var(--warning) 22%, transparent) !important;
+  color: color-mix(in srgb, var(--warning) 86%, var(--text-primary)) !important;
 }
 
 body[arco-theme='dark'] .arco-tag-checked.arco-tag-gray {
-  background-color: rgba(156, 163, 175, 0.2) !important;
-  color: rgb(209, 213, 219) !important;
+  background-color: color-mix(in srgb, var(--text-secondary) 18%, transparent) !important;
+  color: color-mix(in srgb, var(--text-secondary) 86%, var(--text-primary)) !important;
 }
 
 /* AionUi Steps wrapper styles */

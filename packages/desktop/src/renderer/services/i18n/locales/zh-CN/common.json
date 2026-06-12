@@ -53,6 +53,10 @@
   "remove": "移除",
   "show": "显示",
   "hide": "隐藏",
+  "showSidebar": "显示侧边栏",
+  "hideSidebar": "隐藏侧边栏",
+  "showConversations": "显示对话列表",
+  "hideConversations": "隐藏对话列表",
   "goToSettings": "前往设置",
   "forward": "前进",
   "historyBack": "后退",
@@ -92,5 +96,11 @@
     "noMatches": "没有匹配的模型",
     "addFavorite": "添加到收藏",
     "removeFavorite": "从收藏中移除"
-  }
+  },
+  "unit": {
+    "minute_short": "分",
+    "second_short": "秒"
+  },
+  "resizeSidebar": "调整侧栏大小",
+  "resizePanel": "调整面板大小"
 }
