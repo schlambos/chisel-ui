@@ -32,7 +32,6 @@ import {
 } from '@renderer/hooks/system/useSiderResize';
 import { useDirectorySelection } from '@renderer/hooks/file/useDirectorySelection';
 import SidebarIcon from '@renderer/components/layout/icons/SidebarIcon';
-import ResizeHandle from '@renderer/components/layout/ResizeHandle';
 import { cleanupSiderTooltips } from '@renderer/utils/ui/siderTooltip';
 import { useConversationShortcuts } from '@renderer/hooks/ui/useConversationShortcuts';
 import { useCustomCssInjection, useCustomCssStyleInjection } from '@renderer/hooks/system/useCustomCssInjection';
@@ -142,6 +141,33 @@ const Layout: React.FC<{
     collapsed,
     setCollapsed,
   });
+  const handleSiderResizeKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      switch (event.key) {
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          event.preventDefault();
+          resizeBy(-16);
+          return;
+        case 'ArrowRight':
+        case 'ArrowDown':
+          event.preventDefault();
+          resizeBy(16);
+          return;
+        case 'Home':
+          event.preventDefault();
+          resizeBy(Number.NEGATIVE_INFINITY);
+          return;
+        case 'End':
+          event.preventDefault();
+          resizeBy(Number.POSITIVE_INFINITY);
+          return;
+        default:
+          return;
+      }
+    },
+    [resizeBy]
+  );
 
   // Guard against transition-on-mount for the mobile sider: add a class after
   // the first render so CSS only enables the open/close transition after the
@@ -322,17 +348,26 @@ const Layout: React.FC<{
                         : sider}
                     </ArcoLayout.Content>
                     {!isMobile && (
-                      <ResizeHandle
-                        orientation='vertical'
-                        variant='edge'
-                        onMouseDown={beginSiderResizeDrag}
-                        onKeyboardResize={resizeBy}
+                      <div
+                        role='separator'
+                        aria-orientation='vertical'
                         aria-label={t('common.resizeSidebar', { defaultValue: 'Resize sidebar' })}
                         aria-valuemin={SIDER_MIN_WIDTH}
                         aria-valuemax={SIDER_MAX_WIDTH}
                         aria-valuenow={desktopSiderWidth}
-                        data-dragging={siderDragging ? 'true' : undefined}
-                      />
+                        tabIndex={0}
+                        className='absolute top-0 h-full w-12px z-20 cursor-col-resize group flex items-center justify-center'
+                        style={{ right: '-6px' }}
+                        onMouseDown={beginSiderResizeDrag}
+                        onKeyDown={handleSiderResizeKeyDown}
+                      >
+                        <div
+                          className={classNames(
+                            'pointer-events-none block h-full w-2px bg-bg-3 opacity-90 rd-full transition-all duration-150 group-hover:w-6px group-hover:bg-brand group-focus-visible:w-6px group-focus-visible:bg-brand group-active:w-6px group-active:bg-brand',
+                            siderDragging && '!w-6px !bg-brand'
+                          )}
+                        />
+                      </div>
                     )}
                   </div>
                 </ArcoLayout.Sider>
