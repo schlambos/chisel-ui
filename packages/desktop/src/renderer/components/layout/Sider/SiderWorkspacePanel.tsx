@@ -52,7 +52,7 @@ type SiderWorkspacePanelProps = {
 const ORDER_STORAGE_KEY = 'sider.section.order';
 const HEIGHTS_STORAGE_KEY = 'sider.section.heights';
 const DEFAULT_ORDER = ['explorer', 'diff', 'outline', 'timeline'];
-const MIN_SECTION_HEIGHT = 44; // header height
+const MIN_SECTION_HEIGHT = 30; // compact header height; body may shrink to zero
 
 const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) => {
   const { t } = useTranslation();
@@ -137,9 +137,13 @@ const SiderWorkspacePanel: React.FC<SiderWorkspacePanelProps> = ({ collapsed }) 
       const upperCurrentHeight = heights[upperId] ?? upperEl.offsetHeight;
       const lowerCurrentHeight = heights[lowerId] ?? lowerEl.offsetHeight;
 
-      const newUpperHeight = Math.max(MIN_SECTION_HEIGHT, upperCurrentHeight + delta);
-      const actualDelta = newUpperHeight - upperCurrentHeight;
-      const newLowerHeight = Math.max(MIN_SECTION_HEIGHT, lowerCurrentHeight - actualDelta);
+      const maxGrow = Math.max(0, lowerCurrentHeight - MIN_SECTION_HEIGHT);
+      const maxShrink = Math.max(0, upperCurrentHeight - MIN_SECTION_HEIGHT);
+      const actualDelta = Math.max(-maxShrink, Math.min(maxGrow, delta));
+      if (actualDelta === 0) return;
+
+      const newUpperHeight = upperCurrentHeight + actualDelta;
+      const newLowerHeight = lowerCurrentHeight - actualDelta;
 
       setHeights((prev) => {
         const newHeights = {

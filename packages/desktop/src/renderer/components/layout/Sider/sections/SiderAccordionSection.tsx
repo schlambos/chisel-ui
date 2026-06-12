@@ -66,10 +66,14 @@ const SiderAccordionSection: React.FC<Props> = ({
     [elementRef, setNodeRef]
   );
 
-  const style = {
+  const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    ...(expanded && height !== undefined ? { height: `${height}px`, flex: '0 0 auto' } : {}),
+    // Use a shrinkable flex-basis for user-sized panes. A fixed `0 0 auto`
+    // height can push lower sections out of view on short displays; shrinkable
+    // basis lets expanded bodies compress to their compact header before any
+    // later section becomes unreachable.
+    ...(expanded && height !== undefined ? { flex: `0 1 ${height}px` } : {}),
     ...(isDragging ? { zIndex: 1, position: 'relative' as const } : {}),
   };
 
