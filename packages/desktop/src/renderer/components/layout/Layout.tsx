@@ -372,20 +372,11 @@ const Layout: React.FC<{
                   </div>
                 </ArcoLayout.Sider>
 
-                {/* Command Center editor pane — peer column to the LEFT of the
-                    chat content (desktop), universal across routes: conversation
-                    routes and non-workspace routes (/guid, settings). Team routes
-                    are excluded (no editor; different id shape). Self-gates to
-                    command-center mode; renders null otherwise. A later phase
-                    adds the left/right dock-side preference. */}
-                {(isConversationRoute || !workspaceAvailable) && !isMobile && (
-                  <Suspense fallback={null}>
-                    <CommandCenterEditorHost />
-                  </Suspense>
-                )}
-
-                <ArcoLayout.Content
-                  className={'bg-1 layout-content flex flex-col min-h-0'}
+                <div
+                  role='main'
+                  data-layout-region='content'
+                  tabIndex={-1}
+                  className={'bg-1 layout-content flex flex-col flex-1 min-h-0'}
                   onClick={() => {
                     if (isMobile && !collapsed) setCollapsed(true);
                   }}
@@ -397,23 +388,33 @@ const Layout: React.FC<{
                     ...(isMobile ? { width: '100%' } : {}),
                   }}
                 >
-                  <div role='main' data-layout-region='content' tabIndex={-1} className='flex flex-col flex-1 min-h-0'>
-                    <TerminalPanelHost isMobile={isMobile}>
-                      <Outlet />
-                    </TerminalPanelHost>
-                    {directorySelectionContextHolder}
-                    <PwaPullToRefresh />
-                    <Suspense fallback={null}>
-                      <UpdateModal />
-                    </Suspense>
-                  </div>
-                </ArcoLayout.Content>
-
-                {/* Right-side conversation navigation pane — app-wide peer of
-                    the main content (replaces the old left-Sider chat list).
-                    Hidden on Settings routes. Visibility within an enabled
-                    route is driven by LayoutContext.conversationPaneCollapsed. */}
-                {conversationPaneEnabled && <ConversationPane />}
+                  <TerminalPanelHost isMobile={isMobile}>
+                    <div className='flex flex-row flex-1 min-h-0'>
+                      {(isConversationRoute || !workspaceAvailable) && !isMobile && (
+                        <Suspense fallback={null}>
+                          <CommandCenterEditorHost />
+                        </Suspense>
+                      )}
+                      <div
+                        className='flex-1 min-h-0 flex flex-col overflow-auto justify-center'
+                        style={{
+                          // Complementary order to the editor host: start → editor(1)
+                          // chat(2); end → chat(1) editor(2). Conversation pane is
+                          // pinned rightmost (order 3) in its own component.
+                          order: editorDock === 'end' ? 1 : 2,
+                        }}
+                      >
+                        <Outlet />
+                      </div>
+                      {conversationPaneEnabled && <ConversationPane />}
+                    </div>
+                  </TerminalPanelHost>
+                  {directorySelectionContextHolder}
+                  <PwaPullToRefresh />
+                  <Suspense fallback={null}>
+                    <UpdateModal />
+                  </Suspense>
+                </div>
               </ArcoLayout>
             </div>
           </LayoutModeProvider>
