@@ -31,11 +31,13 @@ type Props = {
   id: string;
   title: React.ReactNode;
   defaultExpanded?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
   storageKey?: string;
   actions?: React.ReactNode;
   children: React.ReactNode;
   height?: number;
-  onHeightChange?: (height: number) => void;
+  _onHeightChange?: (height: number) => void;
   elementRef?: (element: HTMLElement | null) => void;
   'data-testid'?: string;
 };
@@ -44,16 +46,20 @@ const SiderAccordionSection: React.FC<Props> = ({
   id,
   title,
   defaultExpanded = true,
+  expanded: controlledExpanded,
+  onExpandedChange,
   storageKey,
   actions,
   children,
   height,
-  onHeightChange,
+  _onHeightChange,
   elementRef,
   'data-testid': testId,
 }) => {
   const [expanded, setExpanded] = useState<boolean>(defaultExpanded);
   const [hydrated, setHydrated] = useState<boolean>(false);
+  const isControlled = controlledExpanded !== undefined;
+  const effectiveExpanded = controlledExpanded ?? expanded;
   const reactId = useId();
   const bodyId = `sider-accordion-body-${reactId}`;
 
@@ -73,7 +79,7 @@ const SiderAccordionSection: React.FC<Props> = ({
     // height can push lower sections out of view on short displays; shrinkable
     // basis lets expanded bodies compress to their compact header before any
     // later section becomes unreachable.
-    ...(expanded && height !== undefined ? { flex: `0 1 ${height}px` } : {}),
+    ...(effectiveExpanded && height !== undefined ? { flex: `0 1 ${height}px` } : {}),
     ...(isDragging ? { zIndex: 1, position: 'relative' as const } : {}),
   };
 
@@ -81,6 +87,10 @@ const SiderAccordionSection: React.FC<Props> = ({
   // effect below. Wrapped in try/catch so a Storage quota / SecurityError
   // never blocks the UI.
   useEffect(() => {
+    if (isControlled) {
+      setHydrated(true);
+      return;
+    }
     if (!storageKey || typeof window === 'undefined') {
       setHydrated(true);
       return;
@@ -94,26 +104,31 @@ const SiderAccordionSection: React.FC<Props> = ({
       /* ignore */
     }
     setHydrated(true);
-  }, [storageKey]);
+  }, [isControlled, storageKey]);
 
   useEffect(() => {
-    if (!hydrated || !storageKey || typeof window === 'undefined') return;
+    if (isControlled || !hydrated || !storageKey || typeof window === 'undefined') return;
     try {
       window.localStorage.setItem(storageKey, expanded ? 'true' : 'false');
     } catch {
       /* ignore */
     }
-  }, [hydrated, storageKey, expanded]);
+  }, [hydrated, isControlled, storageKey, expanded]);
 
   const toggle = useCallback(() => {
-    setExpanded((prev) => !prev);
-  }, []);
+    const next = !effectiveExpanded;
+    if (isControlled) {
+      onExpandedChange?.(next);
+      return;
+    }
+    setExpanded(next);
+  }, [effectiveExpanded, isControlled, onExpandedChange]);
 
   return (
     <section
       ref={setSectionRef}
       style={style}
-      className={`${panelStyles.accordionSection} ${expanded ? panelStyles.accordionSectionOpen : panelStyles.accordionSectionCollapsed} ${isDragging ? 'opacity-50 shadow-lg !z-50 ring-1 ring-[var(--border-focus)]' : ''}`}
+      className={`${panelStyles.accordionSection} ${effectiveExpanded ? panelStyles.accordionSectionOpen : panelStyles.accordionSectionCollapsed} ${isDragging ? 'opacity-50 shadow-lg !z-50 ring-1 ring-[var(--border-focus)]' : ''}`}
       data-testid={testId}
     >
       <div className={`${panelStyles.header} cursor-grab active:cursor-grabbing`} {...attributes} {...listeners}>
@@ -121,21 +136,21 @@ const SiderAccordionSection: React.FC<Props> = ({
           type='button'
           className={panelStyles.toggle}
           onClick={toggle}
-          aria-expanded={expanded}
+          aria-expanded={effectiveExpanded}
           aria-controls={bodyId}
         >
           <Down
             theme='outline'
             size={14}
             fill='currentColor'
-            className={`${panelStyles.chevron} ${expanded ? panelStyles.chevronOpen : ''}`}
+            className={`${panelStyles.chevron} ${effectiveExpanded ? panelStyles.chevronOpen : ''}`}
             aria-hidden='true'
           />
           <h3 className={panelStyles.title}>{title}</h3>
         </button>
         {actions ? <div className={panelStyles.actions}>{actions}</div> : null}
       </div>
-      {expanded ? (
+      {effectiveExpanded ? (
         <div
           id={bodyId}
           className={panelStyles.accordionBody}
