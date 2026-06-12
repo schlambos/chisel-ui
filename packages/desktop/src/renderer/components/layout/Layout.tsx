@@ -18,17 +18,25 @@ import { LayoutContext } from '@renderer/hooks/context/LayoutContext';
 import { LayoutModeProvider } from '@renderer/hooks/context/LayoutModeContext';
 import { NavigationHistoryProvider } from '@renderer/hooks/context/NavigationHistoryContext';
 import { TerminalPanelProvider } from '@renderer/hooks/context/TerminalPanelContext';
-import TerminalPanelHost from '@renderer/components/layout/TerminalPanel/TerminalPanelHost';
+import TerminalPanelHost from '@/renderer/components/layout/TerminalPanel/TerminalPanelHost';
 import { useDeepLink } from '@renderer/hooks/system/useDeepLink';
 import { useNotificationClick } from '@renderer/hooks/system/useNotificationClick';
 import { useMainProcessLogBridge } from '@renderer/hooks/system/useMainProcessLogBridge';
 import { useTrayEventHandlers } from '@renderer/hooks/system/useTrayEventHandlers';
+import { useMobileViewport } from '@renderer/hooks/system/useMobileViewport';
+import {
+  useSiderResize,
+  MOBILE_SIDER_MIN_WIDTH,
+  MOBILE_SIDER_MAX_WIDTH,
+  MOBILE_SIDER_WIDTH_RATIO,
+  SIDER_MIN_WIDTH,
+  SIDER_MAX_WIDTH,
+} from '@renderer/hooks/system/useSiderResize';
 import { useDirectorySelection } from '@renderer/hooks/file/useDirectorySelection';
 import SidebarIcon from '@renderer/components/layout/icons/SidebarIcon';
 import { processCustomCss } from '@renderer/utils/theme/customCssProcessor';
 import { cleanupSiderTooltips } from '@renderer/utils/ui/siderTooltip';
 import { useConversationShortcuts } from '@renderer/hooks/ui/useConversationShortcuts';
-import { isElectronDesktop } from '@renderer/utils/platform';
 import { computeCssSyncDecision, resolveCssByActiveTheme } from '@renderer/utils/theme/themeCssSync';
 import { DEFAULT_THEME_ID } from '@renderer/pages/settings/DisplaySettings/presets';
 import { dispatchConversationPaneStateEvent } from '@renderer/utils/conversationPane/events';
@@ -85,39 +93,6 @@ const LayoutModeOrchestrator: React.FC<{
   return null;
 };
 
-const DEFAULT_SIDER_WIDTH = 200;
-const SIDER_MIN_WIDTH = 56;
-const SIDER_MAX_WIDTH = 380;
-const SIDER_ICON_ONLY_THRESHOLD = 90;
-const SIDER_COLLAPSE_THRESHOLD = 36;
-const SIDER_WIDTH_STORAGE_KEY = 'aionui.siderWidth';
-const MOBILE_SIDER_WIDTH_RATIO = 0.7;
-const MOBILE_SIDER_MIN_WIDTH = 240;
-const MOBILE_SIDER_MAX_WIDTH = 320;
-
-const readStoredSiderWidth = (): number => {
-  if (typeof window === 'undefined') return DEFAULT_SIDER_WIDTH;
-  try {
-    const raw = window.localStorage.getItem(SIDER_WIDTH_STORAGE_KEY);
-    const parsed = raw ? Number.parseInt(raw, 10) : NaN;
-    if (Number.isFinite(parsed)) {
-      return Math.min(SIDER_MAX_WIDTH, Math.max(SIDER_MIN_WIDTH, parsed));
-    }
-  } catch {
-    /* localStorage unavailable */
-  }
-  return DEFAULT_SIDER_WIDTH;
-};
-
-const persistSiderWidth = (value: number): void => {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(SIDER_WIDTH_STORAGE_KEY, String(Math.round(value)));
-  } catch {
-    /* localStorage unavailable */
-  }
-};
-
 const CONVERSATION_PANE_COLLAPSE_KEY = 'aionui.conversationPaneCollapsed';
 
 // Default: OPEN on desktop so the conversation list is immediately usable.
@@ -139,21 +114,6 @@ const persistConversationPaneCollapsed = (value: boolean): void => {
   }
 };
 
-const detectMobileViewportOrTouch = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  if (isElectronDesktop()) {
-    return window.innerWidth < 768;
-  }
-  const width = window.innerWidth;
-  const byWidth = width < 768;
-  // 仅在小屏时才将 coarse/touch 视为移动端，避免触控笔记本被误判
-  // Treat touch/coarse pointer as mobile only on smaller viewports
-  const smallScreen = width < 1024;
-  const byMedia = window.matchMedia('(hover: none)').matches || window.matchMedia('(pointer: coarse)').matches;
-  const byTouchPoints = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
-  return byWidth || (smallScreen && (byMedia || byTouchPoints));
-};
-
 const Layout: React.FC<{
   sider: React.ReactNode;
   onSessionClick?: () => void;
@@ -163,12 +123,6 @@ const Layout: React.FC<{
   const [conversationPaneCollapsed, setConversationPaneCollapsedState] = useState<boolean>(
     readStoredConversationPaneCollapsed
   );
-  const [isMobile, setIsMobile] = useState(false);
-  const [viewportWidth, setViewportWidth] = useState<number>(() =>
-    typeof window === 'undefined' ? 390 : window.innerWidth
-  );
-  const [desktopSiderWidth, setDesktopSiderWidth] = useState<number>(readStoredSiderWidth);
-  const [siderDragging, setSiderDragging] = useState(false);
   const [customCss, setCustomCss] = useState<string>('');
   const [shouldMountUpdateModal, setShouldMountUpdateModal] = useState(false);
   const { contextHolder: directorySelectionContextHolder } = useDirectorySelection();
@@ -179,32 +133,35 @@ const Layout: React.FC<{
   const location = useLocation();
   const workspaceAvailable =
     location.pathname.startsWith('/conversation/') || (TEAM_MODE_ENABLED && location.pathname.startsWith('/team/'));
-  // The Command Center editor pane is a conversation-route concern (it resolves
-  // the active conversation's workspace from the route `:id`). Team routes use a
-  // different id shape and have no editor today, so gate strictly on this.
   const isConversationRoute = location.pathname.startsWith('/conversation/');
   const isSettingsRoute = location.pathname.startsWith('/settings');
-  // Editor dock side drives the chat content's flex order so the editor sits
-  // left (start) or right (end) of chat without reparenting either pane.
   const { dock: editorDock } = useEditorDock();
-  // The conversation pane is available everywhere except the Settings menu.
   const conversationPaneEnabled = !isSettingsRoute;
+
+  const { isMobile, viewportWidth } = useMobileViewport();
+
+  const { desktopSiderWidth, siderDragging, siderIconOnly, beginSiderResizeDrag } = useSiderResize({
+    isMobile,
+    collapsed,
+    setCollapsed,
+  });
+
+  // Guard against transition-on-mount for the mobile sider: add a class after
+  // the first render so CSS only enables the open/close transition after the
+  // initial collapsed state is committed.
+  const [siderMounted, setSiderMounted] = useState(false);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setSiderMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const setConversationPaneCollapsed = useCallback((value: boolean) => {
     setConversationPaneCollapsedState(value);
     persistConversationPaneCollapsed(value);
   }, []);
-  const collapsedRef = useRef(collapsed);
-  const desktopSiderWidthRef = useRef(desktopSiderWidth);
-  const dragWidthRef = useRef(0);
-  const prevDragWidthRef = useRef<number | null>(null);
+
   const lastCssRef = useRef('');
   const lastUiCssUpdateAtRef = useRef(0);
-  const dragStateRef = useRef<{ active: boolean; startX: number; startWidth: number }>({
-    active: false,
-    startX: 0,
-    startWidth: DEFAULT_SIDER_WIDTH,
-  });
 
   const loadAndHealCustomCss = useCallback(async () => {
     try {
@@ -283,9 +240,36 @@ const Layout: React.FC<{
     };
   }, [loadAndHealCustomCss]);
 
-  // Re-sync theme css on route changes, because some settings pages do not mount CssThemeSettings.
+  // Track the previous pathname so we only re-sync on settings transitions.
+  const prevPathnameRef = useRef(location.pathname);
+  const shouldReSyncCss = (): boolean => {
+    const prev = prevPathnameRef.current;
+    const curr = location.pathname;
+    const wasSettings = prev.startsWith('/settings');
+    const isSettings = curr.startsWith('/settings');
+    // Re-sync when entering or leaving a settings route, plus the initial mount.
+    const enteringLeavingSettings = wasSettings !== isSettings;
+    prevPathnameRef.current = curr;
+    return enteringLeavingSettings;
+  };
+
+  // Re-sync theme css on route changes — only when entering/leaving settings
+  // routes, because some settings pages do not mount CssThemeSettings.
+  // Initial mount always runs (prevPathnameRef starts with the current pathname,
+  // so wasSettings===isSettings and enteringLeavingSettings is false here; we
+  // explicitly also run on mount when prevPathnameRef hasn't been set yet).
+  const isFirstMountRef = useRef(true);
   useEffect(() => {
-    void loadAndHealCustomCss();
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      prevPathnameRef.current = location.pathname;
+      void loadAndHealCustomCss();
+      return;
+    }
+    if (shouldReSyncCss()) {
+      void loadAndHealCustomCss();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, location.search, location.hash, loadAndHealCustomCss]);
 
   // 注入自定义 CSS / Inject custom CSS into document head
@@ -337,29 +321,21 @@ const Layout: React.FC<{
     };
   }, [customCss]);
 
-  // 检测移动端并响应窗口大小变化
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobile = detectMobileViewportOrTouch();
-      setIsMobile(mobile);
-      setViewportWidth(window.innerWidth);
-    };
-
-    // 初始检测
-    checkMobile();
-
-    // 监听窗口大小变化
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   // 进入移动端后立即折叠 / Collapse immediately when switching to mobile
+  // Track previous isMobile so we only fire on the desktop→mobile transition.
+  // Using collapsed as a dep would re-fire whenever the user opens the sider
+  // on mobile, immediately slamming it shut again.
+  const prevIsMobileRef = useRef(isMobile);
   useEffect(() => {
-    if (!isMobile || collapsedRef.current) {
+    if (!isMobile || collapsed) {
+      prevIsMobileRef.current = isMobile;
       return;
     }
-    setCollapsed(true);
-  }, [isMobile]);
+    if (!prevIsMobileRef.current) {
+      setCollapsed(true);
+    }
+    prevIsMobileRef.current = isMobile;
+  }, [isMobile, collapsed]);
 
   // Broadcast the new ConversationPane state to the event bus so decoupled
   // listeners (e.g. mobile overlay animations, third-party widgets) can
@@ -374,7 +350,7 @@ const Layout: React.FC<{
     if (isMobile) {
       setConversationPaneCollapsed(true);
     }
-  }, [isMobile]);
+  }, [isMobile, setConversationPaneCollapsed]);
 
   // 清理侧栏 Tooltip 残留节点，避免移动端路由切换后浮层卡在左上角
   useEffect(() => {
@@ -393,129 +369,12 @@ const Layout: React.FC<{
         Math.min(MOBILE_SIDER_MAX_WIDTH, Math.round(viewportWidth * MOBILE_SIDER_WIDTH_RATIO))
       )
     : desktopSiderWidth;
-  useEffect(() => {
-    collapsedRef.current = collapsed;
-  }, [collapsed]);
-  useEffect(() => {
-    desktopSiderWidthRef.current = desktopSiderWidth;
-  }, [desktopSiderWidth]);
 
-  const applySiderWidthVar = useCallback((px: number) => {
-    document.documentElement.style.setProperty('--layout-sider-width', `${px}px`);
-  }, []);
-
-  const clearSiderWidthVar = useCallback(() => {
-    document.documentElement.style.removeProperty('--layout-sider-width');
-  }, []);
-
-  // Keep the CSS variable in sync with the committed width outside of drag,
-  // and clear it when the sider is collapsed or on mobile.
-  useEffect(() => {
-    if (isMobile || collapsed) {
-      clearSiderWidthVar();
-      return;
-    }
-    applySiderWidthVar(desktopSiderWidth);
-  }, [desktopSiderWidth, isMobile, collapsed, applySiderWidthVar, clearSiderWidthVar]);
-
-  const beginSiderResizeDrag = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      if (isMobile) return;
-      event.preventDefault();
-      const startWidth = collapsedRef.current ? 0 : desktopSiderWidthRef.current;
-      dragStateRef.current = {
-        active: true,
-        startX: event.clientX,
-        startWidth,
-      };
-      dragWidthRef.current = startWidth;
-      prevDragWidthRef.current = desktopSiderWidthRef.current;
-      setSiderDragging(true);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      if (!collapsedRef.current && startWidth > 0) {
-        applySiderWidthVar(startWidth);
-      }
-    },
-    [isMobile, applySiderWidthVar]
-  );
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const dragState = dragStateRef.current;
-      if (!dragState.active) return;
-
-      const rawWidth = dragState.startWidth + (event.clientX - dragState.startX);
-
-      if (rawWidth < SIDER_COLLAPSE_THRESHOLD) {
-        if (!collapsedRef.current) {
-          setCollapsed(true);
-        }
-        return;
-      }
-
-      const clamped = Math.min(SIDER_MAX_WIDTH, Math.max(SIDER_MIN_WIDTH, rawWidth));
-      if (collapsedRef.current) {
-        setCollapsed(false);
-      }
-
-      // Drive the visual width via CSS variable — no React re-render.
-      dragWidthRef.current = clamped;
-      applySiderWidthVar(clamped);
-
-      // Commit state once when crossing the icon-only threshold so the
-      // `layout-sider--icon-only` class flips without per-frame re-renders.
-      const prevWidth = prevDragWidthRef.current ?? desktopSiderWidthRef.current;
-      const prevIconOnly = prevWidth < SIDER_ICON_ONLY_THRESHOLD;
-      const currIconOnly = clamped < SIDER_ICON_ONLY_THRESHOLD;
-      if (prevIconOnly !== currIconOnly) {
-        setDesktopSiderWidth(clamped);
-        prevDragWidthRef.current = clamped;
-      }
-    };
-
-    const endDrag = () => {
-      if (!dragStateRef.current.active) return;
-      dragStateRef.current.active = false;
-      setSiderDragging(false);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-
-      const finalWidth = dragWidthRef.current;
-      if (!collapsedRef.current && finalWidth > 0) {
-        setDesktopSiderWidth(finalWidth);
-        persistSiderWidth(finalWidth);
-        applySiderWidthVar(finalWidth);
-      }
-      dragWidthRef.current = 0;
-      prevDragWidthRef.current = null;
-    };
-
-    const handleBlur = () => endDrag();
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', endDrag);
-    window.addEventListener('blur', handleBlur);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', endDrag);
-      window.removeEventListener('blur', handleBlur);
-      endDrag();
-    };
-  }, [applySiderWidthVar, clearSiderWidthVar]);
-
-  const siderStyle = isMobile
-    ? {
-        position: 'fixed' as const,
-        left: 0,
-        zIndex: 100,
-        transform: collapsed ? 'translateX(-100%)' : 'translateX(0)',
-        transition: 'none',
-        pointerEvents: collapsed ? ('none' as const) : ('auto' as const),
-      }
-    : {
-        position: 'relative' as const,
-        overflow: 'visible' as const,
-      };
+  const mobileSiderClass = classNames('layout-sider--mobile', {
+    'layout-sider--mounted': siderMounted,
+    collapsed: collapsed,
+    'layout-sider--dragging': siderDragging,
+  });
 
   // During drag the live width is driven by the CSS variable so the Sider
   // resizes without triggering React re-renders on every mousemove.
@@ -534,11 +393,19 @@ const Layout: React.FC<{
       siderCollapsed: collapsed,
       setSiderCollapsed: setCollapsed,
       siderWidth: isMobile ? 0 : desktopSiderWidth,
-      siderIconOnly: !isMobile && !collapsed && desktopSiderWidth < SIDER_ICON_ONLY_THRESHOLD,
+      siderIconOnly: siderIconOnly,
       conversationPaneCollapsed,
       setConversationPaneCollapsed,
     }),
-    [isMobile, collapsed, desktopSiderWidth, conversationPaneCollapsed, setCollapsed, setConversationPaneCollapsed]
+    [
+      isMobile,
+      collapsed,
+      desktopSiderWidth,
+      siderIconOnly,
+      conversationPaneCollapsed,
+      setCollapsed,
+      setConversationPaneCollapsed,
+    ]
   );
 
   return (
@@ -559,12 +426,10 @@ const Layout: React.FC<{
                   collapsedWidth={isMobile ? 0 : 0}
                   collapsed={collapsed}
                   width={siderDragging && !isMobile && !collapsed ? undefined : siderWidth}
-                  className={classNames('!bg-2 layout-sider', {
-                    collapsed: collapsed,
-                    'layout-sider--dragging': siderDragging,
-                    'layout-sider--icon-only': !isMobile && !collapsed && desktopSiderWidth < SIDER_ICON_ONLY_THRESHOLD,
+                  className={classNames('!bg-2 layout-sider', isMobile ? mobileSiderClass : undefined, {
+                    'layout-sider--icon-only': siderIconOnly,
                   })}
-                  style={{ ...siderStyle, ...siderDragStyle }}
+                  style={siderDragStyle}
                 >
                   <div
                     role='navigation'
