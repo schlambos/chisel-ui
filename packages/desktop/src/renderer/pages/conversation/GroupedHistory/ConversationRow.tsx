@@ -94,7 +94,7 @@ const ConversationRow: React.FC<ConversationRowProps> = (props) => {
 
     return (
       <span className='absolute right-8px top-1/2 -translate-y-1/2 flex items-center justify-center group-hover:hidden'>
-        <span className='h-8px w-8px rounded-full bg-#2C7FFF shadow-[0_0_0_2px_rgba(44,127,255,0.18)]' />
+        <span className='h-8px w-8px rounded-full bg-brand shadow-[0_0_0_2px_color-mix(in_srgb,var(--brand)_18%,transparent)]' />
       </span>
     );
   };
