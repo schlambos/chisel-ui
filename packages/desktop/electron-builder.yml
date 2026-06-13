@@ -1,10 +1,10 @@
-appId: com.aionui.app
-productName: AionUi
-executableName: AionUi
-copyright: Copyright © 2024 Chisel
+appId: com.chisl.app
+productName: Chisl
+executableName: Chisl
+copyright: Copyright © 2024 Chisl
 
 protocols:
-  - name: Chisel Protocol
+  - name: Chisl Protocol
     schemes:
       - aionui
 
@@ -188,7 +188,7 @@ linux:
   description: ${description}
   desktop:
     entry:
-      Name: Chisel
+      Name: Chisl
       Comment: ${description}
       Icon: aionui
       Categories: Office;Utility;
@@ -239,7 +239,7 @@ electronDownload:
 
 publish:
   provider: github
-  owner: iOfficeAI
-  repo: AionUi
+  owner: schlambos
+  repo: chisel-ui
   publishAutoUpdate: true
   releaseType: release
