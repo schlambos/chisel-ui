@@ -141,7 +141,7 @@ const SiderAccordionSection: React.FC<Props> = ({
         >
           <Down
             theme='outline'
-            size={14}
+            size={12}
             fill='currentColor'
             className={`${panelStyles.chevron} ${effectiveExpanded ? panelStyles.chevronOpen : ''}`}
             aria-hidden='true'

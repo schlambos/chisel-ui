@@ -168,7 +168,7 @@ body {
 
 /* Tabs */
 .arco-tabs-header-title {
-  padding: 6px 10px;
+  padding: 4px 8px;
   font-size: 13px;
 }
 
@@ -203,8 +203,8 @@ body {
 
 /* Modal — tighter header / body / footer */
 .arco-modal-header {
-  padding: 10px 14px;
-  min-height: 40px;
+  padding: 8px 12px;
+  min-height: 32px;
 }
 .arco-modal-title {
   font-size: 14px;
@@ -229,7 +229,7 @@ body {
 
 /* Form items */
 .arco-form-item {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .arco-form-label-item > label {
   font-size: 13px;
@@ -237,7 +237,7 @@ body {
 
 /* Collapse */
 .arco-collapse-item-header {
-  padding: 6px 10px;
+  padding: 4px 8px;
   font-size: 13px;
 }
 .arco-collapse-item-content-box {
@@ -246,7 +246,7 @@ body {
 
 /* Divider — tighten margins */
 .arco-divider-horizontal {
-  margin: 10px 0;
+  margin: 6px 0;
 }
 
 .arco-btn {

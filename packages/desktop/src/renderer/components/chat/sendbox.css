@@ -9,9 +9,9 @@
    so state changes never snap — color, opacity, background, border-color,
    transform, and shadow all share the same motion-base curve. */
 .send-button-custom {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
   border-radius: var(--radius-control);
   background-color: transparent;
   border: 1px solid transparent;
@@ -57,15 +57,15 @@
 }
 
 /* Phase 5 — stop button: outline-style rust border, brand-coloured icon,
-   same 32×32 footprint as the send button. The breathing animation is
-   preserved (existing 1.4s ambient pulse — no Phase 0 motion token matches
-   a long ambient pulse, so the duration literal stays; only the easing
-   routes through the new motion vocabulary). Property transitions match
-   the send button so cross-fade hand-off feels like one continuous motion. */
+    same 26×26 footprint as the send button. The breathing animation is
+    preserved (existing 1.4s ambient pulse — no Phase 0 motion token matches
+    a long ambient pulse, so the duration literal stays; only the easing
+    routes through the new motion vocabulary). Property transitions match
+    the send button so cross-fade hand-off feels like one continuous motion. */
 .sendbox-stop-button {
-  width: 32px;
-  min-width: 32px;
-  height: 32px;
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
   border-radius: var(--radius-control);
   background-color: transparent;
   border: 1px solid var(--brand);
@@ -94,9 +94,9 @@
 }
 
 /* Phase 5 (remediated) — breathing pulse animates ground tint + a tight 2px
-   outer halo only. The earlier 1.04 scale + 6px ring blew past the cross-fade
-   wrap's 32×32 footprint and the panel's 8px right-edge padding, clipping
-   the right and bottom sides of the pulse. The pulse now stays within bounds. */
+    outer halo only. The earlier 1.04 scale + 6px ring blew past the cross-fade
+    wrap's 26×26 footprint and the panel's 8px right-edge padding, clipping
+    the right and bottom sides of the pulse. The pulse now stays within bounds. */
 @keyframes sendbox-stop-breathe {
   0% {
     background-color: transparent;
@@ -135,8 +135,8 @@
    button's breathing halo isn't clipped by the wrap or the panel edge. */
 .sendbox-action-btn-wrap {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   overflow: visible;
 }
@@ -276,16 +276,16 @@
 }
 
 /* Phase 5 / R3 — unified composer pill (collapsed from sendbox-model-btn,
-   header-model-btn, agent-mode-compact-pill). 32px tall, 10px h-padding,
-   rounded-control, bg-1 ground, border-light edge, text-primary, hover bg-2.
+    header-model-btn, agent-mode-compact-pill). 26px tall, 10px h-padding,
+    rounded-control, bg-1 ground, border-light edge, text-primary, hover bg-2.
    Active selection is brand-tinted via color-mix. Globally scoped — no
    ancestor gate. The GUID landing's :global() copy is removed; this rule
    applies everywhere. Flex-shrink rules (formerly agent-mode-compact-pill)
    are harmless outside a flex container. */
 .composerPill,
 .composerPill.arco-btn {
-  height: 32px;
-  min-height: 32px;
+  height: 26px;
+  min-height: 26px;
   padding: 0 10px;
   border-radius: var(--radius-control);
   background-color: var(--bg-1) !important; /* fights .arco-btn bg */

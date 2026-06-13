@@ -1,6 +1,6 @@
 .card {
   background: var(--bg-1);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   border: 1px solid var(--border-1);
   border-radius: 8px;
   outline: none;
@@ -36,10 +36,10 @@
 }
 
 .body {
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .header {

@@ -34,8 +34,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  height: 44px;
-  min-height: 44px;
+   height: 32px;
+   min-height: 32px;
   padding: 0 12px;
   border-bottom: 1px solid var(--border-light);
   background-color: var(--bg-2);
@@ -66,8 +66,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+   width: 24px;
+   height: 24px;
   border: none;
   border-radius: 6px;
   background-color: transparent;

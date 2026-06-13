@@ -342,7 +342,7 @@
   align-items: center;
   justify-content: center;
   height: 20px;
-  padding: 0 16px;
+  padding: 0 10px;
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -375,7 +375,7 @@
    desktops, then tighten only the pill slider before resorting to truncation. */
 @media (max-width: 1280px) {
   .app-titlebar__pill-slider__segment {
-    padding: 0 12px;
+    padding: 0 8px;
   }
 }
 
