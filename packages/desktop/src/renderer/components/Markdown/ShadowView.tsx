@@ -42,15 +42,15 @@ const createInitStyle = (
     ${cssVarsDeclaration}
   }
 
-  * {
-    line-height:${lineHeight};
-    font-size:${fontSize};
-    color: inherit;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'PingFang SC', sans-serif;
-  }
-  code, pre, kbd, samp {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  }
+   * {
+     line-height:${lineHeight};
+     font-size:${fontSize};
+     color: inherit;
+     font-family: var(--font-ui);
+   }
+   code, pre, kbd, samp {
+     font-family: var(--font-mono);
+   }
 
   .markdown-shadow-body {
     word-break: break-word;
@@ -136,14 +136,14 @@ const createInitStyle = (
     font-weight: 600;
     color: var(--text-primary);
   }
-  .markdown-shadow-body code:not(pre code) {
-    background: var(--bg-3);
-    color: var(--text-primary);
-    padding: 2px 6px;
-    border-radius: var(--radius-control);
-    font-size: 0.92em;
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  }
+   .markdown-shadow-body code:not(pre code) {
+     background: var(--bg-3);
+     color: var(--text-primary);
+     padding: 2px 6px;
+     border-radius: var(--radius-control);
+     font-size: 0.92em;
+     font-family: var(--font-mono);
+   }
   blockquote {
     border-left: 2px solid var(--bg-3);
     padding-left: 8px;
