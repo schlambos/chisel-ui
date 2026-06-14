@@ -228,11 +228,11 @@ const MessageMcpElicitation: React.FC<{ message: IMessagePermission }> = React.m
         {hasResponded && (
           <div
             className='mt-10px p-2 rounded-md border flex items-center gap-6px'
-            style={{ backgroundColor: 'var(--color-success-light-1)', borderColor: 'rgb(var(--success-3))' }}
+            style={{ backgroundColor: 'color-mix(in srgb, var(--success) 8%, transparent)', borderColor: 'rgb(var(--success-3))' }}
             data-testid='mcp-elicitation-responded'
           >
             <CheckOne theme='outline' size='14' />
-            <Text className='text-sm' style={{ color: 'rgb(var(--success-6))' }}>
+            <Text className='text-sm' style={{ color: 'rgb(var(--success))' }}>
               {t('messages.responseSentSuccessfully')}
             </Text>
           </div>

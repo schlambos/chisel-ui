@@ -42,11 +42,11 @@ const statusColor = (status: LocalOpenCodeStatus): string => {
 const statusBorderColor = (status: LocalOpenCodeStatus): string => {
   switch (status) {
     case 'running':
-      return 'var(--color-success-6)';
+      return 'var(--success)';
     case 'starting':
-      return 'var(--color-warning-6)';
+      return 'var(--warning)';
     case 'crashed':
-      return 'var(--color-danger-6)';
+      return 'var(--danger)';
     default:
       return 'var(--color-neutral-4)';
   }

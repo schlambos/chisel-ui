@@ -1439,7 +1439,7 @@ const SendBox: React.FC<{
             : isInputActive
               ? 'rgb(var(--primary-6))'
               : 'var(--border-base)',
-          ...(isFileDragging ? { backgroundColor: 'var(--color-primary-light-1)' } : null),
+          ...(isFileDragging ? { backgroundColor: 'color-mix(in srgb, var(--brand) 8%, transparent)' } : null),
         }}
         {...dragHandlers}
       >

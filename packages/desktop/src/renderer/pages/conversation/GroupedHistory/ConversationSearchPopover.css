@@ -24,11 +24,11 @@
 }
 
 .conversation-search-trigger-full:hover {
-  background: var(--color-fill-3) !important;
+  background: var(--bg-3) !important;
 }
 
 .conversation-search-trigger-full:active {
-  background: var(--color-fill-4) !important;
+  background: var(--bg-4) !important;
 }
 
 .conversation-search-trigger-full:focus,
@@ -46,12 +46,12 @@ body[arco-theme='dark'] .conversation-search-modal {
   --conversation-search-panel-border: var(--color-border-2);
   --conversation-search-panel-shadow: 0 20px 44px rgba(0, 0, 0, 0.38);
   --conversation-search-panel-outline: color-mix(in srgb, var(--color-border-3) 56%, transparent);
-  --conversation-search-surface-bg: color-mix(in srgb, var(--color-fill-2) 88%, transparent);
-  --conversation-search-input-bg: color-mix(in srgb, var(--color-fill-2) 92%, transparent);
+  --conversation-search-surface-bg: color-mix(in srgb, var(--bg-2) 88%, transparent);
+  --conversation-search-input-bg: color-mix(in srgb, var(--bg-2) 92%, transparent);
   --conversation-search-input-border: var(--color-border-2);
   --conversation-search-input-shadow: 0 1px 2px rgba(0, 0, 0, 0.22), 0 8px 18px rgba(0, 0, 0, 0.18);
   --conversation-search-divider: var(--color-border-2);
-  --conversation-search-hover-bg: var(--color-fill-2);
+  --conversation-search-hover-bg: var(--bg-2);
   --conversation-search-highlight-fg: #93c5fd;
 }
 
@@ -220,7 +220,7 @@ body[arco-theme='dark'] .conversation-search-modal {
 }
 
 .conversation-search-modal__clear-btn:hover {
-  background: var(--fill-2);
+  background: var(--bg-2);
   color: var(--text-primary);
 }
 

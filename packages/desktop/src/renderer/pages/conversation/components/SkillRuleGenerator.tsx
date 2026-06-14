@@ -133,14 +133,14 @@ Please acknowledge receiving this rule/skill and confirm you will apply it.
                 actionLayout='vertical'
                 style={{ cursor: 'pointer', padding: '12px 0' }}
                 onClick={() => handleSelectFile(file)}
-                className='hover:bg-[var(--color-fill-2)] px-2 rounded transition-colors'
+                 className='hover:bg-[var(--bg-2)] px-2 rounded transition-colors'
               >
                 <div className='flex items-center gap-3'>
-                  <div className='bg-[var(--color-primary-light-1)] p-2 rounded'>
+                  <div className='bg-[color-mix(in srgb, var(--brand) 8%, transparent)] p-2 rounded'>
                     {file.name.endsWith('.py') ? (
-                      <Lightning size={18} fill='var(--color-primary-6)' />
+                      <Lightning size={18} fill='var(--brand)' />
                     ) : (
-                      <FolderOpen size={18} fill='var(--color-primary-6)' />
+                      <FolderOpen size={18} fill='var(--brand)' />
                     )}
                   </div>
                   <div className='flex-1'>

@@ -45,9 +45,9 @@ const AtFileMenu: React.FC<AtFileMenuProps> = ({
               role='option'
               aria-selected={isActive}
               className='px-12px py-8px rounded-10px cursor-pointer transition-colors'
-              style={{
-                background: isActive ? 'var(--color-fill-2)' : 'transparent',
-              }}
+               style={{
+                 background: isActive ? 'var(--bg-2)' : 'transparent',
+               }}
               onMouseEnter={() => {
                 onHoverItem(index);
               }}

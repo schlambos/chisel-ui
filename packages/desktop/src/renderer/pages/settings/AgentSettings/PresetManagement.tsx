@@ -115,10 +115,10 @@ const PresetManagement: React.FC<PresetManagementProps> = ({ message }) => {
               {presets.map((preset) => (
                 <div key={preset.id} className='p-4 bg-fill-2 rounded-lg'>
                   <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-2'>
-                      <Lightning theme='filled' fill='var(--color-primary-6)' />
-                      <div className='font-medium'>{preset.name}</div>
-                    </div>
+                     <div className='flex items-center gap-2'>
+                       <Lightning theme='filled' fill='var(--brand)' />
+                       <div className='font-medium'>{preset.name}</div>
+                     </div>
                     <div className='flex gap-2'>
                       <Button
                         type='text'

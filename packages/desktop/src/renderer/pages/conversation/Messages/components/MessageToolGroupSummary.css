@@ -98,7 +98,7 @@
   font-size: 12px;
   line-height: 1.5;
   color: var(--color-text-2, #4a4434);
-  background: var(--color-fill-1, #f0e4b4);
+  background: var(--bg-1, #f0e4b4);
   border-radius: var(--radius-control);
   padding: 6px 8px;
   margin: 0;

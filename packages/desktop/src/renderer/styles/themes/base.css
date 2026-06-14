@@ -110,10 +110,10 @@ body,
   }
   50% {
     opacity: 0.85;
-    background-color: color-mix(in srgb, var(--color-primary-6) 18%, transparent);
+    background-color: color-mix(in srgb, var(--brand) 18%, transparent);
     box-shadow:
-      0 0 8px 2px color-mix(in srgb, var(--color-primary-6) 30%, transparent),
-      inset 0 0 6px 0 color-mix(in srgb, var(--color-primary-6) 15%, transparent);
+      0 0 8px 2px color-mix(in srgb, var(--brand) 30%, transparent),
+      inset 0 0 6px 0 color-mix(in srgb, var(--brand) 15%, transparent);
   }
 }
 

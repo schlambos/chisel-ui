@@ -122,7 +122,7 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
             </div>
           </Panel>
           <PanelResizeHandle className='group relative h-8px shrink-0 flex items-center justify-center cursor-row-resize'>
-            <span className='h-3px w-32px rounded-full bg-[var(--color-border-2)] group-hover:bg-[var(--color-primary)] transition-colors' />
+            <span className='h-3px w-32px rounded-full bg-[var(--color-border-2)] group-hover:bg-[var(--brand)] transition-colors' />
           </PanelResizeHandle>
           <Panel defaultSize={40} minSize={15} className='min-h-0'>
             <ConversationPaneBottomPanel conversationId={conversationId ?? ''} />

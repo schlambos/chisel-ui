@@ -5,7 +5,7 @@ import AgentStatusBadge from './AgentStatusBadge';
 import TeamAgentIdentity from './TeamAgentIdentity';
 import { useTeamTabs } from '../hooks/TeamTabsContext';
 
-const DRAG_OVER_CLASS = 'border-l-2 border-[color:var(--color-primary-6)]';
+const DRAG_OVER_CLASS = 'border-l-2 border-[color:var(--brand)]';
 
 const TAB_OVERFLOW_THRESHOLD = 10;
 
@@ -94,11 +94,11 @@ const TeamTabView: React.FC<TeamTabViewProps> = ({
   return (
     <div
       draggable={!isLeader}
-      className={`relative group flex items-center gap-8px px-12px h-full max-w-240px cursor-pointer transition-all duration-200 shrink-0 border-r border-[color:var(--border-base)] ${
-        isActive
-          ? 'bg-[color:var(--color-primary-1)] text-[color:var(--color-text-1)] border-t-2 border-t-solid border-t-[color:var(--color-primary-6)]'
-          : 'bg-2 text-[color:var(--color-text-3)] hover:text-[color:var(--color-text-2)] hover:bg-[color:var(--fill-2)] border-b border-[color:var(--border-base)]'
-      } ${isDragOver ? DRAG_OVER_CLASS : ''}`}
+       className={`relative group flex items-center gap-8px px-12px h-full max-w-240px cursor-pointer transition-all duration-200 shrink-0 border-r border-[color:var(--border-base)] ${
+          isActive
+            ? 'bg-[color:var(--brand)] text-[color:var(--text-primary)] border-t-2 border-t-solid border-t-[color:var(--brand)]'
+            : 'bg-2 text-[color:var(--text-tertiary)] hover:text-[color:var(--text-secondary)] hover:bg-[color:var(--bg-2)] border-b border-[color:var(--border-base)]'
+        } ${isDragOver ? DRAG_OVER_CLASS : ''}`}
       style={isRunning ? { animation: 'team-tab-breathe 2s ease-in-out infinite' } : undefined}
       onClick={() => !editing && onSwitch(slot_id)}
       onDoubleClick={onRename ? startEditing : undefined}
@@ -160,7 +160,7 @@ const TeamTabView: React.FC<TeamTabViewProps> = ({
       )}
       {!editing && !isLeader && onRemove && (
         <span
-          className='opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity duration-150 shrink-0 flex items-center text-[color:var(--color-text-3)] hover:text-[color:var(--color-danger-6)]'
+          className='opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity duration-150 shrink-0 flex items-center text-[color:var(--color-text-3)] hover:text-[color:var(--danger)]'
           onClick={(e) => {
             e.stopPropagation();
             onRemove(slot_id);

@@ -97,7 +97,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
         <Avatar
           size={32}
           shape='square'
-          style={{ flexShrink: 0, backgroundColor: agent.icon ? 'var(--color-fill-2)' : 'transparent', fontSize: 18 }}
+          style={{ flexShrink: 0, backgroundColor: agent.icon ? 'var(--bg-2)' : 'transparent', fontSize: 18 }}
         >
           {agent.icon || <Robot theme='outline' size='20' />}
         </Avatar>

@@ -173,9 +173,9 @@ const RestorePlanPreview: React.FC<RestorePlanPreviewProps> = ({ conversationId,
         return (
           <div
             className='flex items-start gap-8px p-12px rd-6px'
-            style={{ background: 'var(--color-danger-light, #fdecec)' }}
+            style={{ background: 'color-mix(in srgb, var(--danger) 8%, transparent)' }}
           >
-            <IconExclamationCircle style={{ color: 'var(--color-danger, #d9534f)', marginTop: 2, flexShrink: 0 }} />
+            <IconExclamationCircle style={{ color: 'var(--danger, #d9534f)', marginTop: 2, flexShrink: 0 }} />
             <div className='text-13px leading-18px'>
               <div className='font-medium'>
                 {t('messages.restorePlan.errorTitle', { defaultValue: 'Failed to load restore plan' })}
@@ -338,7 +338,7 @@ const RestorePlanWarningsBlock: React.FC<{ title: string; items: string[]; tone?
     <div className='text-12px font-medium text-t-secondary'>{title}</div>
     <ul
       className='m-0 p-6px-12px rd-4px text-12px leading-18px'
-      style={{ background: tone === 'error' ? 'var(--color-danger-light, #fdecec)' : 'var(--color-fill-2, #f5f5f5)' }}
+       style={{ background: tone === 'error' ? 'color-mix(in srgb, var(--danger) 8%, transparent)' : 'var(--bg-2, #f5f5f5)' }}
     >
       {items.map((item, idx) => (
         <li key={`${idx}-${item}`}>{item}</li>
@@ -370,7 +370,7 @@ const RestorePlanUnsupportedCoverageBlock: React.FC<{ coverage: RestorePlanUnsup
     },
   ];
   return (
-    <div className='flex flex-col gap-4px p-8px rd-6px' style={{ background: 'var(--color-fill-2, #f5f5f5)' }}>
+    <div className='flex flex-col gap-4px p-8px rd-6px' style={{ background: 'var(--bg-2, #f5f5f5)' }}>
       <div className='text-12px font-medium text-t-secondary'>
         {t('messages.restorePlan.coverage.title', { defaultValue: 'This plan does not cover' })}
       </div>
@@ -379,7 +379,7 @@ const RestorePlanUnsupportedCoverageBlock: React.FC<{ coverage: RestorePlanUnsup
           .filter((item) => coverage[item.key])
           .map((item) => (
             <li key={item.key} className='text-12px text-t-secondary flex items-start gap-4px'>
-              <IconClose style={{ fontSize: 10, color: 'var(--color-danger, #d9534f)', marginTop: 4, flexShrink: 0 }} />
+              <IconClose style={{ fontSize: 10, color: 'var(--danger, #d9534f)', marginTop: 4, flexShrink: 0 }} />
               <span>{item.label}</span>
             </li>
           ))}

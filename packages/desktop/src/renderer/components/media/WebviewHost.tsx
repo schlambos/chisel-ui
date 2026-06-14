@@ -490,7 +490,7 @@ const WebviewHost: React.FC<WebviewHostProps> = ({
               --viewer-border: var(--color-border-2);
               --viewer-border-hover: var(--color-border-3);
               --viewer-bg: var(--color-bg-3);
-              --viewer-bg-hover: var(--color-fill-2);
+              --viewer-bg-hover: var(--bg-2);
               --viewer-text: var(--color-text-2);
               --viewer-text-muted: var(--color-text-3);
             }

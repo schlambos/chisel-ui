@@ -115,7 +115,7 @@ const AssistantListPanel: React.FC<AssistantListPanelProps> = ({
         key={assistant.id}
         ref={cardRefSetter(assistant.id)}
         data-testid={`assistant-card-${assistant.id}`}
-        className={`group border border-solid rounded-16px px-16px py-14px flex items-center justify-between cursor-pointer transition-all duration-180 hover:border-[var(--color-primary-light-4)] hover:bg-bg-1 ${highlightedId === assistant.id ? 'border-primary-5 bg-primary-1' : 'border-[var(--color-neutral-3)] bg-fill-0'}`}
+        className={`group border border-solid rounded-16px px-16px py-14px flex items-center justify-between cursor-pointer transition-all duration-180 hover:border-[color-mix(in srgb, var(--brand) 28%, transparent)] hover:bg-bg-1 ${highlightedId === assistant.id ? 'border-primary-5 bg-primary-1' : 'border-[var(--color-neutral-3)] bg-fill-0'}`}
         onClick={() => {
           setActiveAssistantId(assistant.id);
           onEdit(assistant);

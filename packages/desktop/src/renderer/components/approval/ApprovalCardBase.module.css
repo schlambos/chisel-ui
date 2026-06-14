@@ -136,12 +136,12 @@
   gap: 6px;
   padding: 8px 12px;
   border-radius: 6px;
-  background: var(--color-success-light-1);
+  background: color-mix(in srgb, var(--success) 8%, transparent);
   border: 1px solid rgb(var(--success-3));
-  color: rgb(var(--success-6));
+  color: rgb(var(--success));
 }
 
 .respondedLabel {
   font-size: 13px;
-  color: rgb(var(--success-6));
+  color: rgb(var(--success));
 }

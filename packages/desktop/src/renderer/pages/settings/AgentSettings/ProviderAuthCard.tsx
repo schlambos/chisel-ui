@@ -254,11 +254,11 @@ const ProviderAuthCard: React.FC<{
         </Typography.Text>
       )}
 
-      {hasApiMethod ? (
-        <div className='mb-10px flex flex-col gap-6px rounded-10px bg-[var(--color-fill-1)] p-10px'>
-          <Typography.Text className='text-12px font-medium'>
-            {t('settings.remoteAgent.providers.apiKeySection')}
-          </Typography.Text>
+       {hasApiMethod ? (
+         <div className='mb-10px flex flex-col gap-6px rounded-10px bg-[var(--bg-1)] p-10px'>
+           <Typography.Text className='text-12px font-medium'>
+             {t('settings.remoteAgent.providers.apiKeySection')}
+           </Typography.Text>
           <div className='flex flex-col gap-6px sm:flex-row sm:items-center'>
             <Input.Password
               size='small'
@@ -281,11 +281,11 @@ const ProviderAuthCard: React.FC<{
         </div>
       ) : null}
 
-      {oauthIdx >= 0 ? (
-        <div className='mb-10px flex flex-col gap-8px rounded-10px bg-[var(--color-fill-1)] p-10px'>
-          <Typography.Text className='text-12px font-medium'>
-            {oauthMethod?.label ?? t('settings.remoteAgent.providers.oauthSection')}
-          </Typography.Text>
+       {oauthIdx >= 0 ? (
+         <div className='mb-10px flex flex-col gap-8px rounded-10px bg-[var(--bg-1)] p-10px'>
+           <Typography.Text className='text-12px font-medium'>
+             {oauthMethod?.label ?? t('settings.remoteAgent.providers.oauthSection')}
+           </Typography.Text>
           {visibleOAuthPrompts.length > 0 ? (
             <div className='flex flex-col gap-8px'>{visibleOAuthPrompts.map(renderPrompt)}</div>
           ) : null}
@@ -325,11 +325,11 @@ const ProviderAuthCard: React.FC<{
         </div>
       ) : null}
 
-      {!hasApiMethod && oauthIdx < 0 ? (
-        <div className='mb-10px flex flex-col gap-6px rounded-10px bg-[var(--color-fill-1)] p-10px'>
-          <Typography.Text className='text-12px font-medium'>
-            {t('settings.remoteAgent.providers.wellknownSection')}
-          </Typography.Text>
+       {!hasApiMethod && oauthIdx < 0 ? (
+         <div className='mb-10px flex flex-col gap-6px rounded-10px bg-[var(--bg-1)] p-10px'>
+           <Typography.Text className='text-12px font-medium'>
+             {t('settings.remoteAgent.providers.wellknownSection')}
+           </Typography.Text>
           <Input
             size='small'
             value={wellknownKey}

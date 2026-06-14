@@ -89,8 +89,8 @@ const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
               className={classNames(
                 'w-full text-left px-10px py-6px rounded-8px transition-all border border-solid outline-none cursor-pointer mb-2px last:mb-0',
                 {
-                  'border-[var(--color-border-2)]': index === activeIndex,
-                  'border-transparent hover:bg-[var(--color-fill-1)]': index !== activeIndex,
+                 'border-[var(--border-base)]': index === activeIndex,
+                   'border-transparent hover:bg-[var(--bg-1)]': index !== activeIndex,
                 }
               )}
               style={{

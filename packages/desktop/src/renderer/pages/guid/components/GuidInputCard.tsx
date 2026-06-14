@@ -100,7 +100,7 @@ const GuidInputCard: React.FC<GuidInputCardProps> = ({
         marginRight: isMobile ? -14 : undefined,
         ...(isFileDragging
           ? {
-              backgroundColor: 'var(--color-primary-light-1)',
+              backgroundColor: 'color-mix(in srgb, var(--brand) 8%, transparent)',
               borderColor: 'rgb(var(--primary-3))',
               borderWidth: '1px',
             }

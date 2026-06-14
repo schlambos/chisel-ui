@@ -531,7 +531,7 @@ const CssThemeSettings: React.FC = () => {
           return (
             <div
               key={theme.id}
-              className={`relative cursor-pointer rounded-12px overflow-hidden border-2 transition-all duration-200 h-112px w-full ${activeThemeId === theme.id ? 'border-[var(--color-primary)]' : 'border-transparent hover:border-border-2'}`}
+              className={`relative cursor-pointer rounded-12px overflow-hidden border-2 transition-all duration-200 h-112px w-full ${activeThemeId === theme.id ? 'border-[var(--brand)]' : 'border-transparent hover:border-border-2'}`}
               style={cardStyle}
               onClick={() => handleSelectTheme(theme)}
               onMouseEnter={() => setHoveredThemeId(theme.id)}
@@ -556,7 +556,7 @@ const CssThemeSettings: React.FC = () => {
               {/* 选中标记 / Selected indicator */}
               {activeThemeId === theme.id && (
                 <div className='absolute top-8px right-8px'>
-                  <CheckOne theme='filled' size='20' fill='var(--color-primary)' />
+                  <CheckOne theme='filled' size='20' fill='var(--brand)' />
                 </div>
               )}
             </div>

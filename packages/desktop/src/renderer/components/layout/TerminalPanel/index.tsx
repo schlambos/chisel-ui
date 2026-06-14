@@ -152,7 +152,7 @@ const TerminalPanel: React.FC = () => {
               className='group relative w-6px shrink-0 flex items-center justify-center cursor-col-resize'
               aria-label={t('terminal.split.resizeHandle', { defaultValue: 'Resize terminal split' })}
             >
-              <span className='w-2px h-32px rounded-full bg-[var(--color-border-2)] group-hover:bg-[var(--color-primary)] transition-colors' />
+              <span className='w-2px h-32px rounded-full bg-[var(--color-border-2)] group-hover:bg-[var(--brand)] transition-colors' />
             </PanelResizeHandle>
             <Panel defaultSize={50} minSize={20} className='min-h-0 overflow-hidden relative'>
               {renderBody(splitSession, true)}

@@ -32,7 +32,7 @@ const SnippetBlock: React.FC<{
   }, [text, copiedLabel]);
 
   return (
-    <div className='relative rounded-8px border border-solid border-[var(--color-border-2)] bg-[var(--color-fill-1)]'>
+     <div className='relative rounded-8px border border-solid border-[var(--color-border-2)] bg-[var(--bg-1)]'>
       <pre className='m-0 overflow-x-auto px-12px py-10px pr-40px font-mono text-12px leading-18px text-t-primary'>
         {displayText ?? text}
       </pre>
@@ -55,7 +55,7 @@ const StatusBanner: React.FC<{ info: RemoteAgentPluginInfo | null; loading: bool
 
   if (loading && !info) {
     return (
-      <div className='flex items-center gap-10px rounded-10px border border-solid border-[var(--color-border-2)] bg-[var(--color-fill-1)] px-14px py-12px'>
+       <div className='flex items-center gap-10px rounded-10px border border-solid border-[var(--color-border-2)] bg-[var(--bg-1)] px-14px py-12px'>
         <Spin size={14} />
         <Typography.Text type='secondary' className='text-13px'>
           {t('settings.remoteAgent.plugin.statusChecking')}
@@ -70,10 +70,10 @@ const StatusBanner: React.FC<{ info: RemoteAgentPluginInfo | null; loading: bool
   return (
     <div
       className='flex flex-wrap items-center gap-x-12px gap-y-6px rounded-10px border border-solid px-14px py-12px'
-      style={{
-        borderColor: connected ? 'rgba(var(--success-6), 0.3)' : 'var(--color-border-2)',
-        background: connected ? 'rgba(var(--success-6), 0.06)' : 'var(--color-fill-1)',
-      }}
+       style={{
+         borderColor: connected ? 'rgba(var(--success-6), 0.3)' : 'var(--color-border-2)',
+         background: connected ? 'rgba(var(--success-6), 0.06)' : 'var(--bg-1)',
+       }}
     >
       <Tag size='small' color={connected ? 'green' : 'orange'}>
         {connected ? t('settings.remoteAgent.plugin.statusConnected') : t('settings.remoteAgent.plugin.statusWaiting')}

@@ -305,7 +305,7 @@ const InlineAgentEditor: React.FC<InlineAgentEditorProps> = ({ agent, onSave, on
             <Avatar
               size={48}
               shape='square'
-              style={{ backgroundColor: 'var(--color-fill-3)', fontSize: 24, borderRadius: 'var(--radius-panel)' }}
+               style={{ backgroundColor: 'var(--bg-3)', fontSize: 24, borderRadius: 'var(--radius-panel)' }}
             >
               {avatar}
             </Avatar>
@@ -438,7 +438,7 @@ const InlineAgentEditor: React.FC<InlineAgentEditorProps> = ({ agent, onSave, on
       </div>
 
       {/* Advanced JSON Editor */}
-      <div className='overflow-hidden rounded-12px border border-solid border-[var(--color-border-2)] bg-[var(--color-fill-1)]'>
+       <div className='overflow-hidden rounded-12px border border-solid border-[var(--color-border-2)] bg-[var(--bg-1)]'>
         <Collapse
           activeKey={showAdvanced ? ['advanced'] : []}
           onChange={(_key, keys) => setShowAdvanced(keys.includes('advanced'))}

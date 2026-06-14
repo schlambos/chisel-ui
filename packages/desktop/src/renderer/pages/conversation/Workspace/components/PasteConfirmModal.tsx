@@ -63,7 +63,7 @@ const PasteConfirmModal: React.FC<PasteConfirmModalProps> = ({
         </div>
 
         {/* Content area */}
-        <div className='mb-20px px-12px py-16px rounded-8px' style={{ backgroundColor: 'var(--color-fill-2)' }}>
+        <div className='mb-20px px-12px py-16px rounded-8px' style={{ backgroundColor: 'var(--bg-2)' }}>
           <div className='flex items-start gap-12px mb-12px'>
             <FileText theme='outline' size='18' fill='var(--color-text-2)' style={{ marginTop: '2px' }} />
             <div className='flex-1'>
@@ -109,9 +109,9 @@ const PasteConfirmModal: React.FC<PasteConfirmModalProps> = ({
               backgroundColor: 'transparent',
               color: 'var(--color-text-1)',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-fill-2)';
-            }}
+             onMouseEnter={(e) => {
+               e.currentTarget.style.backgroundColor = 'var(--bg-2)';
+             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
             }}

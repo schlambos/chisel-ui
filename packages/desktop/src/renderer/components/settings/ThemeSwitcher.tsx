@@ -39,7 +39,7 @@ export const ThemeSwitcher = () => {
           bottom: trackInset,
           left: theme === 'light' ? trackInset : `calc(50% + ${splitGap}px)`,
           right: theme === 'light' ? `calc(50% + ${splitGap}px)` : trackInset,
-          backgroundColor: 'var(--color-fill-2)',
+           backgroundColor: 'var(--bg-2)',
           boxShadow: theme === 'dark' ? '0 1px 4px rgba(0, 0, 0, 0.18)' : '0 2px 8px rgba(0, 0, 0, 0.08)',
         }}
       />
