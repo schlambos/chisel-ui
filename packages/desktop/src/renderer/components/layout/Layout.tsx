@@ -376,7 +376,7 @@ const Layout: React.FC<{
                   role='main'
                   data-layout-region='content'
                   tabIndex={-1}
-                  className={'bg-1 layout-content flex flex-col flex-1 min-h-0'}
+                  className={'bg-1 layout-content flex flex-row flex-1 min-h-0'}
                   onClick={() => {
                     if (isMobile && !collapsed) setCollapsed(true);
                   }}
@@ -405,11 +405,11 @@ const Layout: React.FC<{
                            minWidth: 'var(--app-min-width, 360px)',
                          }}
                        >
-                        <Outlet />
-                      </div>
-                      {conversationPaneEnabled && <ConversationPane />}
-                    </div>
+                         <Outlet />
+                       </div>
+                     </div>
                   </TerminalPanelHost>
+                  {conversationPaneEnabled && <ConversationPane />}
                   {directorySelectionContextHolder}
                   <PwaPullToRefresh />
                   <Suspense fallback={null}>
