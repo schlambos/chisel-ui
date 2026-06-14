@@ -185,6 +185,10 @@
 .message-agent .tool-shell,
 .message-user .tool-shell {
   margin: 4px 0;
+  border: 0;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* ─────────────────────── M02: Inactive (reverted) region ─────────────────────── */
