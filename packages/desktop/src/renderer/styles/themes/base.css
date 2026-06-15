@@ -25,7 +25,7 @@
      of hardcoded pixel values. */
   --radius-control: 4px; /* buttons, inputs, pills */
   --radius-panel: 10px; /* preview, editor, workspace, modals */
-  --radius-card: 6px; /* secondary cards, message blocks */
+  --radius-card: 12px; /* card surfaces (aligned to de-facto 12px usage) */
 
   /* Motion tokens — Phase 0 vocabulary.
      Distinct from the existing duration- and ease- tokens above.
