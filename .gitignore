@@ -215,3 +215,6 @@ graphify-out/
 
 # OpenCode config backups may contain auth tokens — never commit
 opencode-backup.json
+
+# OpenCode config may contain provider API keys — never commit
+opencode.json
