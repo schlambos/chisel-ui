@@ -11,6 +11,8 @@
 - **Feat(terminal): HTTP REST API for terminal session management** — new endpoints for create/list/kill/resize operations via HTTP API.
 - style: warm global shadow tokens to Chisl ink palette — changed light theme shadow RGB from (60, 56, 54) to (42, 38, 32) and dark theme from (0, 0, 0) to (20, 16, 12) in base.css
 - fix(command-center): prevent guide page overflow by enforcing chat pane min-width — added `minWidth: 'var(--app-min-width, 360px)'` to the center chat pane div in Layout.tsx to prevent the New Chat guide page from being squashed below 360px when the Command Center editor or conversation panes are resized too wide
+- Extracted `Surface` primitive in `components/base/Surface.tsx` (Phase 2)
+- Migrated 4 AgentSettings shells to use Surface: AgentHubModal, AgentCard, RemoteAgentManagement, ProviderAuthCard
 
 ## 2026-06-13
 
