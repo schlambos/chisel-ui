@@ -193,7 +193,7 @@ const DevSettings: React.FC = () => {
                 <Collapse
                   bordered={false}
                   onChange={(_, keys) => setExpandedMcpKeys(keys as string[])}
-                   className='[&_.arco-collapse-item]:!border-none [&_.arco-collapse-item]:bg-[var(--bg-1)] [&_.arco-collapse-item]:rounded-8px [&_.arco-collapse-item]:mb-6px [&_.arco-collapse-item-header]:!px-12px [&_.arco-collapse-item-header]:!py-8px [&_.arco-collapse-item-header-title]:!flex-1 [&_.arco-collapse-item-content-box]:!px-12px [&_.arco-collapse-item-content-box]:!pt-0 [&_.arco-collapse-item-content-box]:!pb-8px'
+                  className='[&_.arco-collapse-item]:!border-none [&_.arco-collapse-item]:bg-[var(--bg-1)] [&_.arco-collapse-item]:rounded-8px [&_.arco-collapse-item]:mb-6px [&_.arco-collapse-item-header]:!px-12px [&_.arco-collapse-item-header]:!py-8px [&_.arco-collapse-item-header-title]:!flex-1 [&_.arco-collapse-item-content-box]:!px-12px [&_.arco-collapse-item-content-box]:!pt-0 [&_.arco-collapse-item-content-box]:!pb-8px'
                 >
                   <Collapse.Item
                     name='chrome-devtools'
@@ -221,9 +221,9 @@ const DevSettings: React.FC = () => {
                         />
                       </div>
                     }
-                   >
-                     <pre className='text-11px text-t-secondary font-mono overflow-x-auto whitespace-pre-wrap break-all m-0 leading-relaxed py-4px px-8px bg-[var(--bg-2)] rounded-6px'>
-                       {`{
+                  >
+                    <pre className='text-11px text-t-secondary font-mono overflow-x-auto whitespace-pre-wrap break-all m-0 leading-relaxed py-4px px-8px bg-[var(--bg-2)] rounded-6px'>
+                      {`{
    "mcpServers": {
      "chrome-devtools": {
        "command": "npx",
@@ -265,9 +265,9 @@ const DevSettings: React.FC = () => {
                         />
                       </div>
                     }
-                   >
-                     <pre className='text-11px text-t-secondary font-mono overflow-x-auto whitespace-pre-wrap break-all m-0 leading-relaxed py-4px px-8px bg-[var(--bg-2)] rounded-6px'>
-                       {`{
+                  >
+                    <pre className='text-11px text-t-secondary font-mono overflow-x-auto whitespace-pre-wrap break-all m-0 leading-relaxed py-4px px-8px bg-[var(--bg-2)] rounded-6px'>
+                      {`{
    "mcpServers": {
      "playwright": {
        "command": "npx",

@@ -610,7 +610,7 @@ const RemoteAgentManagement: React.FC = () => {
                 <Avatar
                   size={48}
                   shape='square'
-                   style={{ backgroundColor: 'var(--bg-2)', fontSize: 24, flexShrink: 0 }}
+                  style={{ backgroundColor: 'var(--bg-2)', fontSize: 24, flexShrink: 0 }}
                 >
                   {agent.avatar || <Robot theme='outline' size='18' />}
                 </Avatar>

@@ -302,15 +302,15 @@ const SkillsHubSettings: React.FC<SkillsHubSettingsProps> = ({ withWrapper = tru
             data-testid='extension-skills-section'
             className='px-[16px] md:px-[32px] py-32px bg-base rd-16px md:rd-24px shadow-sm border border-b-base relative overflow-hidden transition-all'
           >
-             <div className='flex items-center gap-10px mb-24px'>
-               <Puzzle theme='filled' size={20} fill='var(--brand)' />
-               <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
-                 {t('settings.extensionSkills', { defaultValue: 'Extension Skills' })}
-               </span>
-               <span className='bg-[rgba(var(--brand),0.08)] text-brand text-12px px-10px py-2px rd-[100px] font-medium ml-4px'>
-                 {extensionSkills.length}
-               </span>
-             </div>
+            <div className='flex items-center gap-10px mb-24px'>
+              <Puzzle theme='filled' size={20} fill='var(--brand)' />
+              <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
+                {t('settings.extensionSkills', { defaultValue: 'Extension Skills' })}
+              </span>
+              <span className='bg-[rgba(var(--brand),0.08)] text-brand text-12px px-10px py-2px rd-[100px] font-medium ml-4px'>
+                {extensionSkills.length}
+              </span>
+            </div>
             <div className='w-full flex flex-col gap-6px'>
               {extensionSkills.map((skill) => (
                 <div
@@ -348,11 +348,11 @@ const SkillsHubSettings: React.FC<SkillsHubSettingsProps> = ({ withWrapper = tru
             data-testid='auto-skills-section'
             className='px-[16px] md:px-[32px] py-32px bg-base rd-16px md:rd-24px shadow-sm border border-b-base relative overflow-hidden transition-all'
           >
-             <div className='flex items-center gap-10px mb-24px'>
-               <Lightning theme='filled' size={20} fill='var(--brand)' />
-               <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
-                 {t('settings.autoInjectedSkills')}
-               </span>
+            <div className='flex items-center gap-10px mb-24px'>
+              <Lightning theme='filled' size={20} fill='var(--brand)' />
+              <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
+                {t('settings.autoInjectedSkills')}
+              </span>
               <span className='bg-[rgba(var(--success-6),0.08)] text-[rgb(var(--success-6))] text-12px px-10px py-2px rd-[100px] font-medium ml-4px'>
                 {builtinAutoSkills.length}
               </span>

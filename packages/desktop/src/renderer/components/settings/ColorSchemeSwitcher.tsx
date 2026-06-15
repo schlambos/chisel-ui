@@ -56,12 +56,12 @@ export const ColorSchemeSwitcher: React.FC = () => {
             role='radio'
             aria-checked={isActive}
             className='inline-flex items-center gap-6px h-26px px-10px rd-full text-13px font-500 transition-all'
-              style={{
-                backgroundColor: isActive ? 'var(--bg-2)' : 'transparent',
-                border: isActive ? '1px solid var(--border-base)' : '1px solid transparent',
-                color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                cursor: isActive ? 'default' : 'pointer',
-              }}
+            style={{
+              backgroundColor: isActive ? 'var(--bg-2)' : 'transparent',
+              border: isActive ? '1px solid var(--border-base)' : '1px solid transparent',
+              color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+              cursor: isActive ? 'default' : 'pointer',
+            }}
             onClick={() => {
               if (!isActive) {
                 void setColorScheme(option.value);
