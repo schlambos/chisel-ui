@@ -16,7 +16,15 @@ interface SurfaceProps {
   children: React.ReactNode;
 }
 
-const Surface: React.FC<SurfaceProps> = ({ padding, minHeight, hoverable, flex, className, variant = 'default', children }) => {
+const Surface: React.FC<SurfaceProps> = ({
+  padding,
+  minHeight,
+  hoverable,
+  flex,
+  className,
+  variant = 'default',
+  children,
+}) => {
   const borderClass =
     variant === 'primary'
       ? 'border-[color-mix(in_srgb,var(--brand)_30%,var(--border-base))]'
@@ -39,8 +47,6 @@ const Surface: React.FC<SurfaceProps> = ({ padding, minHeight, hoverable, flex, 
     'border-solid',
     borderClass,
     bgClass,
-    `p-${padding}`,
-    minHeight ? `min-h-[${minHeight}]` : '',
     flex ? 'flex flex-col' : '',
     hoverClass,
     className,
@@ -48,7 +54,11 @@ const Surface: React.FC<SurfaceProps> = ({ padding, minHeight, hoverable, flex, 
     .filter(Boolean)
     .join(' ');
 
-  return <div className={classes}>{children}</div>;
+  return (
+    <div className={classes} style={{ padding, minHeight }}>
+      {children}
+    </div>
+  );
 };
 
 Surface.displayName = 'Surface';
