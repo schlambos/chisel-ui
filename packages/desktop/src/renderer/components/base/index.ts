@@ -20,6 +20,7 @@ export { default as AionScrollArea } from './AionScrollArea';
 export { default as AionSteps } from './AionSteps';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export type { ErrorBoundaryFallback, ErrorBoundaryProps } from './ErrorBoundary';
+export { default as Surface } from './Surface';
 
 // ==================== 类型导出 / Type Exports ====================
 

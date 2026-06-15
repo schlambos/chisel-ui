@@ -17,6 +17,7 @@ import { Button, Collapse, Input, Message, Select, Tag, Typography } from '@arco
 import { Key, LinkOne } from '@icon-park/react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Surface from '@/renderer/components/base/Surface';
 
 const CollapseItem = Collapse.Item;
 
@@ -204,8 +205,8 @@ const ProviderAuthCard: React.FC<{
     );
   };
 
-  return (
-    <div className='rounded-12px border border-solid border-[var(--color-border-2)] bg-[var(--color-bg-2)] p-14px'>
+return (
+    <Surface padding='14px'>
       <div className='mb-10px flex flex-wrap items-start justify-between gap-8px'>
         <div className='min-w-0 flex-1'>
           <div className='flex flex-wrap items-center gap-6px'>
@@ -407,7 +408,7 @@ const ProviderAuthCard: React.FC<{
           {t('settings.remoteAgent.providers.disconnect')}
         </Button>
       ) : null}
-    </div>
+    </Surface>
   );
 };
 

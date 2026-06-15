@@ -7,6 +7,7 @@ import { useHubAgents } from '@/renderer/hooks/agent/useHubAgents';
 import type { IHubAgentItem } from '@/common/types/agent/hub';
 import { resolveAgentLogo } from '@renderer/utils/model/agentLogo';
 import { openExternalUrl } from '@/renderer/utils/platform';
+import Surface from '@/renderer/components/base/Surface';
 
 interface AgentHubModalProps {
   visible: boolean;
@@ -125,18 +126,14 @@ export const AgentHubModal: React.FC<AgentHubModalProps> = ({ visible, onCancel 
           </div>
         ) : (
           <div data-testid='agent-hub-grid' className='grid grid-cols-1 gap-10px sm:grid-cols-2 lg:grid-cols-4'>
-            {agents.map((agent) => {
+{agents.map((agent) => {
               const logo = resolveAgentLogo({
                 icon: agent.icon,
                 backend: agent.contributes?.acpAdapters?.[0],
               });
 
               return (
-                <div
-                  key={agent.name}
-                  data-testid='agent-hub-card'
-                  className='flex min-h-[144px] flex-col rounded-12px border border-solid border-[var(--color-border-2)] bg-[var(--color-bg-2)] p-10px transition-colors hover:border-[var(--color-border-3)]'
-                >
+                <Surface key={agent.name} padding='10px' minHeight='144px' hoverable flex data-testid='agent-hub-card'>
                   <Typography.Text
                     bold
                     className='mb-6px block min-h-36px text-center text-13px leading-18px line-clamp-2'
@@ -159,7 +156,7 @@ export const AgentHubModal: React.FC<AgentHubModalProps> = ({ visible, onCancel 
                   </Typography.Text>
 
                   <div className='mt-auto flex justify-center'>{renderActionBtn(agent)}</div>
-                </div>
+                </Surface>
               );
             })}
           </div>

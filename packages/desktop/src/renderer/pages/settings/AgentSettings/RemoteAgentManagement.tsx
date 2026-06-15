@@ -41,6 +41,7 @@ import PluginInstallModal from './PluginInstall';
 import { getRemoteProtocolOption, REMOTE_PROTOCOL_OPTIONS } from './remoteAgentProtocolOptions';
 import RemoteProviderAuthModal from './RemoteProviderAuthModal';
 import LocalOpenCodePanel from './LocalOpenCodePanel';
+import Surface from '@/renderer/components/base/Surface';
 
 const FormItem = Form.Item;
 
@@ -602,9 +603,12 @@ const RemoteAgentManagement: React.FC = () => {
       ) : (
         <div className='grid grid-cols-1 gap-12px px-16px md:grid-cols-2 xl:grid-cols-3'>
           {agents.map((agent) => (
-            <div
+            <Surface
               key={agent.id}
-              className='flex min-h-[214px] flex-col rounded-12px border border-solid border-[var(--color-border-2)] bg-[var(--color-bg-2)] p-14px transition-colors hover:border-[var(--color-border-3)]'
+              padding='14px'
+              minHeight='214px'
+              hoverable
+              flex
             >
               <div className='mb-12px flex justify-center'>
                 <Avatar
@@ -726,7 +730,7 @@ const RemoteAgentManagement: React.FC = () => {
                     : t('settings.remoteAgent.setDefault')}
                 </Button>
               </div>
-            </div>
+            </Surface>
           ))}
         </div>
       )}

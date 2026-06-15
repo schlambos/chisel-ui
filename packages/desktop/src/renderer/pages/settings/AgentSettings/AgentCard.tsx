@@ -10,6 +10,7 @@ import { Delete, EditTwo, Robot } from '@icon-park/react';
 import { useTranslation } from 'react-i18next';
 import { resolveAgentLogo } from '@/renderer/utils/model/agentLogo';
 import { resolveExtensionAssetUrl } from '@/renderer/utils/platform';
+import Surface from '@/renderer/components/base/Surface';
 
 type DetectedAgent = {
   agent_type: string;
@@ -66,7 +67,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
       });
 
     return (
-      <div className='flex min-h-[154px] flex-col rounded-12px border border-solid border-[var(--color-border-2)] bg-[var(--color-bg-2)] p-12px transition-colors hover:border-[var(--color-border-3)]'>
+      <Surface padding='12px' minHeight='154px' hoverable flex>
         <div className='mb-10px flex justify-center'>
           <Avatar size={40} shape='square' style={{ flexShrink: 0, backgroundColor: 'transparent' }}>
             {logo ? <img src={logo} alt={agent.name} className='h-full w-full object-contain' /> : '🤖'}
@@ -85,7 +86,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
         <Button size='small' type='secondary' onClick={onGoToChat} className={goToChatButtonClassName}>
           {t('settings.agentManagement.goToChat')}
         </Button>
-      </div>
+      </Surface>
     );
   }
 
