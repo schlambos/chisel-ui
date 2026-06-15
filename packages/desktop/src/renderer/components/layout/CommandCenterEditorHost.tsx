@@ -18,6 +18,7 @@ import { useEditorContext } from '@/renderer/pages/conversation/Editor';
 import { useLayoutModeSafe } from '@/renderer/hooks/context/LayoutModeContext';
 import { useResizableSplit } from '@/renderer/hooks/ui/useResizableSplit';
 import { useEditorDock } from '@/renderer/utils/layout/editorDock';
+import { useHorizontalLayoutBudget } from '@/renderer/hooks/layout';
 
 const EditorLazyEntry = React.lazy(() => import('@/renderer/pages/conversation/Editor/editorLazyEntry'));
 
@@ -77,15 +78,13 @@ const CommandCenterEditorHost: React.FC<CommandCenterEditorHostProps> = ({ works
   );
   const resolvedWorkspaceRoot = workspaceRoot ?? conversation?.extra?.workspace;
 
+  const { editorMaxWidth } = useHorizontalLayoutBudget();
+
   const { splitRatio: editorWidthPx, createDragHandle } = useResizableSplit({
     unit: 'px',
     defaultWidth: 520,
-    // Generous, near-unrestricted operator range — the pane also flex-shrinks
-    // (below) so it never forces its neighbors to overflow/clip regardless of
-    // the chosen width.
     minWidth: 120,
-    maxWidth: 2000,
-    // Single shared editor width preference across all routes.
+    maxWidth: editorMaxWidth,
     storageKey: 'chat-editor-width-px',
   });
 

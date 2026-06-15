@@ -37,6 +37,7 @@ import { useConversationShortcuts } from '@renderer/hooks/ui/useConversationShor
 import { useCustomCssInjection, useCustomCssStyleInjection } from '@renderer/hooks/system/useCustomCssInjection';
 import { dispatchConversationPaneStateEvent } from '@renderer/utils/conversationPane/events';
 import ConversationPane from '@renderer/components/layout/ConversationPane';
+import { useHorizontalLayoutBudget } from '@renderer/hooks/layout';
 import { useTerminalPanelSafe } from '@renderer/hooks/context/TerminalPanelContext';
 import { useLayoutModeSafe } from '@renderer/hooks/context/LayoutModeContext';
 import { useEditorContextSafe } from '@renderer/pages/conversation/Editor';
@@ -135,6 +136,7 @@ const Layout: React.FC<{
   const conversationPaneEnabled = !isSettingsRoute;
 
   const { isMobile, viewportWidth } = useMobileViewport();
+  const { shouldCollapsePane } = useHorizontalLayoutBudget();
 
   const { desktopSiderWidth, siderDragging, siderIconOnly, resizeBy, beginSiderResizeDrag } = useSiderResize({
     isMobile,
@@ -238,14 +240,10 @@ const Layout: React.FC<{
   // both chat content and the pane side-by-side.
   useEffect(() => {
     if (isMobile || conversationPaneCollapsed) return;
-    const availableContentWidth = viewportWidth - desktopSiderWidth;
-    const CHAT_MIN_WIDTH_PX = 360;
-    const PANE_MIN_WIDTH_PX = 240;
-    const COLLAPSE_THRESHOLD_PX = CHAT_MIN_WIDTH_PX + PANE_MIN_WIDTH_PX + 20;
-    if (availableContentWidth < COLLAPSE_THRESHOLD_PX) {
+    if (shouldCollapsePane) {
       setConversationPaneCollapsed(true);
     }
-  }, [isMobile, viewportWidth, desktopSiderWidth, conversationPaneCollapsed, setConversationPaneCollapsed]);
+  }, [isMobile, shouldCollapsePane, conversationPaneCollapsed, setConversationPaneCollapsed]);
 
   // 清理侧栏 Tooltip 残留节点，避免移动端路由切换后浮层卡在左上角
   useEffect(() => {

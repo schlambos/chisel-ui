@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
+import { useHorizontalLayoutBudget } from '@/renderer/hooks/layout';
 import { usePreviewContext } from '@/renderer/pages/conversation/Preview/context/PreviewContext';
 import { useResizableSplit } from '@/renderer/hooks/ui/useResizableSplit';
 import { blurActiveElement } from '@/renderer/utils/ui/focus';
@@ -25,7 +26,6 @@ const DEFAULT_PANE_WIDTH_PX = 300;
 const MIN_PANE_WIDTH_PX = 240;
 const MAX_PANE_WIDTH_PX = 560;
 const PANE_WIDTH_STORAGE_KEY = 'aionui.conversationPaneWidth';
-const CHAT_MIN_WIDTH_PX = 360;
 
 interface ConversationPaneDesktopProps {
   collapsed: boolean;
@@ -67,12 +67,7 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
     };
   }, [isResizing]);
 
-  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
-  useEffect(() => {
-    const handleResize = () => setViewportWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const { conversationPaneMaxWidth } = useHorizontalLayoutBudget();
 
   const handleNewChat = useCallback(() => {
     cleanupSiderTooltips();
@@ -89,8 +84,7 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
     layout?.setConversationPaneCollapsed(true);
   }, [layout]);
 
-  const effectiveMaxWidth = Math.max(MIN_PANE_WIDTH_PX, viewportWidth - (layout?.siderWidth ?? 0) - CHAT_MIN_WIDTH_PX);
-  const displayWidth = collapsed ? 0 : Math.min(Math.round(paneWidth), effectiveMaxWidth);
+  const displayWidth = collapsed ? 0 : Math.min(Math.round(paneWidth), conversationPaneMaxWidth);
 
   return (
     <div
