@@ -595,7 +595,7 @@ const WebuiModalContent: React.FC = () => {
         </div>
 
         {/* Messaging 强引导入口 / Messaging primary entry — disabled, kept for future use
-        <div className='rd-12px border border-line bg-2 px-12px py-10px flex items-center justify-between gap-10px'>
+        <div className='rounded-card border border-line bg-2 px-12px py-10px flex items-center justify-between gap-10px'>
             <div className='min-w-0 flex items-center gap-8px'>
               <Communication theme='outline' size='18' className='text-[rgb(var(--primary-6))] shrink-0' />
               <div className='min-w-0'>
@@ -610,7 +610,7 @@ const WebuiModalContent: React.FC = () => {
         */}
 
         {/* WebUI 服务卡片 / WebUI Service Card */}
-        <div className='px-[12px] md:px-[28px] py-14px bg-2 rd-16px'>
+        <div className='px-[12px] md:px-[28px] py-14px bg-2 rounded-card md:rounded-card'>
           {/* WebUI 引导提示 / WebUI hint */}
           <div className='mb-8px rd-10px border border-line bg-fill-1 px-10px py-8px flex items-start gap-6px'>
             <Earth theme='outline' size='16' className='mt-1px text-[rgb(var(--primary-6))]' />
@@ -678,7 +678,7 @@ const WebuiModalContent: React.FC = () => {
         </div>
 
         {/* 登录信息卡片 / Login Info Card */}
-        <div className='px-[12px] md:px-[28px] py-14px bg-2 rd-16px'>
+        <div className='px-[12px] md:px-[28px] py-14px bg-2 rounded-card md:rounded-card'>
           <div className='text-14px font-500 mb-8px text-t-primary'>{t('settings.webui.loginInfo')}</div>
 
           {/* 账号 / Account */}

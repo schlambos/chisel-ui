@@ -122,7 +122,7 @@ const SidecarSettings: React.FC = () => {
           <p className='m-0 mt-4px text-13px text-t-secondary'>{t('settings.sidecar.description')}</p>
         </div>
 
-        <div className='bg-2 rd-16px p-12px md:p-16px space-y-12px'>
+        <div className='bg-2 rounded-card p-12px md:p-16px space-y-12px'>
           <div className='flex items-center gap-6px rd-8px border border-line bg-fill-1 px-10px py-8px'>
             <Server theme='outline' size='16' className='text-t-secondary' />
             <span className='text-12px text-t-secondary leading-relaxed'>
@@ -207,7 +207,7 @@ const SidecarSettings: React.FC = () => {
           </Form>
         </div>
 
-        <div className='bg-2 rd-16px p-12px md:p-16px'>
+        <div className='bg-2 rounded-card p-12px md:p-16px'>
           <div className='flex items-center justify-between mb-12px'>
             <h3 className='text-14px font-500 text-t-primary m-0'>{t('settings.sidecar.listTitle')}</h3>
             <span className='text-12px text-t-tertiary'>{t('settings.sidecar.count', { count: items.length })}</span>

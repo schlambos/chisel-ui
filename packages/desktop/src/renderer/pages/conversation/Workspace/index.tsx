@@ -410,7 +410,7 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
         {dragImportHook.isDragging && (
           <div className='absolute inset-0 pointer-events-none z-30 flex items-center justify-center px-32px'>
             <div
-              className='w-full max-w-480px text-center text-t-primary rounded-16px px-32px py-28px'
+              className='w-full max-w-480px text-center text-t-primary rounded-card px-32px py-28px'
               style={{
                 background: 'color-mix(in srgb, var(--bg-10) 88%, transparent)',
                 border: '1px dashed var(--brand)',
