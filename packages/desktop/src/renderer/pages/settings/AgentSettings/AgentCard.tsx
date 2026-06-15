@@ -67,7 +67,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
       });
 
     return (
-      <Surface padding='12px' minHeight='154px' hoverable flex>
+      <Surface variant='primary' padding='12px' minHeight='154px' hoverable flex>
         <div className='mb-10px flex justify-center'>
           <Avatar size={40} shape='square' style={{ flexShrink: 0, backgroundColor: 'transparent' }}>
             {logo ? <img src={logo} alt={agent.name} className='h-full w-full object-contain' /> : '🤖'}
