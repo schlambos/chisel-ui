@@ -146,11 +146,11 @@ const QueueItemCard: React.FC<QueueItemCardProps> = ({
       data-sortable={dragDisabled ? 'disabled' : 'enabled'}
       aria-grabbed={isDragging}
       aria-label={preview}
-       style={{
-         background: isDragging
-           ? 'color-mix(in srgb, var(--bg-2) 88%, var(--color-bg-1))'
-           : 'color-mix(in srgb, var(--bg-1) 76%, transparent)',
-       }}
+      style={{
+        background: isDragging
+          ? 'color-mix(in srgb, var(--bg-2) 88%, var(--color-bg-1))'
+          : 'color-mix(in srgb, var(--bg-1) 76%, transparent)',
+      }}
     >
       <div className='flex items-center gap-6px min-w-0 flex-1 relative pl-4px'>
         <div className='flex items-center gap-5px w-18px shrink-0 relative'>
@@ -203,7 +203,7 @@ const QueueItemCard: React.FC<QueueItemCardProps> = ({
               className='inline-flex items-center rd-999px px-5px py-1px text-9px leading-none shrink-0'
               style={{
                 color: 'var(--color-text-3)',
-                  background: 'color-mix(in srgb, var(--bg-2) 72%, transparent)',
+                background: 'color-mix(in srgb, var(--bg-2) 72%, transparent)',
               }}
             >
               {fileCountLabel}
@@ -362,10 +362,10 @@ const CommandQueuePanel: React.FC<CommandQueuePanelProps> = ({
       <div
         aria-label={t('conversation.commandQueue.title', { defaultValue: 'Queued Commands' })}
         className='overflow-hidden rd-t-18px border b-solid'
-         style={{
-           borderColor: 'color-mix(in srgb, var(--color-border-2) 56%, transparent)',
-           background: 'color-mix(in srgb, var(--bg-1) 84%, var(--color-bg-1))',
-         }}
+        style={{
+          borderColor: 'color-mix(in srgb, var(--color-border-2) 56%, transparent)',
+          background: 'color-mix(in srgb, var(--bg-1) 84%, var(--color-bg-1))',
+        }}
       >
         <DndContext
           sensors={sensors}

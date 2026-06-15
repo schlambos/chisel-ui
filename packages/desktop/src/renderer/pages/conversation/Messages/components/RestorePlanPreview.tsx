@@ -338,7 +338,9 @@ const RestorePlanWarningsBlock: React.FC<{ title: string; items: string[]; tone?
     <div className='text-12px font-medium text-t-secondary'>{title}</div>
     <ul
       className='m-0 p-6px-12px rd-4px text-12px leading-18px'
-       style={{ background: tone === 'error' ? 'color-mix(in srgb, var(--danger) 8%, transparent)' : 'var(--bg-2, #f5f5f5)' }}
+      style={{
+        background: tone === 'error' ? 'color-mix(in srgb, var(--danger) 8%, transparent)' : 'var(--bg-2, #f5f5f5)',
+      }}
     >
       {items.map((item, idx) => (
         <li key={`${idx}-${item}`}>{item}</li>

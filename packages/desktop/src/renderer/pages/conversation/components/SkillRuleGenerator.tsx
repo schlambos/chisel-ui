@@ -133,7 +133,7 @@ Please acknowledge receiving this rule/skill and confirm you will apply it.
                 actionLayout='vertical'
                 style={{ cursor: 'pointer', padding: '12px 0' }}
                 onClick={() => handleSelectFile(file)}
-                 className='hover:bg-[var(--bg-2)] px-2 rounded transition-colors'
+                className='hover:bg-[var(--bg-2)] px-2 rounded transition-colors'
               >
                 <div className='flex items-center gap-3'>
                   <div className='bg-[color-mix(in srgb, var(--brand) 8%, transparent)] p-2 rounded'>
