@@ -165,7 +165,7 @@ export async function httpRequest<T>(
   if (typeof window !== 'undefined' && window.api?.authToken) {
     headers['Authorization'] = `Bearer ${window.api.authToken}`;
   }
-  
+
   console.debug(
     `[httpBridge] ${method} ${path}`,
     body !== undefined ? `body_len: ${JSON.stringify(body).length}` : '(no body)'
@@ -177,20 +177,20 @@ export async function httpRequest<T>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
-     if (!response.ok) {
-      let errorBody: unknown;
-      try {
-        errorBody = await response.json();
-      } catch {
-        errorBody = await response.text();
-      }
-      if (options?.silentStatuses?.includes(response.status)) {
-        console.debug(`[httpBridge] ${method} ${path} → ${response.status} (silenced)`);
-      } else {
-        console.error(`[httpBridge] ${method} ${path} → ${response.status}`);
-      }
-      throw new BackendHttpError({ method, path, status: response.status, body: errorBody });
+  if (!response.ok) {
+    let errorBody: unknown;
+    try {
+      errorBody = await response.json();
+    } catch {
+      errorBody = await response.text();
     }
+    if (options?.silentStatuses?.includes(response.status)) {
+      console.debug(`[httpBridge] ${method} ${path} → ${response.status} (silenced)`);
+    } else {
+      console.error(`[httpBridge] ${method} ${path} → ${response.status}`);
+    }
+    throw new BackendHttpError({ method, path, status: response.status, body: errorBody });
+  }
 
   console.debug(`[httpBridge] ${method} ${path} → ${response.status} OK`);
 
@@ -366,9 +366,9 @@ function ensureWs(): void {
         data?: unknown;
         payload?: unknown;
       };
-       const eventName = msg.name ?? msg.event;
-       const payload = msg.data ?? msg.payload;
-       console.debug('[WS:msg]', eventName, `payload_len: ${JSON.stringify(payload).length}`);
+      const eventName = msg.name ?? msg.event;
+      const payload = msg.data ?? msg.payload;
+      console.debug('[WS:msg]', eventName, `payload_len: ${JSON.stringify(payload).length}`);
       if (eventName) {
         const handlers = wsListeners.get(eventName);
         if (handlers) {

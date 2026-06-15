@@ -42,30 +42,26 @@ declare global {
 
 /** Send resize event to backend via HTTP POST */
 async function sendResize(sessionId: string, cols: number, rows: number): Promise<void> {
-  const port = typeof window !== 'undefined' && window.__backendPort
-    ? window.__backendPort
-    : 13400;
-  
-  const token = typeof window !== 'undefined' && window.api?.authToken
-    ? window.api.authToken
-    : undefined;
-  
+  const port = typeof window !== 'undefined' && window.__backendPort ? window.__backendPort : 13400;
+
+  const token = typeof window !== 'undefined' && window.api?.authToken ? window.api.authToken : undefined;
+
   const url = `http://127.0.0.1:${port}/api/terminal/sessions/resize`;
-  
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   const response = await fetch(url, {
     method: 'POST',
     headers,
     body: JSON.stringify({ session_id: sessionId, cols, rows }),
   });
-  
+
   if (!response.ok) {
     const error = await response.text().catch(() => 'Unknown error');
     console.error(`[TerminalInstance] Resize failed for session ${sessionId}: ${error}`);
@@ -75,9 +71,8 @@ async function sendResize(sessionId: string, cols: number, rows: number): Promis
 /** Get the WebSocket URL for a terminal session */
 function getTerminalWsUrl(sessionId: string): string {
   // Use the same backend port resolution as other HTTP calls
-  const port =
-    typeof window !== 'undefined' && window.__backendPort ? window.__backendPort : 13400;
-  
+  const port = typeof window !== 'undefined' && window.__backendPort ? window.__backendPort : 13400;
+
   const baseUrl = `ws://localhost:${port}/api/terminal/ws/${encodeURIComponent(sessionId)}`;
   return baseUrl;
 }
@@ -145,25 +140,25 @@ const TerminalInstance: React.FC<Props> = ({ session_id, visible, theme, fontSca
       termRef.current = term;
       fitRef.current = fit;
 
-       // Forward keystrokes to the PTY via WebSocket.
-       const dataSub = term.onData((data) => {
-         const ws = wsRef.current;
-         if (ws && wsConnectedRef.current) {
-           try {
-             // Send as JSON message
-             const msg = JSON.stringify({ type: 'input', data: data });
-             ws.send(msg);
-           } catch (error) {
-             console.warn('[TerminalInstance] WebSocket send failed:', error);
-           }
-         }
-       });
+      // Forward keystrokes to the PTY via WebSocket.
+      const dataSub = term.onData((data) => {
+        const ws = wsRef.current;
+        if (ws && wsConnectedRef.current) {
+          try {
+            // Send as JSON message
+            const msg = JSON.stringify({ type: 'input', data: data });
+            ws.send(msg);
+          } catch (error) {
+            console.warn('[TerminalInstance] WebSocket send failed:', error);
+          }
+        }
+      });
       dataSubRef.current = dataSub;
 
-       // Serialize all writes through a single-flight queue so a flood of PTY
-       // events can never accumulate unbounded chunks in ghostty-web's parser. The
-       // queue chains writes via ghostty-web's write callback and caps the
-       // concatenation buffer at 1MB per write.
+      // Serialize all writes through a single-flight queue so a flood of PTY
+      // events can never accumulate unbounded chunks in ghostty-web's parser. The
+      // queue chains writes via ghostty-web's write callback and caps the
+      // concatenation buffer at 1MB per write.
       const queue = createWriteQueue((data, cb) => {
         term.write(data, cb);
       });
@@ -183,20 +178,20 @@ const TerminalInstance: React.FC<Props> = ({ session_id, visible, theme, fontSca
       const reattachBuf: string[] = [];
       let reattachDone = !restored;
 
-       // Function to establish WebSocket connection with retry logic
-       const establishWebSocketConnection = () => {
-         // Clear any existing reconnect timer
-         if (reconnectTimerRef.current) {
-           clearTimeout(reconnectTimerRef.current);
-           reconnectTimerRef.current = null;
-         }
-  
-         const wsUrl = getTerminalWsUrl(session_id);
-         // Auth rides on the aionui-session cookie auto-sent by the renderer to
-         // 127.0.0.1; no subprotocol token is needed. Forcing a subprotocol the
-         // client never offers violates RFC 6455 and breaks the handshake.
-         const ws = new WebSocket(wsUrl);
-         wsRef.current = ws;
+      // Function to establish WebSocket connection with retry logic
+      const establishWebSocketConnection = () => {
+        // Clear any existing reconnect timer
+        if (reconnectTimerRef.current) {
+          clearTimeout(reconnectTimerRef.current);
+          reconnectTimerRef.current = null;
+        }
+
+        const wsUrl = getTerminalWsUrl(session_id);
+        // Auth rides on the aionui-session cookie auto-sent by the renderer to
+        // 127.0.0.1; no subprotocol token is needed. Forcing a subprotocol the
+        // client never offers violates RFC 6455 and breaks the handshake.
+        const ws = new WebSocket(wsUrl);
+        wsRef.current = ws;
 
         ws.onopen = () => {
           retryCountRef.current = 0; // Reset retry count on successful connection
@@ -204,11 +199,11 @@ const TerminalInstance: React.FC<Props> = ({ session_id, visible, theme, fontSca
           intentionalCloseRef.current = false; // Reset intentional close flag on new connection
           console.log(`[TerminalInstance] WebSocket connected for session ${session_id}`);
 
-           // For restored sessions, we need to send the initial size
-           if (restored && lastSizeRef.current) {
-             const { cols, rows } = lastSizeRef.current;
-             void sendResize(session_id, cols, rows);
-           }
+          // For restored sessions, we need to send the initial size
+          if (restored && lastSizeRef.current) {
+            const { cols, rows } = lastSizeRef.current;
+            void sendResize(session_id, cols, rows);
+          }
         };
 
         ws.onmessage = (event) => {
@@ -232,59 +227,59 @@ const TerminalInstance: React.FC<Props> = ({ session_id, visible, theme, fontSca
               }
             };
             reader.readAsText(event.data);
-           } else if (typeof event.data === 'string') {
-             // Handle string messages (could be JSON control messages)
-             try {
-               const msg = JSON.parse(event.data);
-               if (msg.type === 'exit') {
-                 // FIX 5: Exit-code protocol mismatch - read from msg.data, not msg.exit_code
-                 const exitCode = msg.data ? parseInt(msg.data, 10) || 0 : null;
-                 onExit?.(session_id, exitCode);
-               } else if (msg.type === 'output') {
-                 // FIX 1: UTF-8 chunk corruption - decode base64 data
-                 const data = msg.data ?? '';
-                 if (data) {
-                   try {
-                     // Decode base64 encoded terminal output
-                     const binary = atob(data);
-                     const bytes = new Uint8Array(binary.length);
-                     for (let i = 0; i < binary.length; i++) {
-                       bytes[i] = binary.charCodeAt(i);
-                     }
-                     // Convert to string for the terminal
-                     const output = new TextDecoder().decode(bytes);
-                     if (reattachDone) {
-                       queue.enqueue(output);
-                     } else {
-                       reattachBuf.push(output);
-                     }
-                   } catch {
-                     // If base64 decode fails, treat as plain text (backward compat)
-                     if (reattachDone) {
-                       queue.enqueue(data);
-                     } else {
-                       reattachBuf.push(data);
-                     }
-                   }
-                 }
-               } else if (msg.type === 'error') {
-                 // Handle error messages
-                 const data = msg.data ?? '';
-                 if (reattachDone) {
-                   queue.enqueue(data);
-                 } else {
-                   reattachBuf.push(data);
-                 }
-               }
-             } catch {
-               // If not JSON, treat as raw output
-               if (reattachDone) {
-                 queue.enqueue(event.data);
-               } else {
-                 reattachBuf.push(event.data);
-               }
-             }
-           }
+          } else if (typeof event.data === 'string') {
+            // Handle string messages (could be JSON control messages)
+            try {
+              const msg = JSON.parse(event.data);
+              if (msg.type === 'exit') {
+                // FIX 5: Exit-code protocol mismatch - read from msg.data, not msg.exit_code
+                const exitCode = msg.data ? parseInt(msg.data, 10) || 0 : null;
+                onExit?.(session_id, exitCode);
+              } else if (msg.type === 'output') {
+                // FIX 1: UTF-8 chunk corruption - decode base64 data
+                const data = msg.data ?? '';
+                if (data) {
+                  try {
+                    // Decode base64 encoded terminal output
+                    const binary = atob(data);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) {
+                      bytes[i] = binary.charCodeAt(i);
+                    }
+                    // Convert to string for the terminal
+                    const output = new TextDecoder().decode(bytes);
+                    if (reattachDone) {
+                      queue.enqueue(output);
+                    } else {
+                      reattachBuf.push(output);
+                    }
+                  } catch {
+                    // If base64 decode fails, treat as plain text (backward compat)
+                    if (reattachDone) {
+                      queue.enqueue(data);
+                    } else {
+                      reattachBuf.push(data);
+                    }
+                  }
+                }
+              } else if (msg.type === 'error') {
+                // Handle error messages
+                const data = msg.data ?? '';
+                if (reattachDone) {
+                  queue.enqueue(data);
+                } else {
+                  reattachBuf.push(data);
+                }
+              }
+            } catch {
+              // If not JSON, treat as raw output
+              if (reattachDone) {
+                queue.enqueue(event.data);
+              } else {
+                reattachBuf.push(event.data);
+              }
+            }
+          }
         };
 
         ws.onclose = (event) => {
@@ -359,12 +354,12 @@ const TerminalInstance: React.FC<Props> = ({ session_id, visible, theme, fontSca
         } catch {
           /* terminal may not be visible yet */
         }
-         const { cols, rows } = term;
-         const last = lastSizeRef.current;
-         if (!last || last.cols !== cols || last.rows !== rows) {
-           lastSizeRef.current = { cols, rows };
-           void sendResize(session_id, cols, rows);
-         }
+        const { cols, rows } = term;
+        const last = lastSizeRef.current;
+        if (!last || last.cols !== cols || last.rows !== rows) {
+          lastSizeRef.current = { cols, rows };
+          void sendResize(session_id, cols, rows);
+        }
       };
       const obs = new ResizeObserver(() => {
         if (!host.isConnected || host.offsetParent === null) return;
@@ -476,12 +471,12 @@ const TerminalInstance: React.FC<Props> = ({ session_id, visible, theme, fontSca
       className='size-full overflow-hidden'
       style={{
         display: visible ? 'block' : 'none',
-         // Promote the terminal (and its ghostty-web canvases) to its own compositor
-         // layer + isolate its paint. When a layout pane (left sider / right
-         // ConversationPane) animates its width, the main content reflows every
-         // frame; without isolation the browser repaints the canvases each
-         // frame → visible flicker. On its own layer the terminal is merely
-         // re-composited, not repainted.
+        // Promote the terminal (and its ghostty-web canvases) to its own compositor
+        // layer + isolate its paint. When a layout pane (left sider / right
+        // ConversationPane) animates its width, the main content reflows every
+        // frame; without isolation the browser repaints the canvases each
+        // frame → visible flicker. On its own layer the terminal is merely
+        // re-composited, not repainted.
         transform: 'translateZ(0)',
         contain: 'layout paint',
         backfaceVisibility: 'hidden',

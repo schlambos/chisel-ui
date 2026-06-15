@@ -205,7 +205,7 @@ const ProviderAuthCard: React.FC<{
     );
   };
 
-return (
+  return (
     <Surface padding='14px'>
       <div className='mb-10px flex flex-wrap items-start justify-between gap-8px'>
         <div className='min-w-0 flex-1'>

@@ -221,12 +221,12 @@ const SkillsHubSettings: React.FC<SkillsHubSettingsProps> = ({ withWrapper = tru
               {filteredSkills.map((skill) => (
                 <div
                   key={skill.name}
-data-testid={`my-skill-card-${normalizeTestId(skill.name)}`}
-                   ref={(el) => {
-                     skillRefs.current[skill.name] = el;
-                   }}
-                   className={`group flex flex-col sm:flex-row gap-16px p-16px bg-base border hover:border-border-1 hover:bg-fill-1 hover:shadow-sm rounded-card transition-all duration-200 ${highlightedSkill === skill.name ? 'border-primary-5 bg-primary-1' : 'border-transparent'}`}
-                 >
+                  data-testid={`my-skill-card-${normalizeTestId(skill.name)}`}
+                  ref={(el) => {
+                    skillRefs.current[skill.name] = el;
+                  }}
+                  className={`group flex flex-col sm:flex-row gap-16px p-16px bg-base border hover:border-border-1 hover:bg-fill-1 hover:shadow-sm rounded-card transition-all duration-200 ${highlightedSkill === skill.name ? 'border-primary-5 bg-primary-1' : 'border-transparent'}`}
+                >
                   <div className='shrink-0 flex items-start sm:mt-2px'>
                     <div
                       className={`w-40px h-40px rd-10px flex items-center justify-center font-bold text-16px shadow-sm text-transform-uppercase ${getAvatarColorClass(skill.name)}`}
@@ -285,8 +285,8 @@ data-testid={`my-skill-card-${normalizeTestId(skill.name)}`}
                 </div>
               ))}
             </div>
-) : (
-             <div className='text-center text-t-secondary text-13px py-40px bg-fill-1 rounded-card border border-b-base border-dashed relative z-10'>
+          ) : (
+            <div className='text-center text-t-secondary text-13px py-40px bg-fill-1 rounded-card border border-b-base border-dashed relative z-10'>
               {loading
                 ? t('common.loading', { defaultValue: 'Please wait...' })
                 : t('settings.skillsHub.noSkills', {
@@ -296,30 +296,30 @@ data-testid={`my-skill-card-${normalizeTestId(skill.name)}`}
           )}
         </div>
 
-{/* ======== Extension Skills ======== */}
-{extensionSkills.length > 0 && (
-            <div
-              data-testid='extension-skills-section'
-              className='px-[16px] md:px-[32px] py-32px bg-base rounded-card md:rounded-card shadow-sm border border-b-base relative overflow-hidden transition-all'
-            >
-             <div className='flex items-center gap-10px mb-24px'>
-               <Puzzle theme='filled' size={20} fill='var(--brand)' />
-               <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
-                 {t('settings.extensionSkills', { defaultValue: 'Extension Skills' })}
-               </span>
-               <span className='bg-[rgba(var(--brand),0.08)] text-brand text-12px px-10px py-2px rd-[100px] font-medium ml-4px'>
-                 {extensionSkills.length}
-               </span>
-             </div>
-             <div className='w-full flex flex-col gap-6px'>
-               {extensionSkills.map((skill) => (
-                 <div
-                   key={skill.name}
-                   ref={(el) => {
-                     skillRefs.current[skill.name] = el;
-                   }}
-                   className={`flex flex-col sm:flex-row gap-16px p-16px bg-base border hover:border-border-1 hover:bg-fill-1 rounded-card transition-all duration-200 ${highlightedSkill === skill.name ? 'border-primary-5 bg-primary-1' : 'border-transparent'}`}
-                 >
+        {/* ======== Extension Skills ======== */}
+        {extensionSkills.length > 0 && (
+          <div
+            data-testid='extension-skills-section'
+            className='px-[16px] md:px-[32px] py-32px bg-base rounded-card md:rounded-card shadow-sm border border-b-base relative overflow-hidden transition-all'
+          >
+            <div className='flex items-center gap-10px mb-24px'>
+              <Puzzle theme='filled' size={20} fill='var(--brand)' />
+              <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
+                {t('settings.extensionSkills', { defaultValue: 'Extension Skills' })}
+              </span>
+              <span className='bg-[rgba(var(--brand),0.08)] text-brand text-12px px-10px py-2px rd-[100px] font-medium ml-4px'>
+                {extensionSkills.length}
+              </span>
+            </div>
+            <div className='w-full flex flex-col gap-6px'>
+              {extensionSkills.map((skill) => (
+                <div
+                  key={skill.name}
+                  ref={(el) => {
+                    skillRefs.current[skill.name] = el;
+                  }}
+                  className={`flex flex-col sm:flex-row gap-16px p-16px bg-base border hover:border-border-1 hover:bg-fill-1 rounded-card transition-all duration-200 ${highlightedSkill === skill.name ? 'border-primary-5 bg-primary-1' : 'border-transparent'}`}
+                >
                   <div className='shrink-0 flex items-start sm:mt-2px'>
                     <div className='w-40px h-40px rd-10px bg-[rgba(var(--primary-6),0.08)] flex items-center justify-center shadow-sm'>
                       <Puzzle theme='filled' size={20} fill='rgb(var(--primary-6))' />
@@ -342,30 +342,30 @@ data-testid={`my-skill-card-${normalizeTestId(skill.name)}`}
           </div>
         )}
 
-{/* Builtin Auto-injected Skills ======== */}
-{builtinAutoSkills.length > 0 && (
-            <div
-              data-testid='auto-skills-section'
-              className='px-[16px] md:px-[32px] py-32px bg-base rounded-card md:rounded-card shadow-sm border border-b-base relative overflow-hidden transition-all'
-            >
-             <div className='flex items-center gap-10px mb-24px'>
-               <Lightning theme='filled' size={20} fill='var(--brand)' />
-               <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
-                 {t('settings.autoInjectedSkills')}
-               </span>
-               <span className='bg-[rgba(var(--success-6),0.08)] text-[rgb(var(--success-6))] text-12px px-10px py-2px rd-[100px] font-medium ml-4px'>
-                 {builtinAutoSkills.length}
-               </span>
-             </div>
-             <div className='w-full flex flex-col gap-6px'>
-               {builtinAutoSkills.map((skill) => (
-                 <div
-                   key={skill.name}
-                   ref={(el) => {
-                     skillRefs.current[skill.name] = el;
-                   }}
-                   className={`flex flex-col sm:flex-row gap-16px p-16px bg-base border hover:border-border-1 hover:bg-fill-1 rounded-card transition-all duration-200 ${highlightedSkill === skill.name ? 'border-primary-5 bg-primary-1' : 'border-transparent'}`}
-                 >
+        {/* Builtin Auto-injected Skills ======== */}
+        {builtinAutoSkills.length > 0 && (
+          <div
+            data-testid='auto-skills-section'
+            className='px-[16px] md:px-[32px] py-32px bg-base rounded-card md:rounded-card shadow-sm border border-b-base relative overflow-hidden transition-all'
+          >
+            <div className='flex items-center gap-10px mb-24px'>
+              <Lightning theme='filled' size={20} fill='var(--brand)' />
+              <span className='text-16px md:text-18px text-t-primary font-bold tracking-tight'>
+                {t('settings.autoInjectedSkills')}
+              </span>
+              <span className='bg-[rgba(var(--success-6),0.08)] text-[rgb(var(--success-6))] text-12px px-10px py-2px rd-[100px] font-medium ml-4px'>
+                {builtinAutoSkills.length}
+              </span>
+            </div>
+            <div className='w-full flex flex-col gap-6px'>
+              {builtinAutoSkills.map((skill) => (
+                <div
+                  key={skill.name}
+                  ref={(el) => {
+                    skillRefs.current[skill.name] = el;
+                  }}
+                  className={`flex flex-col sm:flex-row gap-16px p-16px bg-base border hover:border-border-1 hover:bg-fill-1 rounded-card transition-all duration-200 ${highlightedSkill === skill.name ? 'border-primary-5 bg-primary-1' : 'border-transparent'}`}
+                >
                   <div className='shrink-0 flex items-start sm:mt-2px'>
                     <div className='w-40px h-40px rd-10px bg-[rgba(var(--success-6),0.08)] flex items-center justify-center shadow-sm'>
                       <Lightning theme='filled' size={20} fill='rgb(var(--success-6))' />
@@ -388,8 +388,8 @@ data-testid={`my-skill-card-${normalizeTestId(skill.name)}`}
           </div>
         )}
 
-{/* ======== Usage Tip ======== */}
-         <div className='px-16px md:px-[24px] py-20px bg-base border border-b-base shadow-sm rounded-card flex items-start gap-12px text-t-secondary'>
+        {/* ======== Usage Tip ======== */}
+        <div className='px-16px md:px-[24px] py-20px bg-base border border-b-base shadow-sm rounded-card flex items-start gap-12px text-t-secondary'>
           <Info size={18} className='text-primary-6 mt-2px shrink-0' />
           <div className='flex flex-col gap-4px'>
             <span className='font-bold text-t-primary text-14px'>

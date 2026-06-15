@@ -76,8 +76,8 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
     let cancelled = false;
     const restore = async (): Promise<void> => {
       try {
-         const response = await terminal.list.invoke();
-         const liveSessions = response.sessions;
+        const response = await terminal.list.invoke();
+        const liveSessions = response.sessions;
         if (cancelled) return;
         setSessions((prev) => mergeLiveSessions(prev, liveSessions));
       } catch (error) {

@@ -126,7 +126,7 @@ export const AgentHubModal: React.FC<AgentHubModalProps> = ({ visible, onCancel 
           </div>
         ) : (
           <div data-testid='agent-hub-grid' className='grid grid-cols-1 gap-10px sm:grid-cols-2 lg:grid-cols-4'>
-{agents.map((agent) => {
+            {agents.map((agent) => {
               const logo = resolveAgentLogo({
                 icon: agent.icon,
                 backend: agent.contributes?.acpAdapters?.[0],

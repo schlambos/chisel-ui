@@ -603,13 +603,7 @@ const RemoteAgentManagement: React.FC = () => {
       ) : (
         <div className='grid grid-cols-1 gap-12px px-16px md:grid-cols-2 xl:grid-cols-3'>
           {agents.map((agent) => (
-            <Surface
-              key={agent.id}
-              padding='14px'
-              minHeight='214px'
-              hoverable
-              flex
-            >
+            <Surface key={agent.id} padding='14px' minHeight='214px' hoverable flex>
               <div className='mb-12px flex justify-center'>
                 <Avatar
                   size={48}
