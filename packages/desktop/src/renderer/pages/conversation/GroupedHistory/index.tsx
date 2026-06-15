@@ -355,29 +355,29 @@ const WorkspaceGroupedHistory: React.FC<WorkspaceGroupedHistoryProps> = ({
 
           <div className='flex gap-12px justify-end'>
             <button
-               className='px-24px py-8px rounded-20px text-14px font-medium transition-all'
-                style={{
-                  border: '1px solid var(--border-base)',
-                  backgroundColor: 'var(--bg-2)',
-                  color: 'var(--text-primary)',
-                }}
-                onMouseEnter={(event) => {
-                  event.currentTarget.style.backgroundColor = 'var(--bg-3)';
-                }}
-                onMouseLeave={(event) => {
-                  event.currentTarget.style.backgroundColor = 'var(--bg-2)';
-                }}
-               onClick={closeExportModal}
-             >
-               {t('common.cancel')}
-             </button>
-             <button
-               className='px-24px py-8px rounded-20px text-14px font-medium transition-all'
-                style={{
-                  border: '1px solid var(--border-base)',
-                  backgroundColor: 'var(--bg-2)',
-                  color: 'var(--text-primary)',
-                }}
+              className='px-24px py-8px rounded-20px text-14px font-medium transition-all'
+              style={{
+                border: '1px solid var(--border-base)',
+                backgroundColor: 'var(--bg-2)',
+                color: 'var(--text-primary)',
+              }}
+              onMouseEnter={(event) => {
+                event.currentTarget.style.backgroundColor = 'var(--bg-3)';
+              }}
+              onMouseLeave={(event) => {
+                event.currentTarget.style.backgroundColor = 'var(--bg-2)';
+              }}
+              onClick={closeExportModal}
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              className='px-24px py-8px rounded-20px text-14px font-medium transition-all'
+              style={{
+                border: '1px solid var(--border-base)',
+                backgroundColor: 'var(--bg-2)',
+                color: 'var(--text-primary)',
+              }}
               onMouseEnter={(event) => {
                 if (!exportModalLoading) {
                   event.currentTarget.style.opacity = '0.85';
@@ -453,22 +453,22 @@ const WorkspaceGroupedHistory: React.FC<WorkspaceGroupedHistoryProps> = ({
         onCancel={handleRemoveProjectCancel}
         footer={
           <div className='flex justify-end gap-12px pt-16px'>
-             <button
-               type='button'
-               className='px-24px py-8px rounded-20px text-14px font-medium transition-all'
-                style={{
-                  border: '1px solid var(--border-base)',
-                  backgroundColor: 'var(--bg-2)',
-                  color: 'var(--text-primary)',
-                  cursor: removeProjectLoading ? 'not-allowed' : 'pointer',
-                  opacity: removeProjectLoading ? 0.55 : 1,
-                }}
-               onMouseEnter={(event) => {
-                 if (!removeProjectLoading) event.currentTarget.style.backgroundColor = 'var(--bg-3)';
-               }}
-               onMouseLeave={(event) => {
-                 if (!removeProjectLoading) event.currentTarget.style.backgroundColor = 'var(--bg-2)';
-               }}
+            <button
+              type='button'
+              className='px-24px py-8px rounded-20px text-14px font-medium transition-all'
+              style={{
+                border: '1px solid var(--border-base)',
+                backgroundColor: 'var(--bg-2)',
+                color: 'var(--text-primary)',
+                cursor: removeProjectLoading ? 'not-allowed' : 'pointer',
+                opacity: removeProjectLoading ? 0.55 : 1,
+              }}
+              onMouseEnter={(event) => {
+                if (!removeProjectLoading) event.currentTarget.style.backgroundColor = 'var(--bg-3)';
+              }}
+              onMouseLeave={(event) => {
+                if (!removeProjectLoading) event.currentTarget.style.backgroundColor = 'var(--bg-2)';
+              }}
               onClick={handleRemoveProjectCancel}
               disabled={removeProjectLoading}
             >

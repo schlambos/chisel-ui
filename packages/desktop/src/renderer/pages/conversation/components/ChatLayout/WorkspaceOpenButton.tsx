@@ -129,9 +129,9 @@ const WorkspaceOpenButton: React.FC<WorkspaceOpenButtonProps> = ({ workspacePath
       {availableOptions.map((option) => (
         <div
           key={option.key}
-           className={`workspace-open-dropdown-item flex items-center gap-8px px-12px py-8px cursor-pointer hover:bg-[var(--bg-2)] rounded-4px transition-colors ${
-             currentTool === option.key ? 'bg-[var(--bg-2)]' : ''
-           }`}
+          className={`workspace-open-dropdown-item flex items-center gap-8px px-12px py-8px cursor-pointer hover:bg-[var(--bg-2)] rounded-4px transition-colors ${
+            currentTool === option.key ? 'bg-[var(--bg-2)]' : ''
+          }`}
           onClick={() => handleOpenWith(option.key)}
         >
           <span className='flex items-center justify-center w-20px h-20px'>{option.icon}</span>

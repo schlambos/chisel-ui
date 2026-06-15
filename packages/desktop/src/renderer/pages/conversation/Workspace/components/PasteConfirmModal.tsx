@@ -109,9 +109,9 @@ const PasteConfirmModal: React.FC<PasteConfirmModalProps> = ({
               backgroundColor: 'transparent',
               color: 'var(--color-text-1)',
             }}
-             onMouseEnter={(e) => {
-               e.currentTarget.style.backgroundColor = 'var(--bg-2)';
-             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-2)';
+            }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
             }}

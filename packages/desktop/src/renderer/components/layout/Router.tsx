@@ -16,9 +16,7 @@ const SidecarSettings = React.lazy(() => import('@renderer/pages/settings/Sideca
 const PetSettings = React.lazy(() => import('@renderer/pages/settings/PetSettings'));
 const ExtensionSettingsPage = React.lazy(() => import('@renderer/pages/settings/ExtensionSettingsPage'));
 const LoginPage = React.lazy(() => import('@renderer/pages/login'));
-const ComponentsShowcase = import.meta.env.DEV
-  ? React.lazy(() => import('@renderer/pages/TestShowcase'))
-  : null;
+const ComponentsShowcase = import.meta.env.DEV ? React.lazy(() => import('@renderer/pages/TestShowcase')) : null;
 const TeamIndex = React.lazy(() => import('@renderer/pages/team'));
 
 const withRouteFallback = (Component: React.LazyExoticComponent<React.ComponentType>) => (
@@ -74,9 +72,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           <Route path='/settings/about' element={withRouteFallback(SystemSettings)} />
           <Route path='/settings/ext/:tabId' element={withRouteFallback(ExtensionSettingsPage)} />
           <Route path='/settings' element={<Navigate to='/settings/model' replace />} />
-          {ComponentsShowcase && (
-            <Route path='/test/components' element={withRouteFallback(ComponentsShowcase)} />
-          )}
+          {ComponentsShowcase && <Route path='/test/components' element={withRouteFallback(ComponentsShowcase)} />}
         </Route>
         <Route path='*' element={<Navigate to={status === 'authenticated' ? '/guid' : '/login'} replace />} />
       </Routes>

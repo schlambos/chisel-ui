@@ -395,19 +395,19 @@ const Layout: React.FC<{
                           <CommandCenterEditorHost />
                         </Suspense>
                       )}
-                       <div
-                         className='flex-1 min-h-0 flex flex-col overflow-auto justify-center'
-                         style={{
-                           // Complementary order to the editor host: start → editor(1)
-                           // chat(2); end → chat(1) editor(2). Conversation pane is
-                           // pinned rightmost (order 3) in its own component.
-                           order: editorDock === 'end' ? 1 : 2,
-                           minWidth: 'var(--app-min-width, 360px)',
-                         }}
-                       >
-                         <Outlet />
-                       </div>
-                     </div>
+                      <div
+                        className='flex-1 min-h-0 flex flex-col overflow-auto justify-center'
+                        style={{
+                          // Complementary order to the editor host: start → editor(1)
+                          // chat(2); end → chat(1) editor(2). Conversation pane is
+                          // pinned rightmost (order 3) in its own component.
+                          order: editorDock === 'end' ? 1 : 2,
+                          minWidth: 'var(--app-min-width, 360px)',
+                        }}
+                      >
+                        <Outlet />
+                      </div>
+                    </div>
                   </TerminalPanelHost>
                   {conversationPaneEnabled && <ConversationPane />}
                   {directorySelectionContextHolder}
