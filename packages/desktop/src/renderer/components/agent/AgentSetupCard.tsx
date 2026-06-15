@@ -172,7 +172,7 @@ const AgentSetupCard: React.FC<AgentSetupCardProps> = ({
   return (
     <div className='mb-12px'>
       {/* Main Card - 主卡片 */}
-      <div className='relative rounded-12px p-16px bg-bg-2 border-1 border-solid border-border-2'>
+      <div className='relative rounded-card p-16px bg-bg-2 border-1 border-solid border-border-2'>
         {/* Collapsed View - 收起状态：一行提示 + 展开按钮 */}
         {!expanded && !hasAvailableAndSwitching && (
           <div className='flex items-center justify-between cursor-pointer' onClick={() => setExpanded(true)}>

@@ -324,7 +324,7 @@ const WorkspaceGroupedHistory: React.FC<WorkspaceGroupedHistoryProps> = ({
               : t('conversation.history.exportDialogSingleDescription')}
           </div>
 
-          <div className='mb-16px p-16px rounded-12px bg-fill-1'>
+          <div className='mb-16px p-16px rounded-card bg-fill-1'>
             <div className='text-14px mb-8px text-t-primary'>{t('conversation.history.exportTargetFolder')}</div>
             <div
               className='flex items-center justify-between px-12px py-10px rounded-8px transition-colors'

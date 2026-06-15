@@ -163,7 +163,7 @@ const AionCollapseComponent: React.FC<AionCollapseProps> & { Item: typeof AionCo
   }, []);
 
   return (
-    <div className={classNames('rounded-16px  flex flex-col gap-12px bg-2 py-18px px-[12px] md:px-[32px]', className)}>
+    <div className={classNames('rounded-card  flex flex-col gap-12px bg-2 py-18px px-[12px] md:px-[32px]', className)}>
       {items.map((child) => {
         const {
           name,
@@ -183,7 +183,7 @@ const AionCollapseComponent: React.FC<AionCollapseProps> & { Item: typeof AionCo
           <div
             key={name}
             className={classNames(
-              'overflow-hidden rounded-12px',
+              'overflow-hidden rounded-card',
               itemBorderClass,
               itemClassName,
               disabled && 'opacity-50'
