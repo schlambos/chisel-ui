@@ -8,6 +8,13 @@ import { useMemo } from 'react';
 import { useMobileViewport } from '../system/useMobileViewport';
 import { useLayoutContext } from '../context/LayoutContext';
 
+type LayoutBudgetInputs = {
+  viewportWidth?: number;
+  siderCollapsed?: boolean;
+  siderWidth?: number;
+  conversationPaneCollapsed?: boolean;
+};
+
 type LayoutBudget = {
   editorMaxWidth: number;
   conversationPaneMaxWidth: number;
@@ -19,15 +26,21 @@ const EDITOR_MIN = 120;
 const PANE_MIN = 240;
 const BUFFER = 20;
 
-export function useHorizontalLayoutBudget(): LayoutBudget {
-  const { viewportWidth } = useMobileViewport();
+export function useHorizontalLayoutBudget(inputs?: LayoutBudgetInputs): LayoutBudget {
+  const { viewportWidth: viewportWidthFromHook } = useMobileViewport();
   const layout = useLayoutContext();
 
-  return useMemo(() => {
-    const siderWidth = layout?.siderCollapsed ? 0 : (layout?.siderWidth ?? 0);
-    const conversationPaneCollapsed = layout?.conversationPaneCollapsed ?? false;
+  // Use explicit inputs when provided, fall back to context for missing fields
+  const effectiveViewportWidth = inputs?.viewportWidth ?? viewportWidthFromHook;
+  const effectiveSiderCollapsed = inputs?.siderCollapsed ?? layout?.siderCollapsed;
+  const effectiveSiderWidth = inputs?.siderWidth ?? layout?.siderWidth;
+  const effectiveConversationPaneCollapsed = inputs?.conversationPaneCollapsed ?? layout?.conversationPaneCollapsed;
 
-    const availableWidth = viewportWidth - siderWidth;
+  return useMemo(() => {
+    const siderWidth = effectiveSiderCollapsed ? 0 : (effectiveSiderWidth ?? 0);
+    const conversationPaneCollapsed = effectiveConversationPaneCollapsed ?? false;
+
+    const availableWidth = effectiveViewportWidth - siderWidth;
 
     const editorMaxWidth = Math.max(
       EDITOR_MIN,
@@ -41,7 +54,7 @@ export function useHorizontalLayoutBudget(): LayoutBudget {
       conversationPaneMaxWidth,
       shouldCollapsePane,
     };
-  }, [viewportWidth, layout?.siderCollapsed, layout?.siderWidth, layout?.conversationPaneCollapsed]);
+  }, [effectiveViewportWidth, effectiveSiderCollapsed, effectiveSiderWidth, effectiveConversationPaneCollapsed]);
 }
 
 export default useHorizontalLayoutBudget;

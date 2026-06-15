@@ -136,12 +136,16 @@ const Layout: React.FC<{
   const conversationPaneEnabled = !isSettingsRoute;
 
   const { isMobile, viewportWidth } = useMobileViewport();
-  const { shouldCollapsePane } = useHorizontalLayoutBudget();
-
   const { desktopSiderWidth, siderDragging, siderIconOnly, resizeBy, beginSiderResizeDrag } = useSiderResize({
     isMobile,
     collapsed,
     setCollapsed,
+  });
+  const { shouldCollapsePane } = useHorizontalLayoutBudget({
+    viewportWidth,
+    siderCollapsed: collapsed,
+    siderWidth: desktopSiderWidth,
+    conversationPaneCollapsed,
   });
   const handleSiderResizeKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
