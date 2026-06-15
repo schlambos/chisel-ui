@@ -234,6 +234,19 @@ const Layout: React.FC<{
     }
   }, [isMobile, setConversationPaneCollapsed]);
 
+  // Desktop: auto-collapse ConversationPane when viewport is too narrow to fit
+  // both chat content and the pane side-by-side.
+  useEffect(() => {
+    if (isMobile || conversationPaneCollapsed) return;
+    const availableContentWidth = viewportWidth - desktopSiderWidth;
+    const CHAT_MIN_WIDTH_PX = 360;
+    const PANE_MIN_WIDTH_PX = 240;
+    const COLLAPSE_THRESHOLD_PX = CHAT_MIN_WIDTH_PX + PANE_MIN_WIDTH_PX + 20;
+    if (availableContentWidth < COLLAPSE_THRESHOLD_PX) {
+      setConversationPaneCollapsed(true);
+    }
+  }, [isMobile, viewportWidth, desktopSiderWidth, conversationPaneCollapsed, setConversationPaneCollapsed]);
+
   // 清理侧栏 Tooltip 残留节点，避免移动端路由切换后浮层卡在左上角
   useEffect(() => {
     cleanupSiderTooltips();

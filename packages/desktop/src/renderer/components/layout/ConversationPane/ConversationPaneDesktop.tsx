@@ -25,6 +25,7 @@ const DEFAULT_PANE_WIDTH_PX = 300;
 const MIN_PANE_WIDTH_PX = 240;
 const MAX_PANE_WIDTH_PX = 560;
 const PANE_WIDTH_STORAGE_KEY = 'aionui.conversationPaneWidth';
+const CHAT_MIN_WIDTH_PX = 360;
 
 interface ConversationPaneDesktopProps {
   collapsed: boolean;
@@ -66,6 +67,13 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
     };
   }, [isResizing]);
 
+  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleNewChat = useCallback(() => {
     cleanupSiderTooltips();
     blurActiveElement();
@@ -81,7 +89,8 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
     layout?.setConversationPaneCollapsed(true);
   }, [layout]);
 
-  const width = collapsed ? 0 : Math.round(paneWidth);
+  const effectiveMaxWidth = Math.max(MIN_PANE_WIDTH_PX, viewportWidth - (layout?.siderWidth ?? 0) - CHAT_MIN_WIDTH_PX);
+  const displayWidth = collapsed ? 0 : Math.min(Math.round(paneWidth), effectiveMaxWidth);
 
   return (
     <div
@@ -91,7 +100,7 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
       })}
       // `order: 3` keeps the conversation pane pinned rightmost regardless of
       // the editor dock side (Sider 0, editor/chat 1–2, this pane 3).
-      style={{ width, flexBasis: width, order: 3 }}
+      style={{ width: displayWidth, flexBasis: displayWidth, order: 3 }}
       aria-hidden={collapsed}
     >
       {!collapsed && (
