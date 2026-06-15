@@ -507,7 +507,7 @@ const WeixinConfigForm: React.FC<WeixinConfigFormProps> = ({ pluginStatus, model
 
       {/* Next Steps Guide - shown when connected but no authorized users yet */}
       {pluginStatus?.connected && authorizedUsers.length === 0 && (
-        <div className='bg-blue-50 dark:bg-blue-900/20 rd-12px p-16px border border-blue-200 dark:border-blue-800'>
+        <div className='bg-blue-50 dark:bg-blue-900/20 rounded-card p-16px border border-blue-200 dark:border-blue-800'>
           <SectionHeader title={t('settings.assistant.nextSteps', 'Next Steps')} />
           <div className='text-14px text-t-secondary space-y-8px'>
             <p className='m-0'>
@@ -533,7 +533,7 @@ const WeixinConfigForm: React.FC<WeixinConfigFormProps> = ({ pluginStatus, model
 
       {/* Pending Pairing Requests */}
       {pluginStatus?.connected && (
-        <div className='bg-fill-1 rd-12px pt-16px pr-16px pb-16px pl-0'>
+        <div className='bg-fill-1 rounded-card pt-16px pr-16px pb-16px pl-0'>
           <SectionHeader
             title={t('settings.assistant.pendingPairings', 'Pending Pairing Requests')}
             action={
@@ -607,7 +607,7 @@ const WeixinConfigForm: React.FC<WeixinConfigFormProps> = ({ pluginStatus, model
 
       {/* Authorized Users */}
       {authorizedUsers.length > 0 && (
-        <div className='bg-fill-1 rd-12px pt-16px pr-16px pb-16px pl-0'>
+        <div className='bg-fill-1 rounded-card pt-16px pr-16px pb-16px pl-0'>
           <SectionHeader
             title={t('settings.assistant.authorizedUsers', 'Authorized Users')}
             action={

@@ -170,7 +170,7 @@ const SpeechToTextSettingsSection: React.FC<{
   );
 
   return (
-    <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px border border-border-2'>
+    <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rounded-card md:rounded-card border border-border-2'>
       <div className='flex items-center justify-between gap-12px mb-8px'>
         <div className='flex flex-col gap-4px'>
           <span className='text-14px text-t-primary'>{t('settings.speechToText')}</span>
@@ -313,7 +313,7 @@ const TextToSpeechSettingsSection: React.FC<{
   );
 
   return (
-    <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px border border-border-2'>
+    <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rounded-card md:rounded-card border border-border-2'>
       <div className='flex items-center justify-between gap-12px mb-8px'>
         <div className='flex flex-col gap-4px'>
           <span className='text-14px text-t-primary'>{t('settings.textToSpeech')}</span>
@@ -621,7 +621,7 @@ const ModalMcpManagementSection: React.FC<{
 
       <div className='flex-1 min-h-0'>
         {visibleMcpServers.length === 0 && extensionMcpServers.length === 0 ? (
-          <div className='py-24px text-center text-t-secondary text-14px border border-dashed border-border-2 rd-12px'>
+          <div className='py-24px text-center text-t-secondary text-14px border border-dashed border-border-2 rounded-card'>
             {t('settings.mcpNoServersFound')}
           </div>
         ) : (
@@ -950,7 +950,7 @@ const ToolsModalContent: React.FC = () => {
       <AionScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
         <div className='space-y-16px'>
           {/* MCP 工具配置 */}
-          <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px flex flex-col min-h-0 border border-border-2'>
+          <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rounded-card md:rounded-card flex flex-col min-h-0 border border-border-2'>
             <div className='flex-1 min-h-0'>
               <AionScrollArea
                 className={classNames('h-full', isPageMode && 'overflow-visible')}
@@ -967,7 +967,7 @@ const ToolsModalContent: React.FC = () => {
             </div>
           </div>
           {/* 图像生成 */}
-          <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px border border-border-2'>
+          <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rounded-card md:rounded-card border border-border-2'>
             <div className='flex items-center justify-between mb-16px'>
               <span className='text-14px text-t-primary'>{t('settings.imageGeneration')}</span>
               <div className='flex items-center gap-8px'>

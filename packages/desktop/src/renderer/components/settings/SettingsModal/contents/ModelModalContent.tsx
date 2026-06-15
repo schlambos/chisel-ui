@@ -460,8 +460,8 @@ const ModelModalContent: React.FC = () => {
     },
   });
 
-return (
-     <div className='flex flex-col bg-2 rounded-card px-16px md:px-24px lg:px-28px py-16px md:py-18px'>
+  return (
+    <div className='flex flex-col bg-2 rounded-card px-16px md:px-24px lg:px-28px py-16px md:py-18px'>
       {messageContext}
       {addPlatformModalContext}
       {editModalContext}

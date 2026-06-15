@@ -344,7 +344,7 @@ const StarOfficeMonitorCard: React.FC<StarOfficeMonitorCardProps> = ({ conversat
         }}
       >
         <div className='flex flex-col gap-12px'>
-          <div className='rounded-12px border border-3 bg-2 p-12px'>
+          <div className='rounded-card border border-3 bg-2 p-12px'>
             <button
               type='button'
               className='border-none bg-transparent p-0 text-left text-14px font-500 text-t-primary underline-offset-3 hover:underline cursor-pointer'
