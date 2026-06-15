@@ -21,8 +21,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ipcBridge } from '@/common';
-import type { TerminalExitEvent, TerminalSessionInfo } from '@/common/types/terminal/terminalTypes';
+import { terminal } from '@/common/adapter/ipcBridge';
+import type { TerminalSessionInfo } from '@/common/adapter/ipcBridge';
 import type { TerminalSession } from './types';
 
 const clientId = () => `term-${Math.random().toString(36).slice(2, 10)}`;
@@ -45,6 +45,8 @@ export type UseTerminalSessionsApi = {
   splitActive: () => Promise<void>;
   /** Close the right-pane split session, killing its PTY, and clear split. */
   closeSplit: () => Promise<void>;
+  /** Callback to handle session exit events from TerminalInstance */
+  handleSessionExit: (sessionId: string, exitCode: number | null) => void;
 };
 
 export function useTerminalSessions(): UseTerminalSessionsApi {
@@ -58,18 +60,15 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
     sessionsRef.current = sessions;
   }, [sessions]);
 
-  // Subscribe once to the global exit emitter — when any PTY dies, mark its
-  // tab as exited so the UI can show the exit code and disable input.
-  useEffect(() => {
-    const unsubscribe = ipcBridge.terminal.exit.on((event: TerminalExitEvent) => {
-      setSessions((prev) =>
-        prev.map((s) => (s.session_id === event.session_id ? { ...s, exited: true, exit_code: event.exit_code } : s))
-      );
-    });
-    return () => unsubscribe();
+  // Subscribe to exit events from TerminalInstance components
+  // This will be called by TerminalInstance when it receives an exit event via WebSocket
+  const handleSessionExit = useCallback((sessionId: string, exitCode: number | null) => {
+    setSessions((prev) =>
+      prev.map((s) => (s.session_id === sessionId ? { ...s, exited: true, exit_code: exitCode } : s))
+    );
   }, []);
 
-  // Re-attach: on first mount, pull the list of live PTYs from main. Anything
+  // Re-attach: on first mount, pull the list of live PTYs from backend. Anything
   // we don't already know about becomes a restored tab. Failures are
   // non-fatal — we just leave the panel empty and let the user open a new
   // shell as normal.
@@ -77,13 +76,10 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
     let cancelled = false;
     const restore = async (): Promise<void> => {
       try {
-        const res = await ipcBridge.terminal.list.invoke();
+         const response = await terminal.list.invoke();
+         const liveSessions = response.sessions;
         if (cancelled) return;
-        if (!res?.success || !Array.isArray(res.data)) {
-          console.warn('[TerminalPanel] terminal.list failed:', res?.msg ?? 'unknown');
-          return;
-        }
-        setSessions((prev) => mergeLiveSessions(prev, res.data ?? []));
+        setSessions((prev) => mergeLiveSessions(prev, liveSessions));
       } catch (error) {
         if (cancelled) return;
         console.warn('[TerminalPanel] terminal.list threw:', error);
@@ -115,15 +111,9 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
     setActiveId(client_id);
 
     try {
-      const res = await ipcBridge.terminal.spawn.invoke({ cwd });
-      if (!res?.success || !res.data) {
-        markSpawnFailed(setSessions, client_id, res?.msg ?? 'Failed to spawn shell');
-        return;
-      }
-      const { session_id, shell, cwd: resolvedCwd } = res.data;
-      setSessions((prev) =>
-        prev.map((s) => (s.client_id === client_id ? { ...s, session_id, shell, cwd: resolvedCwd } : s))
-      );
+      const result = await terminal.spawn.invoke({ cwd });
+      const session_id = result.session_id;
+      setSessions((prev) => prev.map((s) => (s.client_id === client_id ? { ...s, session_id } : s)));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       markSpawnFailed(setSessions, client_id, message);
@@ -136,7 +126,7 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
 
     if (target.session_id && !target.exited) {
       try {
-        await ipcBridge.terminal.kill.invoke({ session_id: target.session_id });
+        await terminal.kill.invoke({ session_id: target.session_id });
       } catch (error) {
         // Even if the kill RPC fails, drop the tab — the PTY may already be dead.
         console.error('[TerminalPanel] kill failed:', error);
@@ -205,16 +195,9 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
     setSessions((prev) => [...prev, optimistic]);
     setSplitSessionId(client_id);
     try {
-      const res = await ipcBridge.terminal.spawn.invoke({ cwd });
-      if (!res?.success || !res.data) {
-        markSpawnFailed(setSessions, client_id, res?.msg ?? 'Failed to spawn shell');
-        setSplitSessionId(null);
-        return;
-      }
-      const { session_id, shell, cwd: resolvedCwd } = res.data;
-      setSessions((prev) =>
-        prev.map((s) => (s.client_id === client_id ? { ...s, session_id, shell, cwd: resolvedCwd } : s))
-      );
+      const result = await terminal.spawn.invoke({ cwd });
+      const session_id = result.session_id;
+      setSessions((prev) => prev.map((s) => (s.client_id === client_id ? { ...s, session_id } : s)));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       markSpawnFailed(setSessions, client_id, message);
@@ -229,7 +212,7 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
     const target = sessionsRef.current.find((s) => s.client_id === id);
     if (target?.session_id && !target.exited) {
       try {
-        await ipcBridge.terminal.kill.invoke({ session_id: target.session_id });
+        await terminal.kill.invoke({ session_id: target.session_id });
       } catch (error) {
         console.error('[TerminalPanel] kill (split) failed:', error);
       }
@@ -248,6 +231,7 @@ export function useTerminalSessions(): UseTerminalSessionsApi {
     splitSessionId,
     splitActive,
     closeSplit,
+    handleSessionExit,
   };
 }
 
@@ -280,8 +264,8 @@ function mergeLiveSessions(prev: TerminalSession[], live: readonly TerminalSessi
       client_id: clientId(),
       session_id: info.session_id,
       title: titleFromShell(info.shell),
-      cwd: info.cwd,
-      shell: info.shell,
+      cwd: info.cwd ?? null,
+      shell: info.shell ?? null,
       exited: false,
       exit_code: null,
       restored: true,
@@ -292,7 +276,7 @@ function mergeLiveSessions(prev: TerminalSession[], live: readonly TerminalSessi
 }
 
 /** Best-effort tab title from a shell path: keep just the basename. */
-function titleFromShell(shell: string): string {
+function titleFromShell(shell: string | undefined): string {
   if (!shell) return 'Terminal';
   const idx = Math.max(shell.lastIndexOf('/'), shell.lastIndexOf('\\'));
   return idx >= 0 ? shell.slice(idx + 1) : shell;

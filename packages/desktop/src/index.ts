@@ -829,17 +829,6 @@ app.on('before-quit', async () => {
     disposeCronResumeListener?.();
     disposeCronResumeListener = null;
 
-    // Tear down terminal sessions (node-pty) before the app dies so we don't
-    // leak orphan shell processes.
-    try {
-      const { getTerminalService } = await import('./process/services/terminal/TerminalService');
-      const { disposeTerminalBridge } = await import('./process/bridge');
-      disposeTerminalBridge();
-      getTerminalService().killAll();
-    } catch (err) {
-      console.error('[App] Failed to dispose terminal service:', err);
-    }
-
     // Tear down the Git service (close all chokidar watchers) and detach the
     // bridge subscription. Runs after the terminal block so a slow fs
     // shutdown doesn't block PTY teardown.

@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { ITheme } from '@xterm/xterm';
+import type { ITheme } from 'ghostty-web';
 
 import { useThemeContext } from '@renderer/hooks/context/ThemeContext';
 

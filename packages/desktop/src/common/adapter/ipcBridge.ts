@@ -40,18 +40,6 @@ import type {
   TextToSpeechResult,
 } from '../types/provider/speech';
 import type {
-  TerminalExitEvent,
-  TerminalKillRequest,
-  TerminalOutputEvent,
-  TerminalResizeRequest,
-  TerminalSessionInfo,
-  TerminalSnapshotRequest,
-  TerminalSnapshotResult,
-  TerminalSpawnOptions,
-  TerminalSpawnResult,
-  TerminalWriteRequest,
-} from '../types/terminal/terminalTypes';
-import type {
   GitChangedEvent,
   GitCommitRequest,
   GitCommitResult,
@@ -181,6 +169,56 @@ export const shell = {
   openFolderWith: httpPost<void, { folder_path: string; tool: 'vscode' | 'terminal' | 'explorer' }>(
     '/api/shell/open-folder-with'
   ),
+};
+
+// ---------------------------------------------------------------------------
+// Terminal — routed to /api/terminal/*
+// ---------------------------------------------------------------------------
+
+export type TerminalSpawnOptions = {
+  /** Optional initial command to run in the terminal */
+  command?: string;
+  /** Optional working directory for the terminal session */
+  cwd?: string;
+  /** Terminal columns (default: 80) */
+  cols?: number;
+  /** Terminal rows (default: 24) */
+  rows?: number;
+};
+
+export type TerminalSpawnResult = {
+  session_id: string;
+};
+
+export type TerminalSessionInfo = {
+  session_id: string;
+  created_at: string;
+  cols: number;
+  rows: number;
+  is_active: boolean;
+  cwd?: string;
+  shell?: string;
+};
+
+export type TerminalResizeRequest = {
+  session_id: string;
+  cols: number;
+  rows: number;
+};
+
+export type TerminalKillRequest = {
+  session_id: string;
+};
+
+export const terminal = {
+  /** Create a new terminal session */
+  spawn: httpPost<TerminalSpawnResult, TerminalSpawnOptions>('/api/terminal/sessions'),
+  /** List all terminal sessions */
+  list: httpGet<{ sessions: TerminalSessionInfo[] }, void>('/api/terminal/sessions'),
+  /** Kill a terminal session */
+  kill: httpPost<void, TerminalKillRequest>('/api/terminal/sessions/kill'),
+  /** Resize a terminal session */
+  resize: httpPost<void, TerminalResizeRequest>('/api/terminal/sessions/resize'),
 };
 
 // ---------------------------------------------------------------------------
@@ -677,21 +715,10 @@ export const application = {
 };
 
 // ---------------------------------------------------------------------------
-// Terminal — stays IPC (PTY is owned by Electron main process)
+// Git — stays IPC (system git binary is owned by the Electron main process).
+// Fully decoupled from aioncore: GitService (simple-git) lives in the main
+// process and is reached only through these channels.
 // ---------------------------------------------------------------------------
-
-export const terminal = {
-  spawn: bridge.buildProvider<IBridgeResponse<TerminalSpawnResult>, TerminalSpawnOptions>('terminal.spawn'),
-  write: bridge.buildProvider<IBridgeResponse, TerminalWriteRequest>('terminal.write'),
-  resize: bridge.buildProvider<IBridgeResponse, TerminalResizeRequest>('terminal.resize'),
-  kill: bridge.buildProvider<IBridgeResponse, TerminalKillRequest>('terminal.kill'),
-  /** List live sessions (re-attach after renderer reload). */
-  list: bridge.buildProvider<IBridgeResponse<TerminalSessionInfo[]>, void>('terminal.list'),
-  /** Return recent output ring buffer for a single session. */
-  snapshot: bridge.buildProvider<IBridgeResponse<TerminalSnapshotResult>, TerminalSnapshotRequest>('terminal.snapshot'),
-  output: bridge.buildEmitter<TerminalOutputEvent>('terminal.output'),
-  exit: bridge.buildEmitter<TerminalExitEvent>('terminal.exit'),
-};
 
 // ---------------------------------------------------------------------------
 // Git — stays IPC (system git binary is owned by the Electron main process).

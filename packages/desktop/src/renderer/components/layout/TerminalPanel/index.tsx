@@ -26,7 +26,7 @@ import { useParams } from 'react-router-dom';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Close } from '@icon-park/react';
 
-import { ipcBridge } from '@/common';
+import { conversation } from '@/common/adapter/ipcBridge';
 import { useTerminalPanel } from '@renderer/hooks/context/TerminalPanelContext';
 import { useThemeContext } from '@renderer/hooks/context/ThemeContext';
 import { useTerminalShortcuts } from '@renderer/hooks/ui/useTerminalShortcuts';
@@ -51,6 +51,7 @@ const TerminalPanel: React.FC = () => {
     splitSessionId,
     splitActive,
     closeSplit,
+    handleSessionExit,
   } = useTerminalSessions();
   const params = useParams();
 
@@ -106,6 +107,7 @@ const TerminalPanel: React.FC = () => {
         fontScale={fontScale}
         disabled={session.exited}
         restored={session.restored}
+        onExit={handleSessionExit}
       />
     );
   };
@@ -183,6 +185,7 @@ const TerminalPanel: React.FC = () => {
               fontScale={fontScale}
               disabled={session.exited}
               restored={session.restored}
+              onExit={handleSessionExit}
             />
           ) : null
         )}
@@ -204,7 +207,7 @@ async function openWithActiveWorkspace(
     return;
   }
   try {
-    const conv = await ipcBridge.conversation.get.invoke({ id: conversationId });
+    const conv = await conversation.get.invoke({ id: conversationId });
     const extra = conv?.extra && typeof conv.extra === 'object' ? (conv.extra as { workspace?: string }) : null;
     const workspace = extra?.workspace;
     await openSession(typeof workspace === 'string' && workspace.length > 0 ? workspace : undefined);

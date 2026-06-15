@@ -1,7 +1,14 @@
-## 2026-06-14
+## 2026-06-15
+
+### AionCore
+
+- **Feat(terminal): Migrated terminal backend from Electron node-pty to Rust portable-pty** — new `aionui-terminal` crate provides cross-platform PTY management with WebSocket transport. Terminal sessions now persist server-side and survive renderer crashes.
+- **Feat(terminal): WebSocket-based terminal transport with JSON message protocol** — client and server communicate via JSON messages (`TerminalWebSocketMessage` for input/resize/ping, `TerminalOutputMessage` for output/error/exit/pong).
 
 ### AionUi
 
+- **Feat(terminal): Replaced xterm.js frontend with ghostty-web** — migrated from xterm.js 5.5 to ghostty-web for better performance and WASM-based rendering.
+- **Feat(terminal): HTTP REST API for terminal session management** — new endpoints for create/list/kill/resize operations via HTTP API.
 - style: warm global shadow tokens to Chisl ink palette — changed light theme shadow RGB from (60, 56, 54) to (42, 38, 32) and dark theme from (0, 0, 0) to (20, 16, 12) in base.css
 - fix(command-center): prevent guide page overflow by enforcing chat pane min-width — added `minWidth: 'var(--app-min-width, 360px)'` to the center chat pane div in Layout.tsx to prevent the New Chat guide page from being squashed below 360px when the Command Center editor or conversation panes are resized too wide
 

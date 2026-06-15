@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { TerminalSpawnResult } from '@/common/types/terminal/terminalTypes';
+import type { TerminalSpawnResult } from '@/common/adapter/ipcBridge';
 
 /**
  * Renderer-side view of a single terminal session.
