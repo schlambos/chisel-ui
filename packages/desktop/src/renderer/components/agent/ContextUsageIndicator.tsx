@@ -70,9 +70,9 @@ const ContextUsageIndicator: React.FC<ContextUsageIndicatorProps> = ({
   };
 
   // 背景圆环颜色 - 适配深浅主题
-   const getTrackColor = () => {
-     return 'var(--bg-3)';
-   };
+  const getTrackColor = () => {
+    return 'var(--bg-3)';
+  };
 
   const popoverContent = (
     <div className='p-8px min-w-160px'>

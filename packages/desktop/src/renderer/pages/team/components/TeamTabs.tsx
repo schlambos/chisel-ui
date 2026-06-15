@@ -94,11 +94,11 @@ const TeamTabView: React.FC<TeamTabViewProps> = ({
   return (
     <div
       draggable={!isLeader}
-       className={`relative group flex items-center gap-8px px-12px h-full max-w-240px cursor-pointer transition-all duration-200 shrink-0 border-r border-[color:var(--border-base)] ${
-          isActive
-            ? 'bg-[color:var(--brand)] text-[color:var(--text-primary)] border-t-2 border-t-solid border-t-[color:var(--brand)]'
-            : 'bg-2 text-[color:var(--text-tertiary)] hover:text-[color:var(--text-secondary)] hover:bg-[color:var(--bg-2)] border-b border-[color:var(--border-base)]'
-        } ${isDragOver ? DRAG_OVER_CLASS : ''}`}
+      className={`relative group flex items-center gap-8px px-12px h-full max-w-240px cursor-pointer transition-all duration-200 shrink-0 border-r border-[color:var(--border-base)] ${
+        isActive
+          ? 'bg-[color:var(--brand)] text-[color:var(--text-primary)] border-t-2 border-t-solid border-t-[color:var(--brand)]'
+          : 'bg-2 text-[color:var(--text-tertiary)] hover:text-[color:var(--text-secondary)] hover:bg-[color:var(--bg-2)] border-b border-[color:var(--border-base)]'
+      } ${isDragOver ? DRAG_OVER_CLASS : ''}`}
       style={isRunning ? { animation: 'team-tab-breathe 2s ease-in-out infinite' } : undefined}
       onClick={() => !editing && onSwitch(slot_id)}
       onDoubleClick={onRename ? startEditing : undefined}

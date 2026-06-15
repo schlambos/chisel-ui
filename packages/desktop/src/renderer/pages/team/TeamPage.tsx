@@ -70,20 +70,18 @@ const AgentChatSlot: React.FC<{
     <div
       className='flex flex-col h-full'
       style={
-         isLeader
-           ? {
-               borderLeft: '3px solid var(--brand)',
-               background: 'color-mix(in srgb, var(--brand) 3%, var(--bg-1))',
-             }
-           : { background: 'var(--bg-1)' }
+        isLeader
+          ? {
+              borderLeft: '3px solid var(--brand)',
+              background: 'color-mix(in srgb, var(--brand) 3%, var(--bg-1))',
+            }
+          : { background: 'var(--bg-1)' }
       }
     >
       <div
         className='flex items-center justify-between gap-8px px-12px h-40px shrink-0 border-b border-solid border-[color:var(--border-base)] relative z-10'
         style={
-         isLeader
-             ? { background: 'color-mix(in srgb, var(--brand) 8%, var(--bg-2))' }
-             : { background: 'var(--bg-2)' }
+          isLeader ? { background: 'color-mix(in srgb, var(--brand) 8%, var(--bg-2))' } : { background: 'var(--bg-2)' }
         }
       >
         <TeamAgentIdentity
@@ -115,18 +113,18 @@ const AgentChatSlot: React.FC<{
               />
             </div>
           )}
-           {!isLeader && onRemove && (
-             <div
-               className='shrink-0 cursor-pointer hover:bg-[var(--bg-3)] p-4px rd-4px text-[color:var(--color-text-3)] hover:text-[color:var(--danger)] transition-colors'
-               onClick={onRemove}
-             >
-               <CloseSmall size='16' fill='currentColor' />
-             </div>
-           )}
-           <div
-             className='shrink-0 cursor-pointer hover:bg-[var(--bg-3)] p-4px rd-4px text-[color:var(--color-text-3)] hover:text-[color:var(--color-text-1)] transition-colors'
-             onClick={() => onToggleFullscreen?.()}
-           >
+          {!isLeader && onRemove && (
+            <div
+              className='shrink-0 cursor-pointer hover:bg-[var(--bg-3)] p-4px rd-4px text-[color:var(--color-text-3)] hover:text-[color:var(--danger)] transition-colors'
+              onClick={onRemove}
+            >
+              <CloseSmall size='16' fill='currentColor' />
+            </div>
+          )}
+          <div
+            className='shrink-0 cursor-pointer hover:bg-[var(--bg-3)] p-4px rd-4px text-[color:var(--color-text-3)] hover:text-[color:var(--color-text-1)] transition-colors'
+            onClick={() => onToggleFullscreen?.()}
+          >
             {isFullscreen ? <OffScreen size='16' fill='currentColor' /> : <FullScreen size='16' fill='currentColor' />}
           </div>
         </div>
