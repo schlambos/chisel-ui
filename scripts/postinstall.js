@@ -34,13 +34,7 @@ function isElectronBundleComplete(electronDir, platformPath) {
 
   const platform = os.platform();
   if (platform === 'darwin' || platform === 'mas') {
-    const frameworksDir = path.join(
-      electronDir,
-      'dist',
-      'Electron.app',
-      'Contents',
-      'Frameworks',
-    );
+    const frameworksDir = path.join(electronDir, 'dist', 'Electron.app', 'Contents', 'Frameworks');
     if (!fs.existsSync(frameworksDir)) return false;
   }
   return true;

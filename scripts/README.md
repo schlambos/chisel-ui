@@ -64,7 +64,6 @@ This is the core module that handles all native module rebuilding. It provides:
 #### Windows
 
 - **Modules rebuilt**: `better-sqlite3`
-- **Skipped**: `node-pty` (uses prebuilt binaries)
 - **Environment**: MSVS 2022, Windows SDK 10.0.19041.0
 
 #### macOS
@@ -165,7 +164,6 @@ rebuildSingleModule({
 
 **Solution**:
 
-- Windows: This is expected for `node-pty` (uses prebuilt binaries)
 - macOS/Linux: Ensure build tools for target architecture are installed
 - Consider building on native architecture instead
 
