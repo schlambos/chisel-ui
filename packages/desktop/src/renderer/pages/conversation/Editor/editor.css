@@ -35,10 +35,14 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   opacity: 0;
+  /* Width / flex-basis change INSTANTLY (no tween): the editor is an in-flow
+     flex sibling, so easing its width eases the chat column width every frame,
+     which re-centers the /guid content block across the whole slide (the "slow
+     notch march"). Snapping width keeps the centered content stationary — only
+     the empty auto-margins absorb the change. Opacity + border-color still
+     tween so the editor fades in/out instead of appearing in a single stark
+     frame. */
   transition:
-    width var(--motion-slow, 320ms) var(--motion-ease-emphasized, ease),
-    flex-basis var(--motion-slow, 320ms) var(--motion-ease-emphasized, ease),
-    min-width var(--motion-slow, 320ms) var(--motion-ease-emphasized, ease),
     border-left-color var(--motion-slow, 320ms) var(--motion-ease-emphasized, ease),
     border-right-color var(--motion-slow, 320ms) var(--motion-ease-emphasized, ease),
     opacity var(--motion-slow, 320ms) var(--motion-ease-emphasized, ease);

@@ -37,7 +37,6 @@ import { useConversationShortcuts } from '@renderer/hooks/ui/useConversationShor
 import { useCustomCssInjection, useCustomCssStyleInjection } from '@renderer/hooks/system/useCustomCssInjection';
 import { dispatchConversationPaneStateEvent } from '@renderer/utils/conversationPane/events';
 import ConversationPane from '@renderer/components/layout/ConversationPane';
-import { useHorizontalLayoutBudget } from '@renderer/hooks/layout';
 import { useTerminalPanelSafe } from '@renderer/hooks/context/TerminalPanelContext';
 import { useLayoutModeSafe } from '@renderer/hooks/context/LayoutModeContext';
 import { useEditorContextSafe } from '@renderer/pages/conversation/Editor';
@@ -118,7 +117,7 @@ const Layout: React.FC<{
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(true);
   const [conversationPaneCollapsed, setConversationPaneCollapsedState] = useState<boolean>(
-    readStoredConversationPaneCollapsed
+    readStoredConversationPaneCollapsed()
   );
   const [customCss, setCustomCss] = useState<string>('');
   const [shouldMountUpdateModal, setShouldMountUpdateModal] = useState(false);
@@ -140,12 +139,6 @@ const Layout: React.FC<{
     isMobile,
     collapsed,
     setCollapsed,
-  });
-  const { shouldCollapsePane } = useHorizontalLayoutBudget({
-    viewportWidth,
-    siderCollapsed: collapsed,
-    siderWidth: desktopSiderWidth,
-    conversationPaneCollapsed,
   });
   const handleSiderResizeKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -232,6 +225,19 @@ const Layout: React.FC<{
     dispatchConversationPaneStateEvent(conversationPaneCollapsed);
   }, [conversationPaneCollapsed]);
 
+  // One-time desktop recovery: a prior layout regression could persist a
+  // stuck `collapsed=true`, leaving the pane hidden at 0 width on every
+  // launch. On the first desktop mount, clear that stale value and force the
+  // pane open so it is guaranteed visible. Runs once; the mobile effect below
+  // still wins on mobile.
+  const didRecoverPaneRef = useRef(false);
+  useEffect(() => {
+    if (didRecoverPaneRef.current) return;
+    if (isMobile) return;
+    didRecoverPaneRef.current = true;
+    setConversationPaneCollapsed(false);
+  }, [isMobile, setConversationPaneCollapsed]);
+
   // Mobile: force-collapse the ConversationPane by default so it never
   // opens over a fresh chat unless the user explicitly invokes it.
   useEffect(() => {
@@ -239,15 +245,6 @@ const Layout: React.FC<{
       setConversationPaneCollapsed(true);
     }
   }, [isMobile, setConversationPaneCollapsed]);
-
-  // Desktop: auto-collapse ConversationPane when viewport is too narrow to fit
-  // both chat content and the pane side-by-side.
-  useEffect(() => {
-    if (isMobile || conversationPaneCollapsed) return;
-    if (shouldCollapsePane) {
-      setConversationPaneCollapsed(true);
-    }
-  }, [isMobile, shouldCollapsePane, conversationPaneCollapsed, setConversationPaneCollapsed]);
 
   // 清理侧栏 Tooltip 残留节点，避免移动端路由切换后浮层卡在左上角
   useEffect(() => {
@@ -391,7 +388,7 @@ const Layout: React.FC<{
                   role='main'
                   data-layout-region='content'
                   tabIndex={-1}
-                  className={'bg-1 layout-content flex flex-row flex-1 min-h-0'}
+                  className={'bg-1 layout-content flex flex-row flex-1 min-h-0 relative'}
                   onClick={() => {
                     if (isMobile && !collapsed) setCollapsed(true);
                   }}
@@ -418,6 +415,11 @@ const Layout: React.FC<{
                           // pinned rightmost (order 3) in its own component.
                           order: editorDock === 'end' ? 1 : 2,
                           minWidth: 'var(--app-min-width, 360px)',
+                          // Inset the chat content by the width of the overlay
+                          // conversation pane so content stays centered in the
+                          // visible (un-covered) area. Var is published by
+                          // ConversationPaneDesktop; 0 when collapsed.
+                          paddingRight: 'var(--conversation-pane-inset, 0px)',
                         }}
                       >
                         <Outlet />

@@ -5,12 +5,11 @@
  */
 
 import classNames from 'classnames';
-import React, { Suspense, useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
-import { useHorizontalLayoutBudget } from '@/renderer/hooks/layout';
 import { usePreviewContext } from '@/renderer/pages/conversation/Preview/context/PreviewContext';
 import { useResizableSplit } from '@/renderer/hooks/ui/useResizableSplit';
 import { blurActiveElement } from '@/renderer/utils/ui/focus';
@@ -26,6 +25,7 @@ const DEFAULT_PANE_WIDTH_PX = 300;
 const MIN_PANE_WIDTH_PX = 240;
 const MAX_PANE_WIDTH_PX = 560;
 const PANE_WIDTH_STORAGE_KEY = 'aionui.conversationPaneWidth';
+const CHAT_MIN_WIDTH_PX = 360;
 
 interface ConversationPaneDesktopProps {
   collapsed: boolean;
@@ -67,7 +67,12 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
     };
   }, [isResizing]);
 
-  const { conversationPaneMaxWidth } = useHorizontalLayoutBudget();
+  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleNewChat = useCallback(() => {
     cleanupSiderTooltips();
@@ -84,17 +89,35 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
     layout?.setConversationPaneCollapsed(true);
   }, [layout]);
 
-  const displayWidth = collapsed ? 0 : Math.min(Math.round(paneWidth), conversationPaneMaxWidth);
+  const effectiveMaxWidth = Math.max(MIN_PANE_WIDTH_PX, viewportWidth - (layout?.siderWidth ?? 0) - CHAT_MIN_WIDTH_PX);
+  const paneDisplayWidth = Math.min(Math.round(paneWidth), effectiveMaxWidth);
+
+  // The overlay covers the right edge of the chat region. Publish the space it
+  // occupies as a CSS variable on the parent layout-content so the chat
+  // content can inset its right edge and keep its content visually centered in
+  // the *remaining* area regardless of pane width. Zero when collapsed.
+  const paneRootRef = useRef<HTMLDivElement>(null);
+  const inset = collapsed ? 0 : paneDisplayWidth;
+  useEffect(() => {
+    const parent = paneRootRef.current?.parentElement;
+    if (!parent) return;
+    parent.style.setProperty('--conversation-pane-inset', `${inset}px`);
+    return () => {
+      parent.style.removeProperty('--conversation-pane-inset');
+    };
+  }, [inset]);
 
   return (
     <div
+      ref={paneRootRef}
       className={classNames(styles.paneRoot, {
         [styles.paneAnimating]: !isResizing,
         [styles.paneCollapsed]: collapsed,
       })}
-      // `order: 3` keeps the conversation pane pinned rightmost regardless of
-      // the editor dock side (Sider 0, editor/chat 1–2, this pane 3).
-      style={{ width: displayWidth, flexBasis: displayWidth, order: 3 }}
+      // Absolute overlay pinned to the right edge. Keep a stable width and
+      // slide off-screen via translateX when collapsed so the chat layout is
+      // never reflowed.
+      style={{ width: paneDisplayWidth, transform: collapsed ? 'translateX(100%)' : 'translateX(0)' }}
       aria-hidden={collapsed}
     >
       {!collapsed && (
