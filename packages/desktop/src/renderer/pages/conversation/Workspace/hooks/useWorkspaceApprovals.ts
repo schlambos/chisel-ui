@@ -25,8 +25,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * treats `data` as `IConfirmation`, and answers via `confirmation.confirm`
  * (call_id + `{ value }`) — the same path the old inline card used.
  *
- * MCP elicitation (`command_type === 'mcp_elicitation'`) is excluded; it needs
- * a schema form and stays inline.
+ * The tab surfaces ALL pending confirmations (permission approvals, OpenCode
+ * questions with action === 'question', and other confirmation types) EXCEPT MCP
+ * elicitations, which stay inline in the message list because they require
+ * schema-driven forms that parse `options[0].params.schema` and submit
+ * `{ value: 'submit', payload }`.
  */
 export type WorkspaceApproval = IConfirmation<unknown>;
 

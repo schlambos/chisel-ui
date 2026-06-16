@@ -212,15 +212,15 @@
       "agentModified": "Agent",
       "agentModifiedTooltip": "Modified by the agent in this conversation"
     },
-    "files": {
-      "expandFlyout": "Expand file tree",
-      "flyoutTitle": "Project files",
-      "flyoutDescription": "Browse and manage workspace files with more room."
-    },
-    "approvals": {
-      "tab": "Подтверждения",
-      "empty": "Нет ожидающих подтверждений."
-    },
+"files": {
+       "expandFlyout": "Expand file tree",
+       "flyoutTitle": "Project files",
+       "flyoutDescription": "Browse and manage workspace files with more room."
+     },
+     "approvals": {
+       "tab": "Запросы",
+       "empty": "Нет ожидающих запросов."
+     },
     "todos": {
       "tab": "Задачи",
       "progress": "{{completed}} из {{total}} выполнено",

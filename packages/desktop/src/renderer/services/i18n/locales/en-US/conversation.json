@@ -218,8 +218,8 @@
       "flyoutDescription": "Browse and manage workspace files with more room."
     },
     "approvals": {
-      "tab": "Approvals",
-      "empty": "No pending approvals."
+      "tab": "Requests",
+      "empty": "No pending requests."
     },
     "todos": {
       "tab": "Todos",
@@ -477,7 +477,11 @@
   },
   "remoteCompaction": {
     "title": "Session compacted",
-    "notification": "Session compacted — ~{{tokens}}K tokens reclaimed"
+    "notification": "Context was summarized for future messages.",
+    "notificationNoMetrics": "Context was summarized for future messages."
+  },
+  "compaction": {
+    "dividerLabel": "Session compacted"
   },
   "remoteAbort": {
     "stopping": "Stopping...",
@@ -534,6 +538,13 @@
     "reverted": "Reverted",
     "revertedTooltip": "This session has reverted messages. You can restore them from the menu."
   },
+  "workspaceVcs": {
+    "trackWorkspace": "Track this workspace",
+    "trackSuccess": "Workspace tracked",
+    "trackFailed": "Failed to track workspace",
+    "notGitHint": "This folder is not in git. Track it to see changes.",
+    "noChanges": "No changes"
+  },
   "session": {
     "actions": "Session actions",
     "fork": "Fork session",
@@ -544,6 +555,8 @@
     "summarizeStarted": "Compacting session…",
     "summarizeSuccess": "Session compacted. Future replies will use the compacted context.",
     "summarizeFailed": "Failed to compact",
+    "compactDisabledRunning": "Cannot compact while response is in progress",
+    "compactDisabledEmpty": "No user messages to compact",
     "unrevert": "Restore reverted",
     "unrevertSuccess": "Restored reverted messages",
     "unrevertFailed": "Failed to restore messages",
@@ -593,5 +606,25 @@
     "fromUnknownSession": "Local shell (session unknown)",
     "mainSession": "Main session",
     "elicitSchemaFreeText": "Type your response"
+  },
+  "approvalRules": {
+    "tabTitle": "Remembered",
+    "empty": "No remembered rules for this chat. When a tool asks permission, choose Always in this chat.",
+    "emptyNoSession": "Rules apply to remote OpenCode chats only",
+    "loading": "Loading...",
+    "delete": "Delete",
+    "deleteConfirm": "Delete rule?",
+    "deleteConfirmMessage": "Are you sure you want to delete this remembered rule?",
+    "deleteConfirmOk": "Delete",
+    "deleteConfirmCancel": "Cancel",
+    "deleteSuccess": "Rule deleted",
+    "deleteFailed": "Failed to delete rule",
+    "actionAllow": "Allow",
+    "actionDeny": "Deny",
+    "actionAsk": "Ask",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago"
   }
 }

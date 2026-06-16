@@ -212,15 +212,15 @@
       "agentModified": "Agent",
       "agentModifiedTooltip": "Modified by the agent in this conversation"
     },
-    "files": {
-      "expandFlyout": "Expand file tree",
-      "flyoutTitle": "Project files",
-      "flyoutDescription": "Browse and manage workspace files with more room."
-    },
-    "approvals": {
-      "tab": "승인",
-      "empty": "대기 중인 승인이 없습니다."
-    },
+"files": {
+       "expandFlyout": "Expand file tree",
+       "flyoutTitle": "Project files",
+       "flyoutDescription": "Browse and manage workspace files with more room."
+     },
+     "approvals": {
+       "tab": "요청",
+       "empty": "대기 중인 요청이 없습니다."
+     },
     "todos": {
       "tab": "할 일",
       "progress": "{{completed}} / {{total}} 완료",

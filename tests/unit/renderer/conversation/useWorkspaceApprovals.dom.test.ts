@@ -92,7 +92,7 @@ describe('useWorkspaceApprovals', () => {
     expect(result.current.approvals).toHaveLength(0);
   });
 
-  it('does NOT surface MCP elicitation prompts (they stay inline)', async () => {
+  it('excludes MCP elicitation prompts (they render inline in the message list)', async () => {
     const { result } = renderHook(() => useWorkspaceApprovals('conv-1'));
     await waitFor(() => expect(h.streamHandler).toBeTypeOf('function'));
 

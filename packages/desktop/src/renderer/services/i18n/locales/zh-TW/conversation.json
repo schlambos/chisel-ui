@@ -212,15 +212,15 @@
       "agentModified": "Agent",
       "agentModifiedTooltip": "Modified by the agent in this conversation"
     },
-    "files": {
-      "expandFlyout": "展開檔案樹",
-      "flyoutTitle": "專案檔案",
-      "flyoutDescription": "在更大視圖中瀏覽與管理工作區檔案。"
-    },
-    "approvals": {
-      "tab": "審批",
-      "empty": "沒有待處理的審批。"
-    },
+"files": {
+       "expandFlyout": "展開檔案樹",
+       "flyoutTitle": "專案檔案",
+       "flyoutDescription": "在更大視圖中瀏覽與管理工作區檔案。"
+     },
+     "approvals": {
+       "tab": "請求",
+       "empty": "沒有待處理的請求。"
+     },
     "todos": {
       "tab": "待辦事項",
       "progress": "已完成 {{completed}} / {{total}}",

@@ -212,15 +212,15 @@
       "agentModified": "Agent",
       "agentModifiedTooltip": "Modified by the agent in this conversation"
     },
-    "files": {
-      "expandFlyout": "Expand file tree",
-      "flyoutTitle": "Project files",
-      "flyoutDescription": "Browse and manage workspace files with more room."
-    },
-    "approvals": {
-      "tab": "承認",
-      "empty": "保留中の承認はありません。"
-    },
+"files": {
+       "expandFlyout": "Expand file tree",
+       "flyoutTitle": "Project files",
+       "flyoutDescription": "Browse and manage workspace files with more room."
+     },
+     "approvals": {
+       "tab": "リクエスト",
+       "empty": "保留中のリクエストはありません。"
+     },
     "todos": {
       "tab": "タスク",
       "progress": "{{completed}} / {{total}} 完了",
