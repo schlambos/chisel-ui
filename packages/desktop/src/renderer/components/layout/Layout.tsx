@@ -53,7 +53,8 @@ const CommandCenterEditorHost = React.lazy(() => import('@/renderer/components/l
 const LayoutModeOrchestrator: React.FC<{
   setCollapsed: (val: boolean) => void;
   isDesktop: boolean;
-}> = ({ setCollapsed, isDesktop }) => {
+  isSettingsRoute: boolean;
+}> = ({ setCollapsed, isDesktop, isSettingsRoute }) => {
   const layoutMode = useLayoutModeSafe();
   const terminalCtx = useTerminalPanelSafe();
   const editorCtx = useEditorContextSafe();
@@ -69,7 +70,9 @@ const LayoutModeOrchestrator: React.FC<{
     if (activeMode === 'command-center') {
       setCollapsed(false);
       dispatchWorkspaceSetCollapsedEvent(false);
-      terminalCtx?.open_();
+      if (!isSettingsRoute) {
+        terminalCtx?.open_();
+      }
       if (!editorCtx?.buffers?.length) {
         editorCtx?.openUntitledEditor();
       } else {
@@ -84,7 +87,7 @@ const LayoutModeOrchestrator: React.FC<{
         terminalCtx?.close();
       }
     }
-  }, [activeMode, isDesktop, setCollapsed, terminalCtx, editorCtx]);
+  }, [activeMode, isDesktop, isSettingsRoute, setCollapsed, terminalCtx, editorCtx]);
 
   return null;
 };
@@ -133,6 +136,8 @@ const Layout: React.FC<{
   const isSettingsRoute = location.pathname.startsWith('/settings');
   const { dock: editorDock } = useEditorDock();
   const conversationPaneEnabled = !isSettingsRoute;
+  const showMainSider = !isSettingsRoute;
+  const terminalPanel = useTerminalPanelSafe();
 
   const { isMobile, viewportWidth } = useMobileViewport();
   const { desktopSiderWidth, siderDragging, siderIconOnly, resizeBy, beginSiderResizeDrag } = useSiderResize({
@@ -246,6 +251,14 @@ const Layout: React.FC<{
     }
   }, [isMobile, setConversationPaneCollapsed]);
 
+  // Settings is a full-width surface; keep the conversation sider out of the way.
+  useEffect(() => {
+    if (!isSettingsRoute) return;
+    setCollapsed(true);
+    cleanupSiderTooltips();
+    terminalPanel?.close();
+  }, [isSettingsRoute, setCollapsed, terminalPanel]);
+
   // 清理侧栏 Tooltip 残留节点，避免移动端路由切换后浮层卡在左上角
   useEffect(() => {
     cleanupSiderTooltips();
@@ -308,7 +321,11 @@ const Layout: React.FC<{
         <TerminalPanelProvider>
           <LayoutModeProvider isMobile={isMobile} editorAvailable={!isMobile} diffAvailable={!isMobile}>
             <div className='app-shell flex flex-col size-full min-h-0' role='application'>
-              <LayoutModeOrchestrator setCollapsed={setCollapsed} isDesktop={!isMobile} />
+              <LayoutModeOrchestrator
+                setCollapsed={setCollapsed}
+                isDesktop={!isMobile}
+                isSettingsRoute={isSettingsRoute}
+              />
               <Titlebar workspaceAvailable={workspaceAvailable} />
               {/* 移动端左侧边栏蒙板 / Mobile left sider backdrop */}
               {isMobile && !collapsed && (
@@ -316,6 +333,7 @@ const Layout: React.FC<{
               )}
 
               <ArcoLayout className={'size-full layout flex-1 min-h-0'}>
+                {showMainSider ? (
                 <ArcoLayout.Sider
                   collapsedWidth={isMobile ? 0 : 0}
                   collapsed={collapsed}
@@ -383,6 +401,7 @@ const Layout: React.FC<{
                     )}
                   </div>
                 </ArcoLayout.Sider>
+                ) : null}
 
                 <div
                   role='main'
@@ -400,15 +419,17 @@ const Layout: React.FC<{
                     ...(isMobile ? { width: '100%' } : {}),
                   }}
                 >
-                  <TerminalPanelHost isMobile={isMobile}>
+                  <TerminalPanelHost isMobile={isMobile} hideTerminal={isSettingsRoute}>
                     <div className='flex flex-row flex-1 min-h-0'>
-                      {(isConversationRoute || !workspaceAvailable) && !isMobile && (
+                      {(isConversationRoute || !workspaceAvailable) && !isMobile && !isSettingsRoute && (
                         <Suspense fallback={null}>
                           <CommandCenterEditorHost />
                         </Suspense>
                       )}
                       <div
-                        className='flex-1 min-h-0 flex flex-col overflow-auto justify-center'
+                        className={classNames('flex-1 min-h-0 flex flex-col overflow-auto', {
+                          'justify-center': !isSettingsRoute,
+                        })}
                         style={{
                           // Complementary order to the editor host: start → editor(1)
                           // chat(2); end → chat(1) editor(2). Conversation pane is

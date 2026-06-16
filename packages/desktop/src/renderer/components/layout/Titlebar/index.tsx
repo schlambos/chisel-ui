@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { ArrowCircleLeft, ArrowLeft, ArrowRight, ExpandLeft, ExpandRight, Peoples } from '@icon-park/react';
+import { ArrowCircleLeft, ArrowLeft, ArrowRight, ExpandLeft, ExpandRight, Peoples, SettingTwo } from '@icon-park/react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import { TEAM_MODE_ENABLED } from '@/common/config/constants';
 import MobileConversationBrand from './MobileConversationBrand';
 import WindowControls from '../WindowControls';
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
+import { useExitSettings } from '@/renderer/hooks/system/useExitSettings';
 import { useNavigationHistory } from '@/renderer/hooks/context/NavigationHistoryContext';
 import { useLayoutModeSafe } from '@/renderer/hooks/context/LayoutModeContext';
 import { isElectronDesktop, isMacOS } from '@renderer/utils/platform';
@@ -35,7 +36,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const toolbarRef = useRef<HTMLDivElement | null>(null);
-  const lastNonSettingsPathRef = useRef('/guid');
 
   // The right-side ConversationPane collapsed state comes straight from the
   // layout context (single source of truth) — no local mirror, no init race.
@@ -57,12 +57,15 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   // mobile keeps the default weight so icons stay legible at larger sizes.
   const desktopIconStroke = layout?.isMobile ? undefined : 2.5;
   // 统一在标题栏左侧展示主侧栏开关 / Always expose sidebar toggle on titlebar left side
-  const showSiderToggle = Boolean(layout?.setSiderCollapsed) && !(layout?.isMobile && isSettingsRoute);
-  const showBackToChatButton = Boolean(layout?.isMobile && isSettingsRoute);
+  const showSiderToggle =
+    Boolean(layout?.setSiderCollapsed) && !isSettingsRoute && !(layout?.isMobile && isSettingsRoute);
+  const showBackToChatButton = isSettingsRoute;
+  const { exitSettings } = useExitSettings();
+  const showSettingsToolbarButton = !isSettingsRoute;
   const siderTooltip = layout?.siderCollapsed ? t('common.showSidebar') : t('common.hideSidebar');
   // 前进/后退仅在桌面端显示（移动端空间有限，保留原有的返回到聊天按钮）
   // Show back/forward on desktop only; mobile keeps the existing back-to-chat button.
-  const showHistoryNav = Boolean(navigationHistory) && !layout?.isMobile;
+  const showHistoryNav = Boolean(navigationHistory) && !layout?.isMobile && !isSettingsRoute;
   const historyBackTooltip = t('common.historyBack', { defaultValue: 'Back' });
   const historyForwardTooltip = t('common.forward', { defaultValue: 'Forward' });
 
@@ -75,13 +78,8 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
     layout?.setConversationPaneCollapsed?.(!conversationPaneCollapsed);
   };
 
-  const handleBackToChat = () => {
-    const target = lastNonSettingsPathRef.current;
-    if (target && !target.startsWith('/settings')) {
-      void navigate(target);
-      return;
-    }
-    void navigate(-1);
+  const handleOpenSettings = () => {
+    void navigate('/settings/agent');
   };
 
   // --- Layout pane controls (titlebar pill-slider) ---
@@ -94,27 +92,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   const handleSelectCommandCenter = useCallback(() => {
     layoutModeCtx?.setMode('command-center');
   }, [layoutModeCtx]);
-
-  useEffect(() => {
-    if (!isSettingsRoute) {
-      const path = `${location.pathname}${location.search}${location.hash}`;
-      lastNonSettingsPathRef.current = path;
-      try {
-        sessionStorage.setItem('aion:last-non-settings-path', path);
-      } catch {
-        // ignore
-      }
-      return;
-    }
-    try {
-      const stored = sessionStorage.getItem('aion:last-non-settings-path');
-      if (stored) {
-        lastNonSettingsPathRef.current = stored;
-      }
-    } catch {
-      // ignore
-    }
-  }, [isSettingsRoute, location.pathname, location.search, location.hash]);
 
   useEffect(() => {
     // Team mode: show team name
@@ -197,16 +174,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
       } as React.CSSProperties)
     : undefined;
 
-  const menuStyle: React.CSSProperties = useMemo(() => {
-    if (!isMacRuntime || !showSiderToggle) return {};
-    // macOS: sit the menu buttons right next to the traffic lights (which occupy ~78px).
-    // Mobile keeps its own layout (no traffic lights).
-    const marginLeft = layout?.isMobile ? '0px' : '80px';
-    return {
-      marginLeft,
-    };
-  }, [isMacRuntime, showSiderToggle, layout?.isMobile]);
-
   return (
     <div
       ref={containerRef}
@@ -218,15 +185,16 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
         'app-titlebar--mac': isMacRuntime,
       })}
     >
-      <div ref={menuRef} className='app-titlebar__menu' style={menuStyle}>
+      <div ref={menuRef} className='app-titlebar__menu'>
         {showBackToChatButton && (
           <button
             type='button'
             className={classNames('app-titlebar__button', layout?.isMobile && 'app-titlebar__button--mobile')}
-            onClick={handleBackToChat}
+            onClick={exitSettings}
             aria-label={backToChatTooltip}
+            title={backToChatTooltip}
           >
-            <ArrowCircleLeft theme='outline' size={iconSize} fill='currentColor' />
+            <ArrowCircleLeft theme='outline' size={iconSize} fill='currentColor' strokeWidth={desktopIconStroke} />
           </button>
         )}
         {showSiderToggle && (
@@ -298,7 +266,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
       </div>
       <div ref={toolbarRef} className='app-titlebar__toolbar'>
         {layout?.isMobile && <div id='app-titlebar-actions-slot' className='app-titlebar__actions-slot' />}
-        {!layout?.isMobile && layoutModeCtx && (
+        {!layout?.isMobile && layoutModeCtx && !isSettingsRoute && (
           <div
             className='app-titlebar__pill-slider'
             role='group'
@@ -342,6 +310,17 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
             ) : (
               <ExpandLeft theme='outline' size={iconSize} fill='currentColor' />
             )}
+          </button>
+        )}
+        {showSettingsToolbarButton && (
+          <button
+            type='button'
+            className={classNames('app-titlebar__button', layout?.isMobile && 'app-titlebar__button--mobile')}
+            onClick={handleOpenSettings}
+            aria-label={t('common.settings', { defaultValue: 'Settings' })}
+            title={t('common.settings', { defaultValue: 'Settings' })}
+          >
+            <SettingTwo theme='outline' size={iconSize} fill='currentColor' strokeWidth={desktopIconStroke} />
           </button>
         )}
         {showWindowControls && <WindowControls />}

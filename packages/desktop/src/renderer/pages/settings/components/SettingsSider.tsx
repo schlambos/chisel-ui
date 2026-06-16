@@ -3,7 +3,7 @@ import { isElectronDesktop, resolveExtensionAssetUrl } from '@/renderer/utils/pl
 import { type IExtensionSettingsTab } from '@/common/adapter/ipcBridge';
 import { useExtI18n } from '@/renderer/hooks/system/useExtI18n';
 import { useExtensionSettingsTabs } from '@/renderer/hooks/system/useExtensionSettingsTabs';
-import { Cat, Communication, Computer, Earth, Info, Lightning, Puzzle, Server, Speed, System } from '@icon-park/react';
+import { Communication, Computer, Earth, Info, Puzzle, Speed, System } from '@icon-park/react';
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +14,8 @@ import { getSiderTooltipProps } from '@/renderer/utils/ui/siderTooltip';
 /** Builtin settings tab IDs in display order (must match router paths). */
 export const BUILTIN_TAB_IDS = [
   'agent',
-  'capabilities',
   'display',
   'webui',
-  'sidecar',
-  'pet',
   'system',
   'about',
 ] as const;
@@ -29,8 +26,11 @@ export const BUILTIN_TAB_IDS = [
  * This keeps older extensions working without requiring them to update.
  */
 export const LEGACY_ANCHOR_REMAP: Record<string, string> = {
-  'skills-hub': 'capabilities',
-  tools: 'capabilities',
+  'skills-hub': 'agent',
+  tools: 'agent',
+  capabilities: 'agent',
+  pet: 'display',
+  sidecar: 'agent',
 };
 
 /**
@@ -74,12 +74,6 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
         icon: <Speed />,
         path: 'agent',
       },
-      capabilities: {
-        id: 'capabilities',
-        label: t('settings.capabilities', { defaultValue: 'Capabilities' }),
-        icon: <Lightning />,
-        path: 'capabilities',
-      },
       display: { id: 'display', label: t('settings.display'), icon: <Computer />, path: 'display' },
       webui: {
         id: 'webui',
@@ -87,14 +81,12 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
         icon: isDesktop ? <Earth /> : <Communication />,
         path: 'webui',
       },
-      sidecar: { id: 'sidecar', label: t('settings.sidecar.title'), icon: <Server />, path: 'sidecar' },
-      pet: { id: 'pet', label: t('pet.desktopPet'), icon: <Cat />, path: 'pet' },
       system: { id: 'system', label: t('settings.system'), icon: <System />, path: 'system' },
       about: { id: 'about', label: t('settings.about'), icon: <Info />, path: 'about' },
     };
 
     // Start with ordered builtin IDs, hiding desktop-only tabs in browser mode
-    const result: SiderItem[] = BUILTIN_TAB_IDS.filter((id) => isDesktop || id !== 'pet').map((id) => builtinMap[id]);
+    const result: SiderItem[] = BUILTIN_TAB_IDS.map((id) => builtinMap[id]);
 
     // Extension tabs with position anchoring
     const beforeMap = new Map<string, IExtensionSettingsTab[]>();

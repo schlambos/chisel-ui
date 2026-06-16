@@ -9,20 +9,17 @@ import type { AgentMetadata } from '@/renderer/utils/model/agentTypes';
 import AionModal from '@/renderer/components/base/AionModal';
 import { useAgents } from '@/renderer/hooks/agent/useAgents';
 import { Button, Typography } from '@arco-design/web-react';
-import { Home, Plus } from '@icon-park/react';
+
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AgentCard from './AgentCard';
-import { AgentHubModal } from './AgentHubModal';
 import InlineAgentEditor, { type CustomAgentDraft } from './InlineAgentEditor';
 import { getAgentKey } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 
 const LocalAgents: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [hubModalVisible, setHubModalVisible] = useState(false);
-
   // Single fetch for all agents; both detected and custom lists are derived from it.
   const { agents: allAgents, revalidate: mutateAgents } = useAgents();
 
@@ -104,47 +101,9 @@ const LocalAgents: React.FC = () => {
 
   return (
     <div className='flex flex-col gap-8px py-16px'>
-      <div className='px-16px text-12px text-t-secondary'>
-        <span>{t('settings.agentManagement.localAgentsDescription')} </span>
-        <Button
-          type='text'
-          size='mini'
-          className='!h-auto !p-0 !align-baseline !text-12px !font-normal !text-primary-6 hover:!text-primary-7 hover:!underline underline-offset-2'
-          onClick={openCustomAgentEditor}
-        >
-          {t('settings.agentManagement.detectCustomAgent')}
-        </Button>
+      <div className='px-16px text-12px text-t-secondary leading-18px'>
+        {t('settings.agentManagement.localAgentsDescription')}
       </div>
-
-      {process.env.NODE_ENV === 'development' && (
-        <div className='px-16px mt-8px'>
-          <div className='flex flex-col gap-14px rounded-16px border border-solid border-[rgba(var(--primary-6),0.18)] bg-[rgba(var(--primary-6),0.06)] p-16px md:flex-row md:items-center md:justify-between'>
-            <div className='flex items-center gap-12px'>
-              <div className='flex h-40px w-40px items-center justify-center leading-none rounded-12px border border-solid border-[rgba(var(--primary-6),0.12)] bg-[rgba(var(--primary-6),0.10)] text-primary-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.28)]'>
-                <Home theme='outline' size='20' strokeWidth={2} className='block' />
-              </div>
-              <div className='min-w-0'>
-                <Typography.Text className='mb-4px block text-15px font-medium text-t-primary'>
-                  {t('settings.agentManagement.installFromMarket')}
-                </Typography.Text>
-                <Typography.Text className='block text-12px leading-18px text-t-secondary'>
-                  {t('settings.agentManagement.discoverMoreAgents')}
-                </Typography.Text>
-              </div>
-            </div>
-
-            <Button
-              type='primary'
-              size='small'
-              icon={<Plus size='14' />}
-              className='!rounded-10px md:!min-w-144px'
-              onClick={() => setHubModalVisible(true)}
-            >
-              {t('settings.agentManagement.installFromMarket')}
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Detected Agents section */}
       <div className='px-16px mt-8px'>
@@ -168,6 +127,12 @@ const LocalAgents: React.FC = () => {
         </Typography.Text>
       )}
 
+      <div className='px-16px mt-12px'>
+        <Button type='outline' size='small' onClick={openCustomAgentEditor}>
+          {t('settings.agentManagement.addCustomAgent')}
+        </Button>
+      </div>
+
       {/* Custom Agents section */}
       {(editorVisible || (customAgents && customAgents.length > 0)) && (
         <div className='px-16px mt-16px'>
@@ -186,7 +151,7 @@ const LocalAgents: React.FC = () => {
         header={{
           title: editingAgent
             ? t('settings.agentManagement.editCustomAgent')
-            : t('settings.agentManagement.detectCustomAgent'),
+            : t('settings.agentManagement.addCustomAgent'),
           showClose: true,
         }}
         footer={null}
@@ -232,8 +197,6 @@ const LocalAgents: React.FC = () => {
           />
         ))}
       </div>
-
-      {hubModalVisible && <AgentHubModal visible={hubModalVisible} onCancel={() => setHubModalVisible(false)} />}
     </div>
   );
 };

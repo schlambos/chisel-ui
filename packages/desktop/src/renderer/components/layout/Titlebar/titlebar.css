@@ -32,6 +32,13 @@
   padding-right: 12px;
 }
 
+/* Reserve space for traffic lights (hiddenInset titlebar). Must apply whenever the
+   left menu cluster is visible — not only when the sider toggle shows (e.g. settings back). */
+.app-titlebar--mac:not(.app-titlebar--mobile) .app-titlebar__menu {
+  /* traffic lights ~12px at x=12 + ~52px cluster + gap */
+  margin-left: 92px;
+}
+
 /* Windows/Linux desktop: stretch toolbar so system window controls go full height. */
 .app-titlebar--desktop:not(.app-titlebar--mac) {
   align-items: stretch;

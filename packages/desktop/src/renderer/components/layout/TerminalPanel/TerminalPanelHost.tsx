@@ -25,13 +25,15 @@ import TerminalPanel from '.';
 
 type Props = {
   isMobile: boolean;
+  /** When true, render route content only (e.g. settings — no terminal blade/panel). */
+  hideTerminal?: boolean;
   children: React.ReactNode;
 };
 
 const MIN_TOP_PCT = 20;
 const MIN_TERM_PCT = 10;
 
-const TerminalPanelHost: React.FC<Props> = ({ isMobile, children }) => {
+const TerminalPanelHost: React.FC<Props> = ({ isMobile, hideTerminal = false, children }) => {
   const { t } = useTranslation();
   const panel = useTerminalPanel();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,8 +63,7 @@ const TerminalPanelHost: React.FC<Props> = ({ isMobile, children }) => {
     [panel.setHeightPct]
   );
 
-  // On mobile we don't expose the terminal at all.
-  if (isMobile) {
+  if (isMobile || hideTerminal) {
     return <>{children}</>;
   }
 

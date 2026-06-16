@@ -864,7 +864,7 @@
   "agentManagement": {
     "localAgents": "Local Agents",
     "remoteAgents": "Remote Agents",
-    "localAgentsDescription": "Aion CLI is the built-in agent and ships with the app — no install needed. Other agents are detected only after their CLI is installed locally.",
+    "localAgentsDescription": "Chisl detects locally installed CLI agent tools from multiple vendors. If yours is not listed, you can add one via ACP.",
     "localAgentsSetupLink": "Setup guide",
     "goToChat": "Start Chat",
     "remoteAgentsDescription": "Remote OpenClaw Gateway and OpenCode Server connections are supported. Other remote agents are in development.",
