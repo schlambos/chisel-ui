@@ -365,7 +365,7 @@ describe('Bet A3 — remote session revert / fork / unrevert', () => {
   });
 
   // ─── (a) Revert round-trip ──────────────────────────────────────────────
-  it('a1. per-message revert click: invoke revertRemoteSession + update extra with is_reverted/revert_message_id', async () => {
+  it('a1. per-message revert click: invoke revertRemoteSession + refresh conversation cache', async () => {
     const MessageText = await loadMessageText();
     const message = makeTextMessage({ id: 'm-1', msgId: 'msg-1', position: 'right', content: 'Try this' });
 
@@ -388,14 +388,11 @@ describe('Bet A3 — remote session revert / fork / unrevert', () => {
       conversation_id: 'conv-1',
       message_id: 'msg-1',
     });
-    expect(mockedIpc.conversation.update.invoke).toHaveBeenCalledWith({
-      id: 'conv-1',
-      updates: { extra: { is_reverted: true, revert_message_id: 'msg-1' } },
-      merge_extra: true,
-    });
+    const { refreshConversationCache } = await import('@/renderer/pages/conversation/utils/conversationCache');
+    expect(refreshConversationCache).toHaveBeenCalledWith('conv-1');
   });
 
-  it('a2. unrevert via RemoteSessionActions: invoke unrevertRemoteSession + clear extra', async () => {
+  it('a2. unrevert via RemoteSessionActions: invoke unrevertRemoteSession + refresh cache', async () => {
     const RemoteSessionActions = await loadRemoteSessionActions();
     const conversation = {
       id: 'conv-1',
@@ -428,11 +425,8 @@ describe('Bet A3 — remote session revert / fork / unrevert', () => {
 
     await waitFor(() => expect(mockedIpc.conversation.unrevertRemoteSession.invoke).toHaveBeenCalledTimes(1));
     expect(mockedIpc.conversation.unrevertRemoteSession.invoke).toHaveBeenCalledWith({ conversation_id: 'conv-1' });
-    expect(mockedIpc.conversation.update.invoke).toHaveBeenCalledWith({
-      id: 'conv-1',
-      updates: { extra: { is_reverted: false, revert_message_id: null } },
-      merge_extra: true,
-    });
+    const { refreshConversationCache } = await import('@/renderer/pages/conversation/utils/conversationCache');
+    expect(refreshConversationCache).toHaveBeenCalledWith('conv-1');
   });
 
   // ─── (b) Fork from earlier turn ─────────────────────────────────────────

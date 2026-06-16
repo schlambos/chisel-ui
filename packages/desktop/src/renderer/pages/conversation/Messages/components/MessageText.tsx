@@ -14,7 +14,7 @@ import { uuid } from '@/common/utils';
 import type { TChatConversation } from '@/common/config/storage';
 import AionModal from '@/renderer/components/base/AionModal';
 import { useRemoveMessageByMsgId } from '@/renderer/pages/conversation/Messages/hooks';
-import { getConversationOrNull } from '@/renderer/pages/conversation/utils/conversationCache';
+import { getConversationOrNull, refreshConversationCache } from '@/renderer/pages/conversation/utils/conversationCache';
 import { Alert, Button, Message, Tooltip } from '@arco-design/web-react';
 import { Branch, Copy, Delete, Undo } from '@icon-park/react';
 import classNames from 'classnames';
@@ -220,11 +220,7 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
     if (!msgId || !conversationId) return;
     try {
       await ipcBridge.conversation.revertRemoteSession.invoke({ conversation_id: conversationId, message_id: msgId });
-      await ipcBridge.conversation.update.invoke({
-        id: conversationId,
-        updates: { extra: { is_reverted: true, revert_message_id: msgId } as any },
-        merge_extra: true,
-      });
+      await refreshConversationCache(conversationId);
       Message.success(t('messages.revertSuccess', { defaultValue: 'Reverted to this message' }));
     } catch (error) {
       Message.error(t('messages.revertFailed', { defaultValue: 'Failed to revert' }));

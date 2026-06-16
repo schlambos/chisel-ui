@@ -8,7 +8,7 @@ import { ipcBridge } from '@/common';
 import type { TChatConversation } from '@/common/config/storage';
 import { uuid } from '@/common/utils';
 import AionModal from '@/renderer/components/base/AionModal';
-import { getConversationOrNull } from '@/renderer/pages/conversation/utils/conversationCache';
+import { getConversationOrNull, refreshConversationCache } from '@/renderer/pages/conversation/utils/conversationCache';
 import { findShadowedPaths } from './configShadowDiff';
 import { iconColors } from '@/renderer/styles/colors';
 import { Button, Dropdown, Input, Menu, Message, Tooltip } from '@arco-design/web-react';
@@ -131,11 +131,7 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
     runExclusive(async () => {
       try {
         await ipcBridge.conversation.unrevertRemoteSession.invoke({ conversation_id });
-        await ipcBridge.conversation.update.invoke({
-          id: conversation_id,
-          updates: { extra: { is_reverted: false, revert_message_id: null } as any },
-          merge_extra: true,
-        });
+        await refreshConversationCache(conversation_id);
         Message.success(t('conversation.session.unrevertSuccess', { defaultValue: 'Restored reverted messages' }));
       } catch (error) {
         Message.error(t('conversation.session.unrevertFailed', { defaultValue: 'Failed to restore messages' }));
