@@ -16,7 +16,8 @@ import * as monaco from '@aionui/editor-monaco';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { emitter } from '@/renderer/utils/emitter';
-import { uriForBuffer } from './editorMonacoUri';
+import { tryExpandEmmet, isEmmetLanguage } from './editorEmmet';
+import { uriForBuffer, fileIdentityKey } from './editorMonacoUri';
 import { applyTheme, ensureAionuiThemesRegistered, initialThemeFor } from './monacoTheme';
 import type { OpenBuffer } from './types';
 import type { EditorUserSettings } from './editorSettings';
@@ -217,6 +218,35 @@ export type MonacoEditorHandle = {
    * no conflict is pending.
    */
   keepUserConflict: () => void;
+
+  // LSP navigation — these invoke Monaco's built-in action IDs which
+  // become available when a LanguageClientWrapper is connected and the
+  // language server advertises the corresponding capability. They
+  // silently no-op when the LSP hasn't registered the action.
+  /** Navigate to the definition of the symbol under the cursor (F12). */
+  goToDefinition: () => void;
+  /** Peek at the definition of the symbol under the cursor (Alt+F12). */
+  peekDefinition: () => void;
+  /** Navigate to the type definition of the symbol under the cursor. */
+  goToTypeDefinition: () => void;
+  /** Peek at the type definition of the symbol under the cursor. */
+  peekTypeDefinition: () => void;
+  /** Navigate to references of the symbol under the cursor (Shift+F12). */
+  goToReferences: () => void;
+  /** Peek at references of the symbol under the cursor. */
+  peekReferences: () => void;
+  /** Navigate to implementations of the symbol under the cursor. */
+  goToImplementation: () => void;
+  /** Rename the symbol under the cursor (F2). */
+  renameSymbol: () => void;
+  /** Trigger the quick-fix / code-action menu (Cmd/Ctrl+.). */
+  quickFix: () => void;
+  /** Show the hover tooltip at the current cursor position. */
+  showHover: () => void;
+  /** Format only the selected range (no-op without a range formatter). */
+  formatSelection: () => void;
+  /** Run the organize-imports code action (no-op if not supported). */
+  organizeImports: () => void;
 };
 
 type Props = {
@@ -298,6 +328,7 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
   // editor.
   const [pendingConflictContent, setPendingConflictContent] = useState<string | null>(null);
   const [isReviewingDiff, setIsReviewingDiff] = useState<boolean>(false);
+  const [isInlineDiff, setIsInlineDiff] = useState<boolean>(false);
   // Refs mirror the React state so the file-stream subscription (which
   // lives behind an empty-deps effect) can read the latest values without
   // re-subscribing on every state change. They are also the cleanup
@@ -413,6 +444,9 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
         highlightActiveIndentation: 'always',
       },
       matchBrackets: 'always',
+      autoClosingBrackets: 'languageDefined',
+      autoClosingQuotes: 'languageDefined',
+      autoSurround: 'languageDefined',
       'semanticHighlighting.enabled': true,
 
       // Whitespace / indentation
@@ -496,6 +530,33 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
     // Cmd/Ctrl+S → save.  Monaco's KeyMod treats CtrlCmd as platform-aware.
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
       callbacksRef.current.onSave();
+    });
+
+    // Emmet: expand abbreviation on Tab in supported languages.
+    // Precondition ensures this does NOT fire when the suggestion widget is
+    // visible or snippet mode is active, so existing tabCompletion still
+    // works. When the text before the cursor isn't an expandable Emmet
+    // abbreviation, tryExpandEmmet returns null and Tab falls through to
+    // Monaco's default indent/snippet behavior.
+    editor.addAction({
+      id: 'aionui.emmetExpand',
+      label: 'Emmet: Expand Abbreviation',
+      keybindings: [monaco.KeyCode.Tab],
+      precondition: 'editorTextFocus && !suggestWidgetVisible && !snippetMode',
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 1.5,
+      run: (ed: monaco.editor.IStandaloneCodeEditor): void => {
+        const model = ed.getModel();
+        if (!model) return;
+        if (!isEmmetLanguage(model.getLanguageId(), model.uri.path)) return;
+
+        const result = tryExpandEmmet(ed);
+        if (result) {
+          ed.executeEdits('emmet', [
+            { range: result.range, text: result.text, forceMoveMarkers: true },
+          ]);
+        }
+      },
     });
 
     // Right-click context menu → "Send Selection to Chat" wires the active
@@ -686,7 +747,7 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
     const diffEditor = monaco.editor.createDiffEditor(container, {
       automaticLayout: true,
       theme: initialThemeFor(initialMode),
-      renderSideBySide: true,
+      renderSideBySide: !isInlineDiff,
       // Match the main editor's font so the diff doesn't look "smaller".
       fontSize: fontSizeRef.current,
       fontFamily:
@@ -762,11 +823,13 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
         // name (e.g. nested git worktrees) would otherwise collide.
         const bufferWorkspace = buffer.workspace ?? '';
         const eventWs = eventWorkspace ?? '';
-        const pathMatches = file_path === buffer.filePath && bufferWorkspace === eventWs;
+        const pathMatches =
+          fileIdentityKey(file_path) === fileIdentityKey(buffer.filePath) &&
+          fileIdentityKey(bufferWorkspace) === fileIdentityKey(eventWs);
         if (!pathMatches) {
           // Even if not active, if a buffer for this path exists, clear its
           // dirty flag so the model on disk becomes the new truth.
-          const key = `${eventWs}::${file_path}`;
+          const key = `${fileIdentityKey(eventWs)}::${fileIdentityKey(file_path)}`;
           callbacksRef.current.onApplyExternalContent?.(key, content);
           return;
         }
@@ -931,6 +994,21 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
       },
       acceptAgentConflict,
       keepUserConflict,
+
+      // LSP navigation actions — each calls the Monaco built-in action
+      // ID. They silently no-op when no LSP has registered the action.
+      goToDefinition: () => runAction('editor.action.revealDefinition'),
+      peekDefinition: () => runAction('editor.action.peekDefinition'),
+      goToTypeDefinition: () => runAction('editor.action.goToTypeDefinition'),
+      peekTypeDefinition: () => runAction('editor.action.peekTypeDefinition'),
+      goToReferences: () => runAction('editor.action.goToReferences'),
+      peekReferences: () => runAction('editor.action.referenceSearch.trigger'),
+      goToImplementation: () => runAction('editor.action.goToImplementation'),
+      renameSymbol: () => runAction('editor.action.rename'),
+      quickFix: () => runAction('editor.action.quickFix'),
+      showHover: () => runAction('editor.action.showHover'),
+      formatSelection: () => runAction('editor.action.formatSelection'),
+      organizeImports: () => runAction('editor.action.organizeImports'),
     };
   }, []);
 
@@ -974,6 +1052,12 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
       {isReviewingDiff ? (
         <>
           <DiffReviewHeader
+            isInlineDiff={isInlineDiff}
+            onToggleInlineDiff={() => {
+              const next = !isInlineDiff;
+              setIsInlineDiff(next);
+              diffEditorRef.current?.updateOptions({ renderSideBySide: !next });
+            }}
             onAccept={() => {
               const content = pendingConflictContentRef.current;
               if (content === null) {
@@ -1070,10 +1154,12 @@ const ConflictBanner: React.FC<ConflictBannerProps> = ({ theme, onReviewDiff, on
  * without touching the user's model.
  */
 type DiffReviewHeaderProps = {
+  isInlineDiff: boolean;
+  onToggleInlineDiff: () => void;
   onAccept: () => void;
   onKeep: () => void;
 };
-const DiffReviewHeader: React.FC<DiffReviewHeaderProps> = ({ onAccept, onKeep }) => {
+const DiffReviewHeader: React.FC<DiffReviewHeaderProps> = ({ isInlineDiff, onToggleInlineDiff, onAccept, onKeep }) => {
   const { t } = useTranslation();
   return (
     <div className='editor-diff-review-header' role='toolbar' aria-label='Diff review actions'>
@@ -1082,6 +1168,15 @@ const DiffReviewHeader: React.FC<DiffReviewHeaderProps> = ({ onAccept, onKeep })
         {' / '}
         {t('conversation.editor.agentConflictModifiedLabel', { defaultValue: "Agent's version" })}
       </span>
+      <button
+        type='button'
+        className='editor-conflict-banner__button editor-conflict-banner__button--ghost'
+        onClick={onToggleInlineDiff}
+      >
+        {isInlineDiff
+          ? t('conversation.editor.diffToggleSideBySide', { defaultValue: 'Side by Side' })
+          : t('conversation.editor.diffToggleInline', { defaultValue: 'Inline' })}
+      </button>
       <button
         type='button'
         className='editor-conflict-banner__button editor-conflict-banner__button--primary'

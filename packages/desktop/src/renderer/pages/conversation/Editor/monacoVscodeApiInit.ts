@@ -30,12 +30,19 @@
  */
 
 import { LogLevel } from '@codingame/monaco-vscode-api';
+import type { OpenEditor } from '@codingame/monaco-vscode-editor-service-override';
+import { editorOpenProxy } from './editorOpenBridge';
+import { disableBuiltInTsJsProviders } from './disableBuiltInTsJsProviders';
 
 let initPromise: Promise<void> | null = null;
 
 type InitConfig = {
   $type: 'extended' | 'classic';
-  viewsConfig: { $type: 'EditorService' };
+  viewsConfig: {
+    $type: 'EditorService';
+    /** The OpenEditor callback from monaco-languageclient / monaco-vscode-editor-service-override. */
+    openEditorFunc?: OpenEditor;
+  };
   logLevel: typeof LogLevel.Off;
   monacoWorkerFactory: (logger?: unknown) => void;
   advanced: { enableExtHostWorker: boolean; loadThemes: boolean };
@@ -50,6 +57,7 @@ const bootWrapper = async ($type: 'extended' | 'classic'): Promise<void> => {
     $type,
     viewsConfig: {
       $type: 'EditorService',
+      openEditorFunc: editorOpenProxy,
     },
     logLevel: LogLevel.Off,
     monacoWorkerFactory: configureDefaultWorkerFactory,
@@ -67,6 +75,12 @@ const bootWrapper = async ($type: 'extended' | 'classic'): Promise<void> => {
 
   const wrapper = new MonacoVscodeApiWrapper(config);
   await wrapper.start();
+  try {
+    disableBuiltInTsJsProviders();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('[bootWrapper] disableBuiltInTsJsProviders threw; continuing editor boot.', err);
+  }
 };
 
 /**

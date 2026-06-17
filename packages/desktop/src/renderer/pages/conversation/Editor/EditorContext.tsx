@@ -6,12 +6,15 @@
 
 import { ipcBridge } from '@/common';
 import { useRemoteWorkspaceChanged } from '@/renderer/hooks/agent/useRemoteWorkspaceEvents';
+import * as monaco from '@aionui/editor-monaco';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { mutate } from 'swr';
 import { isEditorAccessibleInLayoutMode } from '@renderer/utils/layout/layoutModeStorage';
 import { EDITOR_MAX_EDITABLE_BYTES, getEditorFileName, inferEditorLanguage } from './editorLanguage';
 import { requestEditorRevealInTree } from './editorReveal';
 import { writeEditorTabs, type PersistedEditorTabEntry } from './editorTabsPersistence';
+import { setEditorOpenCallback, uriToDiskPath, waitForEditorWithUri } from './editorOpenBridge';
+import { fileIdentityKey, uriForBuffer } from './editorMonacoUri';
 import type {
   EditorBufferViewState,
   EditorContextValue,
@@ -60,7 +63,8 @@ const createNotice = (kind: EditorNotice['kind'], key: string, values?: EditorNo
   values,
 });
 
-const bufferKeyFor = (request: EditorOpenRequest): string => `${request.workspace ?? ''}::${request.path}`;
+const bufferKeyFor = (request: EditorOpenRequest): string =>
+  `${fileIdentityKey(request.workspace ?? '')}::${fileIdentityKey(request.path)}`;
 
 // ---- Untitled Backup Debouncer -------------------------------------------
 const backupTimers = new Map<string, number>();
@@ -246,7 +250,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const byWorkspace = new Map<string, OpenBuffer[]>();
       for (const b of state.buffers) {
         if (!b.filePath && !b.backupId) continue;
-        const wsKey = b.workspace ?? '';
+        const wsKey = fileIdentityKey(b.workspace ?? '');
         const arr = byWorkspace.get(wsKey) ?? [];
         arr.push(b);
         byWorkspace.set(wsKey, arr);
@@ -273,7 +277,9 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         // Untitled buffers have no path, so they're naturally excluded from
         // the persisted group layout — they rehydrate into the focused group.
         const pathForKey = (key: string): string | null =>
-          state.buffers.find((b) => b.key === key && (b.workspace ?? '') === wsKey)?.filePath ?? null;
+          state.buffers.find(
+            (b) => b.key === key && fileIdentityKey(b.workspace ?? '') === wsKey
+          )?.filePath ?? null;
         const groups = state.groups
           .map((g) => {
             const entryPaths = g.bufferKeys.map(pathForKey).filter((p): p is string => Boolean(p));
@@ -296,9 +302,9 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const active = stateRef.current.buffers.find((b) => b.key === stateRef.current.activeKey);
     const targetPath = filePath ?? active?.filePath ?? null;
     if (!targetPath) return;
-    // Prefer the explicit argument, then the buffer that owns this path,
-    // then the active buffer's workspace, then empty string.
-    const ownerBuffer = stateRef.current.buffers.find((b) => b.filePath === targetPath);
+    const ownerBuffer = stateRef.current.buffers.find(
+      (b) => b.filePath && fileIdentityKey(b.filePath) === fileIdentityKey(targetPath)
+    );
     const targetWorkspace = workspace ?? ownerBuffer?.workspace ?? active?.workspace ?? '';
     setRevealRequest({ workspace: targetWorkspace, filePath: targetPath });
     requestEditorRevealInTree({ workspace: targetWorkspace, filePath: targetPath });
@@ -446,6 +452,40 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     [executeOpenFile]
   );
 
+  // ---- Editor-open bridge (LSP go-to-definition on closed files) -----------
+  // Register a callback that Monaco-VSCode's wrapOpenEditor STEP 3 will invoke
+  // when LSP triggers navigation to a file that isn't already open. The callback
+  // opens the file via EditorContext, waits for the Monaco editor to appear,
+  // and returns the ICodeEditor instance.
+  useEffect(() => {
+    setEditorOpenCallback(async (uri, _options) => {
+      // Reject non-file URIs at the boundary — only file-backed resources
+      // map to disk paths; inmemory:, vscode-userdata:, etc. are unsupported.
+      if (uri.scheme !== 'file') return undefined;
+
+      // Convert Monaco URI to disk path (reverse of uriForBuffer)
+      const path = uriToDiskPath(uri);
+
+      // Use the active buffer's workspace, or derive from the path
+      const activeBuffer = stateRef.current.buffers.find((b) => b.key === stateRef.current.activeKey);
+      const workspace = activeBuffer?.workspace;
+
+      // Open the file via EditorContext
+      const opened = await openEditorFile({ path, workspace });
+      if (!opened) return undefined;
+
+      // Wait for the Monaco editor to have this model
+      // waitForEditorWithUri returns ICodeEditor | null, but the bridge
+      // contract uses ICodeEditor | undefined — coerce null → undefined.
+      const editor = await waitForEditorWithUri(uri, { timeout: 3000, interval: 50 });
+      return editor ?? undefined;
+    });
+
+    return () => {
+      setEditorOpenCallback(null);
+    };
+  }, [openEditorFile]);
+
   const executeNewFile = useCallback(() => {
     if (!isEditorAccessibleInLayoutMode()) return;
     const buffer = newUntitledBuffer();
@@ -521,7 +561,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const ok = await ipcBridge.fs.writeFile.invoke({ path: filePath, data: current.content });
       if (!ok) throw new Error('write failed');
       const metadata = await ipcBridge.fs.getFileMetadata.invoke({ path: filePath });
-      const newKey = `::${filePath}`;
+      const newKey = bufferKeyFor({ path: filePath, workspace: undefined });
       setState((prev) =>
         normalizeGroups({
           ...prev,
@@ -657,9 +697,18 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         g.id === groupId ? { ...g, bufferKeys: g.bufferKeys.filter((k) => k !== key) } : g
       );
       const stillReferenced = groups.some((g) => g.bufferKeys.includes(key));
-      if (!stillReferenced && buffer?.filePath === null && buffer.backupId) {
-        cancelUntitledBackup(buffer.backupId);
-        ipcBridge.untitledBackup.delete.invoke({ backupId: buffer.backupId }).catch(() => {});
+      if (!stillReferenced) {
+        // Dispose the Monaco text model — frees memory and triggers
+        // textDocument/didClose via the language client's document sync.
+        if (buffer) {
+          const uri = uriForBuffer(buffer);
+          const model = monaco.editor.getModel(uri);
+          model?.dispose();
+        }
+        if (buffer?.filePath === null && buffer.backupId) {
+          cancelUntitledBackup(buffer.backupId);
+          ipcBridge.untitledBackup.delete.invoke({ backupId: buffer.backupId }).catch(() => {});
+        }
       }
       const buffers = stillReferenced ? prev.buffers : prev.buffers.filter((b) => b.key !== key);
       const next = normalizeGroups({ ...prev, buffers, groups });

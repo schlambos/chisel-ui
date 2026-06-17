@@ -44,6 +44,12 @@ const editorLineDecorationClassNames = (kind: GitLineDecoration['kind']): string
   }
 };
 
+const minimapColorId = (kind: GitLineDecoration['kind']): string =>
+  kind === 'added' ? 'minimapGutter.addedBackground' : kind === 'modified' ? 'minimapGutter.modifiedBackground' : 'minimapGutter.deletedBackground';
+
+const overviewRulerColorId = (kind: GitLineDecoration['kind']): string =>
+  kind === 'added' ? 'editorOverviewRuler.addedForeground' : kind === 'modified' ? 'editorOverviewRuler.modifiedForeground' : 'editorOverviewRuler.deletedForeground';
+
 const applyDecorations = (editor: monaco.editor.IStandaloneCodeEditor, decorations: GitLineDecoration[]): void => {
   const modelDecorations: monaco.editor.IModelDeltaDecoration[] = [];
   for (const dec of decorations) {
@@ -54,6 +60,8 @@ const applyDecorations = (editor: monaco.editor.IStandaloneCodeEditor, decoratio
         isWholeLine: true,
         glyphMarginClassName: `editor-git-glyph editor-git-glyph--${dec.kind}`,
         className: `editor-git-line editor-git-line--${dec.kind}`,
+        minimap: { color: { id: minimapColorId(dec.kind) }, position: 2 },
+        overviewRuler: { color: { id: overviewRulerColorId(dec.kind) }, position: 7 },
         stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
       },
     });
@@ -122,6 +130,8 @@ export const useEditorGitDecorations = ({ activeBuffer, editor }: UseEditorGitDe
             isWholeLine: true,
             glyphMarginClassName: `editor-git-glyph editor-git-glyph--${dec.kind}`,
             className: editorLineDecorationClassNames(dec.kind).join(' '),
+            minimap: { color: { id: minimapColorId(dec.kind) }, position: 2 },
+            overviewRuler: { color: { id: overviewRulerColorId(dec.kind) }, position: 7 },
             stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
           },
         });
@@ -169,6 +179,8 @@ export const useEditorGitDecorations = ({ activeBuffer, editor }: UseEditorGitDe
               isWholeLine: true,
               glyphMarginClassName: `editor-git-glyph editor-git-glyph--${dec.kind}`,
               className: editorLineDecorationClassNames(dec.kind).join(' '),
+              minimap: { color: { id: minimapColorId(dec.kind) }, position: 2 },
+              overviewRuler: { color: { id: overviewRulerColorId(dec.kind) }, position: 7 },
               stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
             },
           });

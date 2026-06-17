@@ -12,10 +12,12 @@ import * as vscode from 'vscode';
 
 import { buildLspSessionWebSocketUrl } from './lspWebSocketUrl';
 import { monacoDocumentSelectorsForLsp } from './lspLanguageId';
+import { fileIdentityKey } from './editorMonacoUri';
 
 type SessionKey = string;
 
-const sessionKey = (workspace: string, language: string): SessionKey => `${workspace}::${language}`;
+const sessionKey = (workspace: string, language: string): SessionKey =>
+  `${fileIdentityKey(workspace)}::${language}`;
 
 type ManagedSession = {
   workspace: string;
@@ -97,8 +99,9 @@ export async function attachLspForBuffer(options: {
 
 export async function detachLspForWorkspace(workspace: string): Promise<void> {
   const toStop: ManagedSession[] = [];
+  const normalisedWorkspace = fileIdentityKey(workspace);
   for (const [key, session] of sessions) {
-    if (session.workspace === workspace) {
+    if (fileIdentityKey(session.workspace) === normalisedWorkspace) {
       toStop.push(session);
       sessions.delete(key);
     }

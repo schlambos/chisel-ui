@@ -27,6 +27,7 @@ import { ipcBridge } from '@/common';
 import { isEditorAccessibleInLayoutMode } from '@renderer/utils/layout/layoutModeStorage';
 import { useEditorContext } from './EditorContext';
 import { readEditorTabs } from './editorTabsPersistence';
+import { fileIdentityKey } from './editorMonacoUri';
 
 type Options = {
   /** Conversation / project workspace root (absolute path). */
@@ -83,7 +84,8 @@ export const useEditorTabsHydration = ({ workspaceRoot }: Options): void => {
         }
       }
 
-      const keyForPath = (path: string): string => `${wsForPath.get(path) ?? workspaceRoot}::${path}`;
+      const keyForPath = (path: string): string =>
+        `${fileIdentityKey(wsForPath.get(path) ?? workspaceRoot)}::${fileIdentityKey(path)}`;
 
       // Restore the split layout when one was persisted.
       if (persisted.groups && persisted.groups.length > 1) {
