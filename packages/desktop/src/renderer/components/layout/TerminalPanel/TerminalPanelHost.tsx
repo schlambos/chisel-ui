@@ -69,7 +69,7 @@ const TerminalPanelHost: React.FC<Props> = ({ isMobile, hideTerminal = false, ch
 
   return (
     <div ref={containerRef} className='relative flex flex-col flex-1 min-h-0'>
-      <div className='flex-1 min-h-0 overflow-auto flex flex-col'>{children}</div>
+      <div className='flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col'>{children}</div>
       {panel.open && (
         <div
           className='terminal-resize-handle relative h-6px -my-3px z-10 shrink-0 cursor-row-resize flex items-center justify-center'

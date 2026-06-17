@@ -218,3 +218,4 @@ opencode-backup.json
 
 # OpenCode config may contain provider API keys — never commit
 opencode.json
+.slim/

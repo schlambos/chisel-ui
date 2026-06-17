@@ -299,8 +299,8 @@
   right: 0;
   top: 0;
   transform: translateY(-50%);
-  height: 2px;
-  background: transparent;
+  height: 0;
+  background: transparent !important;
   border-radius: 9999px;
   pointer-events: none;
   transition:
@@ -311,7 +311,7 @@
 .terminal-resize-handle[data-resize-handle-state='hover'] .terminal-resize-handle__line,
 .terminal-resize-handle[data-resize-handle-state='drag'] .terminal-resize-handle__line {
   height: 6px;
-  background: var(--brand);
+  background: var(--brand) !important;
 }
 
 /* Terminal bottom blade — persistent collapsed/expanded strip mirroring the
