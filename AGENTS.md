@@ -132,11 +132,17 @@ Formatting rules (Oxfmt, Prettier-compatible):
 - Prefer `type` over `interface` (per Oxlint config)
 - English for code comments; JSDoc for public functions
 
-### Internationalization (i18n)
+### Internationalization (i18n) — DO NOT IMPLEMENT
 
-All user-facing text must use i18n keys — never hardcode strings. Languages and modules are defined in `packages/desktop/src/common/config/i18n-config.json`.
+Do not spend time on i18n, localization, translation dictionaries, locale routing, language switchers, or abstraction layers for display strings unless I explicitly request it.
 
-See the `i18n` skill (`.claude/skills/i18n/SKILL.md`) for complete workflow, key naming, and validation steps.
+For now, the app is English-only. Use plain English UI copy directly where appropriate. Do not create locale files, i18n providers, translation hooks, or string-key systems.
+
+The only acceptable consideration is avoiding obviously hostile future design choices, such as deeply coupling business logic to user-facing prose. But do not proactively implement i18n infrastructure.
+
+Prioritize functional correctness, UX behavior, state management, architecture, bug fixing, and code maintainability over theoretical future localization.
+
+> Upstream's `i18n` skill (`.claude/skills/i18n/SKILL.md`) and the rule about i18n keys are **superseded by this directive** for this fork.
 
 ## Architecture
 

@@ -77,7 +77,7 @@ const TerminalPanelHost: React.FC<Props> = ({ isMobile, hideTerminal = false, ch
           aria-label={t('terminal.layout.resizeHandle', { defaultValue: 'Resize terminal panel' })}
           aria-orientation='vertical'
         >
-          <span className='terminal-resize-handle__line w-full h-2px bg-[var(--color-border-2)]' aria-hidden='true' />
+          <span className='terminal-resize-handle__line w-full h-2px' aria-hidden='true' />
         </div>
       )}
       <div
