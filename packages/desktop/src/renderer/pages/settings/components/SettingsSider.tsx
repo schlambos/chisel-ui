@@ -12,13 +12,7 @@ import { Tooltip } from '@arco-design/web-react';
 import { getSiderTooltipProps } from '@/renderer/utils/ui/siderTooltip';
 
 /** Builtin settings tab IDs in display order (must match router paths). */
-export const BUILTIN_TAB_IDS = [
-  'agent',
-  'display',
-  'webui',
-  'system',
-  'about',
-] as const;
+export const BUILTIN_TAB_IDS = ['agent', 'display', 'webui', 'system', 'about'] as const;
 
 /**
  * Legacy anchor IDs that have been merged into other tabs.

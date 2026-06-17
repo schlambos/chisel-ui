@@ -193,6 +193,17 @@ export function listApprovalRules(store: ChislApprovalStore): ApprovalRule[] {
   return rows.map(rowToApprovalRule);
 }
 
+export function listApprovalRulesForSession(store: ChislApprovalStore, sessionId: string): ApprovalRule[] {
+  const rows = store.driver
+    .prepare(
+      `SELECT id, name, scope, scope_ref, tool, matcher_json, action, priority, expiry,
+              enabled, created_by, created_at, updated_at, reason, tags_json
+       FROM approval_rules WHERE scope = 'session' AND scope_ref = ? AND enabled = 1 ORDER BY created_at ASC`
+    )
+    .all(sessionId) as ApprovalRuleRow[];
+  return rows.map(rowToApprovalRule);
+}
+
 export function updateApprovalRule(
   store: ChislApprovalStore,
   id: string,

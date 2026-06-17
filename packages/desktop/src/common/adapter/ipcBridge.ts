@@ -112,6 +112,7 @@ import {
   fromBackendTeamOptional,
   toBackendAgent,
 } from './teamMapper';
+import type { ApprovalRule } from '@process/services/approval/types';
 import { absoluteToRelativePath, fromBackendWorkspaceList } from './workspaceMapper';
 
 // ---------------------------------------------------------------------------
@@ -444,9 +445,28 @@ export const conversation = {
     { conversation_id: string; mode?: 'git' | 'branch' }
   >((p) => `/api/conversations/${p.conversation_id}/opencode/vcs/diff?mode=${p.mode ?? 'git'}`),
   /** M22: compact the remote session using V2 (with V1 summarize fallback). */
-  compactRemoteSession: httpPost<void, { conversation_id: string; instructions?: string }>(
+  compactRemoteSession: httpPost<void, { conversation_id: string }>(
     (p) => `/api/conversations/${p.conversation_id}/opencode/compact`,
-    (p) => (p.instructions ? { instructions: p.instructions } : {})
+    () => ({})
+  ),
+  /** T18.1: native conversation workspace VCS (snapshot baseline), NOT opencode/vcs. */
+  getWorkspaceVcs: httpGet<
+    {
+      mode: string;
+      is_tracked: boolean;
+      summary: { files_changed: number; additions: number; deletions: number };
+      patches: Array<{
+        relative_path: string;
+        patch: string;
+        additions: number;
+        deletions: number;
+        operation: string;
+      }>;
+    },
+    { conversation_id: string }
+  >((p) => `/api/conversations/${p.conversation_id}/workspace/vcs`),
+  initWorkspaceVcs: httpPost<void, { conversation_id: string }>(
+    (p) => `/api/conversations/${p.conversation_id}/workspace/vcs/init`
   ),
   /** M22: get the session's active context window (all messages after last compaction). */
   getSessionContext: httpGet<unknown[], { conversation_id: string }>(
@@ -2341,4 +2361,17 @@ export const sidecar = {
   })),
   /** Remove a sidecar registration. */
   remove: httpDelete<void, { id: string }>((p) => `/api/sidecars/${p.id}`),
+};
+
+// ---------------------------------------------------------------------------
+// Approval Rules — stays IPC (Electron-native SQLite in main process)
+// ---------------------------------------------------------------------------
+
+export const approvalRules = {
+  listForSession: bridge.buildProvider<IBridgeResponse<ApprovalRule[]>, { sessionId: string }>(
+    'approval-rules.list-for-session'
+  ),
+  delete: bridge.buildProvider<IBridgeResponse<{ deleted: boolean }>, { id: string; sessionId: string }>(
+    'approval-rules.delete'
+  ),
 };

@@ -558,11 +558,19 @@ export { ChatKeyProvider, MessageListProvider, useChatKey, useMessageList, useUp
 export type RemoteConversationExtra = {
   is_reverted?: boolean;
   revert_message_id?: string | null;
+  compaction_start_message_id?: string | null;
+  compaction_end_message_id?: string | null;
+  compaction_marker_message_id?: string | null;
+  compaction_summary_message_id?: string | null;
+  compaction_tokens_reclaimed?: number;
+  compaction_summary?: string | null;
   sessionKey?: string;
   workspace?: string;
   remote_workspace?: string;
   remoteAgentId?: string;
   remote_agent_id?: string;
+  archived?: boolean;
+  archived_at?: number;
   [key: string]: unknown;
 };
 
@@ -595,6 +603,63 @@ export const computeRevertedRegion = (
   // bare `revert_message_id` means the original (non-thinking) message.
   if (idx === undefined) return null;
   return idx;
+};
+
+/**
+ * Pure helper: given the raw message list and a conversation's `extra`,
+ * find the first message index for compaction divider. Returns the index
+ * of `compaction_start_message_id` in the raw list, or `null` if no divider
+ * should render.
+ *
+ * Rules:
+ *   - `compaction_start_message_id` must be a non-empty string.
+ *   - Must resolve to a known message in the list.
+ *   - Empty/missing → no divider, no crash.
+ */
+/** OpenCode `messageID` stamped on persisted text/thinking rows (`content._opencode`). */
+export function getOpencodeMessageIdFromContent(msg: TMessage): string | undefined {
+  if (msg.type !== 'text' && msg.type !== 'thinking') return undefined;
+  const content = msg.content as { _opencode?: { message_id?: string } } | undefined;
+  return content?._opencode?.message_id;
+}
+
+export function messageMatchesLocalOrOpencodeId(msg: TMessage, target: string): boolean {
+  return msg.id === target || msg.msg_id === target || getOpencodeMessageIdFromContent(msg) === target;
+}
+
+export const isCompactionSummaryTranscriptMessage = (
+  msg: TMessage,
+  extra: RemoteConversationExtra | null | undefined
+): boolean => {
+  if (!extra?.compaction_summary || extra.compaction_summary.trim().length === 0) return false;
+  const target = extra.compaction_summary_message_id;
+  if (!target || typeof target !== 'string') return false;
+  return messageMatchesLocalOrOpencodeId(msg, target);
+};
+
+/**
+ * Resolve compaction anchor to a raw-list index. The anchor is the
+ * compaction BOUNDARY (`compaction_end_message_id`): the last message of the
+ * old, pre-compaction range. The divider renders AFTER this item, separating
+ * old chat from the new compressed context (matching OpenCode's UX). Older
+ * sessions only carried `compaction_start_message_id`; fall back to it so they
+ * still draw something. The id may be either a local `msg_id` (a stored row
+ * id) or an OpenCode `messageID` from `session.compacted` — match both.
+ */
+export const computeCompactionRegion = (
+  list: TMessage[],
+  extra: RemoteConversationExtra | null | undefined
+): number | null => {
+  if (!extra) return null;
+  const target = extra.compaction_end_message_id || extra.compaction_start_message_id;
+  if (!target || typeof target !== 'string') return null;
+  const { msgIdIndex } = getOrBuildIndex(list);
+  const byMsgId = msgIdIndex.get(target);
+  if (byMsgId !== undefined) return byMsgId;
+  for (let i = 0; i < list.length; i++) {
+    if (messageMatchesLocalOrOpencodeId(list[i], target)) return i;
+  }
+  return null;
 };
 
 /**
@@ -637,6 +702,37 @@ export const isItemInactive = (
   return false;
 };
 
+/**
+ * Given a processed-list item and the raw list's compaction start index,
+ * decide whether this item is the first compaction target (to render divider).
+ * For composite items, check if any source message matches the compaction start.
+ */
+export const isItemCompactionStart = (
+  item: TMessage | { type: string; sourceMessageIds?: string[]; id?: string },
+  rawList: TMessage[],
+  compactionStartIndex: number | null
+): boolean => {
+  if (compactionStartIndex === null) return false;
+  // Processed/synthetic items: check if any source id matches the compaction start message
+  if ('type' in item && (item.type === 'file_summary' || item.type === 'tool_summary' || item.type === 'artifact')) {
+    const sourceIds = (item as { sourceMessageIds?: string[] }).sourceMessageIds;
+    if (!sourceIds || sourceIds.length === 0) return false;
+    const { msgIdIndex } = getOrBuildIndex(rawList);
+    return sourceIds.some((id) => {
+      const idx = msgIdIndex.get(id);
+      return idx !== undefined && idx === compactionStartIndex;
+    });
+  }
+  // Raw TMessage: check if this message is at the compaction start index
+  const msg = item as TMessage;
+  if (msg.id) {
+    const rawIndex = rawList.findIndex((m) => m.id === msg.id);
+    if (rawIndex === -1) return false;
+    return rawIndex === compactionStartIndex;
+  }
+  return false;
+};
+
 // Test-only exports. These let unit tests exercise the message-merging logic
 // without spinning up React + the provider context; the logic itself is the
 // single source of truth for how parallel events collapse into the chat list
@@ -647,5 +743,10 @@ export const __test__ = {
   composeMessageWithIndex,
   permissionCallId,
   computeRevertedRegion,
+  computeCompactionRegion,
+  getOpencodeMessageIdFromContent,
+  messageMatchesLocalOrOpencodeId,
+  isCompactionSummaryTranscriptMessage,
   isItemInactive,
+  isItemCompactionStart,
 };

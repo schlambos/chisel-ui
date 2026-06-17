@@ -402,6 +402,18 @@ export type TChatConversation =
           archived_at?: number;
           /** Indicates if the session is currently in a reverted state */
           is_reverted?: boolean;
+          /** Message ID where compaction started (for divider rendering) */
+          compaction_start_message_id?: string | null;
+          /** Message ID where compaction ended */
+          compaction_end_message_id?: string | null;
+          /** OpenCode user message carrying the compaction part */
+          compaction_marker_message_id?: string | null;
+          /** OpenCode assistant summary message for the compaction */
+          compaction_summary_message_id?: string | null;
+          /** Tokens reclaimed by compaction */
+          compaction_tokens_reclaimed?: number;
+          /** Structured markdown summary of the compacted range (rendered below the divider) */
+          compaction_summary?: string | null;
           /** Explicit marker for temporary health-check conversations */
           is_health_check?: boolean;
           /** Cron job ID that spawned this conversation */

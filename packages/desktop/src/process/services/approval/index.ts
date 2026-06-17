@@ -22,6 +22,7 @@ export {
   getApprovalRule,
   listApprovalAudits,
   listApprovalRules,
+  listApprovalRulesForSession,
   openChislApprovalStore,
   updateApprovalRule,
   type ChislApprovalStore,

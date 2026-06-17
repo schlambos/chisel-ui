@@ -41,6 +41,7 @@ import { useWorkspaceApprovals } from './hooks/useWorkspaceApprovals';
 import { useWorkspaceTodos } from './hooks/useWorkspaceTodos';
 import { useWorkspaceTree } from './hooks/useWorkspaceTree';
 import { useEditorRevealInTree } from './hooks/useEditorRevealInTree';
+import { useWorkspaceNativeVcs } from './hooks/useWorkspaceNativeVcs';
 import type { WorkspaceProps, WorkspaceTab } from './types';
 import {
   WORKSPACE_OPEN_REMOTE_CHANGES_EVENT,
@@ -93,6 +94,7 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
   // when SiderDiffSection mounts a 'changes' instance below. 'changes' mode
   // enables them (dedicated diff pane). 'full' enables for legacy tab behavior.
   const gitChangesHook = useGitChanges(workspace, !isFilesMode);
+  const nativeVcsHook = useWorkspaceNativeVcs();
   const todosHook = useWorkspaceTodos(conversation_id);
   const approvalsHook = useWorkspaceApprovals(conversation_id);
 
@@ -343,16 +345,18 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
   // Switch to the Changes tab only when the user explicitly asks (e.g. remote
   // session "View changes"). Never force changes on conversation load — that
   // broke panelMode="files" (top Sider tree) by hiding the file tree.
+  // T18.1: When event fires, fetch native VCS data for this conversation.
   useEffect(() => {
     if (typeof window === 'undefined' || isChangesMode || isFilesMode) return undefined;
     const handleOpenRemoteChanges = (event: Event) => {
       const detail = (event as CustomEvent<WorkspaceOpenRemoteChangesDetail>).detail;
       if (detail.conversation_id !== conversation_id) return;
       setActiveTab('changes');
+      void nativeVcsHook.refresh(conversation_id);
     };
     window.addEventListener(WORKSPACE_OPEN_REMOTE_CHANGES_EVENT, handleOpenRemoteChanges);
     return () => window.removeEventListener(WORKSPACE_OPEN_REMOTE_CHANGES_EVENT, handleOpenRemoteChanges);
-  }, [conversation_id, isChangesMode, isFilesMode]);
+  }, [conversation_id, isChangesMode, isFilesMode, nativeVcsHook.refresh]);
 
   useEffect(() => {
     if (!isChangesMode) {
@@ -757,30 +761,65 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
         {/* Changes tab content (or dedicated changes pane) */}
         {(isChangesMode || (!isChangesMode && !isWorkspaceCollapsed && activeTab === 'changes')) && (
           <FlexFullContainer containerClassName='overflow-y-auto'>
-            <GitChangeList
-              t={t}
-              workspace={workspace}
-              repoInfo={gitChangesHook.repoInfo}
-              staged={gitChangesHook.staged}
-              unstaged={gitChangesHook.unstaged}
-              conflicted={gitChangesHook.conflicted}
-              loading={gitChangesHook.loading}
-              error={gitChangesHook.error}
-              statusVersion={gitChangesHook.statusVersion}
-              onRefresh={gitChangesHook.refresh}
-              onInitRepo={gitChangesHook.initRepo}
-              onOpenDiff={handleOpenChangeDiff}
-              onStageFile={gitChangesHook.stageFile}
-              onStageAll={gitChangesHook.stageAll}
-              onUnstageFile={gitChangesHook.unstageFile}
-              onUnstageAll={gitChangesHook.unstageAll}
-              onDiscardFile={gitChangesHook.discardFile}
-              onCommit={gitChangesHook.commit}
-              onGetDiff={gitChangesHook.getDiff}
-              onExpandFlyout={onExpandFlyout}
-              hideToolbar={siderDiffChrome === 'embedded'}
-              isAgentModified={isAgentModified}
-            />
+            {nativeVcsHook.data ? (
+              <GitChangeList
+                t={t}
+                workspace={workspace}
+                repoInfo={{
+                  isRepo: nativeVcsHook.data.is_tracked,
+                  root: workspace,
+                  branch: null,
+                  gitAvailable: true,
+                }}
+                staged={[]}
+                unstaged={nativeVcsHook.mapPatchesToGitChanges(nativeVcsHook.data.patches)}
+                conflicted={[]}
+                loading={nativeVcsHook.loading}
+                error={nativeVcsHook.error}
+                statusVersion={0}
+                onRefresh={() => nativeVcsHook.refresh(conversation_id)}
+                onInitRepo={async () => nativeVcsHook.initRepo(conversation_id)}
+                onOpenDiff={handleOpenChangeDiff}
+                onStageFile={async () => {}}
+                onStageAll={async () => {}}
+                onUnstageFile={async () => {}}
+                onUnstageAll={async () => {}}
+                onDiscardFile={async () => {}}
+                onCommit={async () => ({}) as any}
+                onGetDiff={async (file_path) => ({
+                  patch: nativeVcsHook.data?.patches.find((p) => p.relative_path === file_path)?.patch || '',
+                  binary: false,
+                })}
+                onExpandFlyout={onExpandFlyout}
+                hideToolbar={siderDiffChrome === 'embedded'}
+                isAgentModified={isAgentModified}
+              />
+            ) : (
+              <GitChangeList
+                t={t}
+                workspace={workspace}
+                repoInfo={gitChangesHook.repoInfo}
+                staged={gitChangesHook.staged}
+                unstaged={gitChangesHook.unstaged}
+                conflicted={gitChangesHook.conflicted}
+                loading={gitChangesHook.loading}
+                error={gitChangesHook.error}
+                statusVersion={gitChangesHook.statusVersion}
+                onRefresh={gitChangesHook.refresh}
+                onInitRepo={gitChangesHook.initRepo}
+                onOpenDiff={handleOpenChangeDiff}
+                onStageFile={gitChangesHook.stageFile}
+                onStageAll={gitChangesHook.stageAll}
+                onUnstageFile={gitChangesHook.unstageFile}
+                onUnstageAll={gitChangesHook.unstageAll}
+                onDiscardFile={gitChangesHook.discardFile}
+                onCommit={gitChangesHook.commit}
+                onGetDiff={gitChangesHook.getDiff}
+                onExpandFlyout={onExpandFlyout}
+                hideToolbar={siderDiffChrome === 'embedded'}
+                isAgentModified={isAgentModified}
+              />
+            )}
           </FlexFullContainer>
         )}
 

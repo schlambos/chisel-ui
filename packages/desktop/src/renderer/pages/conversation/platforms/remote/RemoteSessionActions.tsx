@@ -10,10 +10,11 @@ import { uuid } from '@/common/utils';
 import AionModal from '@/renderer/components/base/AionModal';
 import { getConversationOrNull, refreshConversationCache } from '@/renderer/pages/conversation/utils/conversationCache';
 import { findShadowedPaths } from './configShadowDiff';
+import { useRemoteMessage } from './useRemoteMessage';
 import { iconColors } from '@/renderer/styles/colors';
-import { Button, Dropdown, Input, Menu, Message, Tooltip } from '@arco-design/web-react';
+import { Button, Dropdown, Input, Menu, Message, Modal, Tooltip } from '@arco-design/web-react';
 import { Branch, Copy, More, Refresh, ShareTwo, FileText, Setting } from '@icon-park/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { emitter } from '@/renderer/utils/emitter';
@@ -30,10 +31,42 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
   const navigate = useNavigate();
   const conversation_id = conversation.id;
 
+  const { running } = useRemoteMessage(conversation_id);
+
   const [busy, setBusy] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [toolHost, setToolHost] = useState<'local' | 'server' | undefined>(undefined);
   const [protocol, setProtocol] = useState<string | undefined>(undefined);
+
+  // Count user text messages (position === 'right') from local DB to decide
+  // whether Compact should be enabled. Remote sessions may have zero local
+  // messages if the user hasn't spoken yet in this conversation.
+  const [userMessageCount, setUserMessageCount] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    void ipcBridge.database.getConversationMessages
+      .invoke({ conversation_id, page: 0, page_size: 1000 })
+      .then((result) => {
+        if (cancelled || !result?.items) return;
+        const count = result.items.filter((m) => m.type === 'text' && m.position === 'right').length;
+        setUserMessageCount(count);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [conversation_id]);
+
+  const compactDisabled = userMessageCount === 0 || running;
+  const compactTooltip = useMemo(() => {
+    if (running)
+      return t('conversation.session.compactDisabledRunning', {
+        defaultValue: 'Cannot compact while response is in progress',
+      });
+    if (userMessageCount === 0)
+      return t('conversation.session.compactDisabledEmpty', { defaultValue: 'No user messages to compact' });
+    return null;
+  }, [running, userMessageCount, t]);
 
   // M19: server global-config editor state.
   const [configOpen, setConfigOpen] = useState(false);
@@ -112,6 +145,7 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
         } catch {
           await ipcBridge.conversation.summarizeRemoteSession.invoke({ conversation_id });
         }
+        await refreshConversationCache(conversation_id);
         Message.success(
           t('conversation.session.summarizeSuccess', {
             defaultValue: 'Session compacted. Future replies will use the compacted context.',
@@ -163,18 +197,42 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
       }
     });
 
-  // M05: open the Workspace Changes tab with remote session diff source.
+  // M05/T18.1: open the Workspace Changes tab with remote session diff source or native VCS.
   const handleViewChanges = () =>
     runExclusive(async () => {
-      if (toolHost !== 'server') {
-        Message.info(
+      try {
+        const vcsRes = await ipcBridge.conversation.getWorkspaceVcs.invoke({ conversation_id });
+        if (vcsRes.mode === 'not-git') {
+          Modal.confirm({
+            title: t('conversation.workspaceVcs.trackWorkspace', { defaultValue: 'Track this workspace' }),
+            content: t('conversation.workspaceVcs.notGitHint', {
+              defaultValue: 'This folder is not in git. Track it to see changes.',
+            }),
+            okText: t('conversation.workspaceVcs.trackWorkspace', { defaultValue: 'Track this workspace' }),
+            onOk: async () => {
+              try {
+                await ipcBridge.conversation.initWorkspaceVcs.invoke({ conversation_id });
+                Message.success(t('conversation.workspaceVcs.trackSuccess', { defaultValue: 'Workspace tracked' }));
+                dispatchWorkspaceOpenRemoteChangesEvent(conversation_id);
+              } catch (err) {
+                Message.error(
+                  t('conversation.workspaceVcs.trackFailed', { defaultValue: 'Failed to track workspace' })
+                );
+                console.error('[RemoteSessionActions] initWorkspaceVcs failed:', err);
+              }
+            },
+          });
+          return;
+        }
+        dispatchWorkspaceOpenRemoteChangesEvent(conversation_id);
+      } catch (error) {
+        Message.error(
           t('conversation.session.diffLocalMode', {
             defaultValue: 'Server diff is unavailable for local tool-host sessions.',
           })
         );
-        return;
+        console.error('[RemoteSessionActions] getWorkspaceVcs failed:', error);
       }
-      dispatchWorkspaceOpenRemoteChangesEvent(conversation_id);
     });
 
   // M19: load the server's global config into the editor (stashing a known-good
@@ -283,20 +341,20 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
           <span>{t('conversation.session.fork', { defaultValue: 'Fork session' })}</span>
         </div>
       </Menu.Item>
-      {toolHost === 'server' && (
-        <Menu.Item key='changes'>
-          <div className='flex items-center gap-8px'>
-            <FileText theme='outline' size='14' fill={iconColors.secondary} />
-            <span>{t('conversation.session.viewChanges', { defaultValue: 'View changes' })}</span>
-          </div>
-        </Menu.Item>
-      )}
-      <Menu.Item key='summarize'>
+      <Menu.Item key='changes'>
         <div className='flex items-center gap-8px'>
-          <Refresh theme='outline' size='14' fill={iconColors.secondary} />
-          <span>{t('conversation.session.summarize', { defaultValue: 'Summarize / compact' })}</span>
+          <FileText theme='outline' size='14' fill={iconColors.secondary} />
+          <span>{t('conversation.session.viewChanges', { defaultValue: 'View changes' })}</span>
         </div>
       </Menu.Item>
+      <Tooltip content={compactTooltip} disabled={!compactDisabled}>
+        <Menu.Item key='summarize' disabled={compactDisabled}>
+          <div className='flex items-center gap-8px'>
+            <Refresh theme='outline' size='14' fill={iconColors.secondary} />
+            <span>{t('conversation.session.summarize', { defaultValue: 'Summarize / compact' })}</span>
+          </div>
+        </Menu.Item>
+      </Tooltip>
       {isReverted && (
         <Menu.Item key='unrevert'>
           <div className='flex items-center gap-8px'>

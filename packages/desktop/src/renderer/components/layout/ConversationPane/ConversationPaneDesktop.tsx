@@ -5,7 +5,7 @@
  */
 
 import classNames from 'classnames';
-import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
@@ -92,32 +92,15 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
   const effectiveMaxWidth = Math.max(MIN_PANE_WIDTH_PX, viewportWidth - (layout?.siderWidth ?? 0) - CHAT_MIN_WIDTH_PX);
   const paneDisplayWidth = Math.min(Math.round(paneWidth), effectiveMaxWidth);
 
-  // The overlay covers the right edge of the chat region. Publish the space it
-  // occupies as a CSS variable on the parent layout-content so the chat
-  // content can inset its right edge and keep its content visually centered in
-  // the *remaining* area regardless of pane width. Zero when collapsed.
-  const paneRootRef = useRef<HTMLDivElement>(null);
-  const inset = collapsed ? 0 : paneDisplayWidth;
-  useEffect(() => {
-    const parent = paneRootRef.current?.parentElement;
-    if (!parent) return;
-    parent.style.setProperty('--conversation-pane-inset', `${inset}px`);
-    return () => {
-      parent.style.removeProperty('--conversation-pane-inset');
-    };
-  }, [inset]);
-
   return (
     <div
-      ref={paneRootRef}
       className={classNames(styles.paneRoot, {
         [styles.paneAnimating]: !isResizing,
         [styles.paneCollapsed]: collapsed,
       })}
-      // Absolute overlay pinned to the right edge. Keep a stable width and
-      // slide off-screen via translateX when collapsed so the chat layout is
-      // never reflowed.
-      style={{ width: paneDisplayWidth, transform: collapsed ? 'translateX(100%)' : 'translateX(0)' }}
+      // In-flow flex sibling. Width animates 0 ↔ paneDisplayWidth so neighbors
+      // reflow rather than being overlapped.
+      style={{ width: collapsed ? 0 : paneDisplayWidth, flexBasis: collapsed ? 0 : paneDisplayWidth }}
       aria-hidden={collapsed}
     >
       {!collapsed && (

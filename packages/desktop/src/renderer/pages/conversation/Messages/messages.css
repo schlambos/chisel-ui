@@ -251,6 +251,55 @@
   white-space: nowrap;
 }
 
+/* Compaction divider - mirrors reverted-divider style for consistency */
+.compaction-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 4px;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.compaction-divider__line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-light, var(--bg-3));
+}
+
+.compaction-divider__pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-2);
+  border: 1px solid var(--border-light, var(--bg-3));
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compaction-divider__hint {
+  flex-shrink: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-tertiary, var(--text-secondary));
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* Compaction summary - the structured recap rendered below the divider */
+.compaction-summary {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
 @media (max-width: 767px) {
   /* On narrow screens the pill + hint are the priority; the trailing
    * hint drops to a second line and both hairlines collapse to flex:auto

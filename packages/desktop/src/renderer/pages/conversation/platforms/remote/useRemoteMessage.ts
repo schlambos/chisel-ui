@@ -9,9 +9,9 @@ import type { AvailableCommand, TMessage, ToolProgress } from '@/common/chat/cha
 import { transformMessage } from '@/common/chat/chatLib';
 import type { SlashCommandItem } from '@/common/chat/slash/types';
 import type { IResponseMessage } from '@/common/adapter/ipcBridge';
-import type { TokenUsageData } from '@/common/config/storage';
+import type { TokenUsageData, TChatConversation } from '@/common/config/storage';
 import { useAddOrUpdateMessage } from '@/renderer/pages/conversation/Messages/hooks';
-import { getConversationOrNull } from '@/renderer/pages/conversation/utils/conversationCache';
+import { getConversationOrNull, refreshConversationCache } from '@/renderer/pages/conversation/utils/conversationCache';
 import type { ThoughtData } from '@/renderer/components/chat/ThoughtDisplay';
 import { uuid } from '@/common/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -547,20 +547,19 @@ export const useRemoteMessage = (conversation_id: string): UseRemoteMessageRetur
           break;
         }
         case 'opencode_session_compacted': {
-          const compacted = message.data as {
-            summary?: string;
-            tokens_reclaimed?: number;
-            original_start_message_id?: string;
-            original_end_message_id?: string;
-          };
-          if (compacted) {
-            Notification.info({
-              title: t('conversation.remoteCompaction.title'),
-              content: t('conversation.remoteCompaction.notification', {
-                tokens: Math.round((compacted.tokens_reclaimed ?? 0) / 1024),
-              }),
-              duration: 5000,
-            });
+          // The divider + summary render from `extra` (backend-persisted);
+          // the toast is just a transient "it happened" cue. OpenCode shows no
+          // token metrics, so neither do we.
+          Notification.info({
+            title: t('conversation.remoteCompaction.title'),
+            content: t('conversation.remoteCompaction.notificationNoMetrics'),
+            duration: 5000,
+          });
+          // Backend persists extra on manual compact; refresh so MessageList divider updates.
+          if (conversation_id) {
+            void refreshConversationCache(conversation_id).catch((err) =>
+              console.warn('[useRemoteMessage] compaction cache refresh failed:', err)
+            );
           }
           break;
         }

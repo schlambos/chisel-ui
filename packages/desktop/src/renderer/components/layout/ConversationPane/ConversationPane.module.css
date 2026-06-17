@@ -1,19 +1,14 @@
 /* ConversationPane — right-side conversation navigation surface.
    Replaces the conversation list that used to live in the left Sider. */
 
-/* Right-docked nav pane that slides OVER the chat content (overlay) instead
-   of reserving an in-flow column. Being absolutely positioned, changing its
-   width or collapsing it never re-lays-out the chat sibling, so the centered
-   message column no longer marches sideways frame-by-frame. */
+/* Right-docked nav pane. In-flow flex sibling that reserves its own column
+   in the layout — never overlays chat/terminal/editor. */
 .paneRoot {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 30;
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  flex: 0 1 auto;
   min-width: 0;
   background-color: var(--bg-2);
   border-left: 1px solid color-mix(in srgb, var(--border-base) 50%, transparent);
@@ -21,15 +16,18 @@
   overflow: hidden;
 }
 
-/* Smooth collapse/expand — slide the overlay in/out via transform so the chat
-   layout width is untouched during the animation. Only applied while toggling
-   collapsed state; resize-dragging runs without it (instant). */
+/* Smooth collapse/expand — width transition mirroring the left sider.
+   Suppressed while resize-dragging so pixel-tracking stays pin-sharp. */
 .paneAnimating {
-  transition: transform var(--motion-slow) var(--ease-out-expo);
+  transition:
+    width var(--motion-slow) var(--ease-out-expo),
+    flex-basis var(--motion-slow) var(--ease-out-expo),
+    border-left-width var(--motion-slow) var(--ease-out-expo);
 }
 
-/* Fully collapsed: slide fully off the right edge and disable interaction. */
+/* Fully collapsed: clip content and drop the divider so no 1px seam shows. */
 .paneCollapsed {
+  border-left-width: 0;
   pointer-events: none;
 }
 

@@ -5,6 +5,7 @@
  */
 
 import { initApplicationBridge } from './applicationBridge';
+import { initApprovalBridge } from './approvalBridge';
 import { initDialogBridge } from './dialogBridge';
 import { initGitBridge } from './gitBridge';
 import { initLocalHistoryBridge } from './localHistoryBridge';
@@ -28,10 +29,12 @@ export function initAllBridges(_deps: BridgeDependencies = {}): void {
   initNotificationBridge();
   initWebuiBridge();
   initUntitledBackupBridge();
+  initApprovalBridge();
 }
 
 export {
   initApplicationBridge,
+  initApprovalBridge,
   initDialogBridge,
   initGitBridge,
   initLocalHistoryBridge,

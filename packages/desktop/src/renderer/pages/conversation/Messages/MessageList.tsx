@@ -8,7 +8,13 @@ import type { IConversationArtifact } from '@/common/adapter/ipcBridge';
 import type { IMessageAcpToolCall, IMessageToolCall, IMessageToolGroup, TMessage } from '@/common/chat/chatLib';
 import { useConversationContextSafe } from '@/renderer/hooks/context/ConversationContext';
 import { iconColors } from '@/renderer/styles/colors';
-import { computeRevertedRegion, isItemInactive } from './hooks';
+import {
+  computeRevertedRegion,
+  computeCompactionRegion,
+  isCompactionSummaryTranscriptMessage,
+  isItemInactive,
+  isItemCompactionStart,
+} from './hooks';
 import { CHAT_MESSAGE_JUMP_EVENT, type ChatMessageJumpDetail } from '@/renderer/utils/chat/chatMinimapEvents';
 import { Image } from '@arco-design/web-react';
 import { Down } from '@icon-park/react';
@@ -36,6 +42,7 @@ import MessageToolGroup from './components/MessageToolGroup';
 import MessageToolGroupSummary from './components/MessageToolGroupSummary';
 import MessageSkillSuggest from './components/MessageSkillSuggest';
 import MessageText from './components/MessageText';
+import MarkdownView from '@renderer/components/Markdown';
 import MessageThinking from './components/MessageThinking';
 import OpencodeErrorCard from './components/OpencodeErrorCard';
 import RetryIndicator from './components/RetryIndicator';
@@ -209,6 +216,14 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     [list, conversationContext?.extra]
   );
 
+  // Compaction divider state. When `compaction_start_message_id` exists in
+  // extra, render a divider at the first message matching that id (mirrors
+  // reverted-divider pattern). Empty start id → no divider, no crash.
+  const compactionRegion = useMemo(
+    () => computeCompactionRegion(list, conversationContext?.extra),
+    [list, conversationContext?.extra]
+  );
+
   // Pre-process message list to group tool outputs into summary cards
   const processedList = useMemo(() => {
     const result: Array<IMessageVO> = [];
@@ -252,6 +267,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
 
     for (let i = 0, len = list.length; i < len; i++) {
       const message = list[i];
+      if (isCompactionSummaryTranscriptMessage(message, conversationContext?.extra)) continue;
       // Skip hidden and available_commands messages
       if (message.hidden) continue;
       if (message.type === 'available_commands') continue;
@@ -308,7 +324,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     return [...result, ...visibleArtifacts].toSorted(
       (a, b) => getProcessedItemCreatedAt(a) - getProcessedItemCreatedAt(b)
     );
-  }, [artifacts, list]);
+  }, [artifacts, conversationContext?.extra, list]);
 
   // Use auto-scroll hook
   const {
@@ -422,13 +438,66 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
   };
   const firstInactiveProcessedIndex = useMemo(findFirstInactiveProcessedIndex, [revertedRegion, processedList, list]);
 
+  // Find first compaction item for divider (mirrors reverted pattern)
+  const findFirstCompactionProcessedIndex = (): number | null => {
+    if (compactionRegion === null) return null;
+    for (let i = 0; i < processedList.length; i++) {
+      const item = processedList[i];
+      if (isItemCompactionStart(item, list, compactionRegion)) return i;
+    }
+    return null;
+  };
+  const firstCompactionProcessedIndex = useMemo(findFirstCompactionProcessedIndex, [
+    compactionRegion,
+    processedList,
+    list,
+  ]);
+
   const renderItem = (index: number, item: (typeof processedList)[0]) => {
     const highlighted = matchesTargetMessage(item, highlightedMessageId);
     const inactive = revertedRegion !== null && isItemInactive(item, list, revertedRegion);
     // Prepend the divider only on the first inactive item so it appears
     // exactly once, immediately before the first inactive message.
-    const showDivider = inactive && index === firstInactiveProcessedIndex;
-    const divider = showDivider ? (
+    const showRevertedDivider = inactive && index === firstInactiveProcessedIndex;
+    // The compaction anchor is the BOUNDARY (last pre-compaction message), so
+    // the divider — and the summary that recaps the compressed range — render
+    // AFTER this item, separating old chat from the new compressed context
+    // (matching OpenCode's UX). A firm line / "Session compacted" label / line,
+    // then the structured summary markdown as a message below it. No token hint.
+    const showCompactionDivider = compactionRegion !== null && index === firstCompactionProcessedIndex;
+    const compactionSummary = (conversationContext?.extra as { compaction_summary?: string | null } | undefined)
+      ?.compaction_summary;
+    const compactionTail = showCompactionDivider ? (
+      <>
+        <div
+          data-testid='compaction-divider'
+          role='separator'
+          aria-label={t('conversation.compaction.dividerLabel', {
+            defaultValue: 'Session compacted',
+          })}
+          className='compaction-divider'
+        >
+          <span className='compaction-divider__line' aria-hidden='true' />
+          <span className='compaction-divider__pill'>
+            {t('conversation.compaction.dividerLabel', {
+              defaultValue: 'Session compacted',
+            })}
+          </span>
+          <span className='compaction-divider__line' aria-hidden='true' />
+        </div>
+        {typeof compactionSummary === 'string' && compactionSummary.trim().length > 0 ? (
+          <div
+            data-testid='compaction-summary'
+            className='compaction-summary message-item px-6px m-t-4px max-w-full w-full'
+          >
+            <MarkdownView>{compactionSummary}</MarkdownView>
+          </div>
+        ) : null}
+      </>
+    ) : null;
+
+    // Reverted divider (existing)
+    const revertedDivider = showRevertedDivider ? (
       <div
         data-testid='reverted-divider'
         role='separator'
@@ -451,13 +520,17 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
         <span className='reverted-divider__line' aria-hidden='true' />
       </div>
     ) : null;
+
+    // The reverted divider still prepends (it marks the start of the dimmed
+    // tail). The compaction tail (divider + summary) APPENDS after the
+    // boundary item — old chat above, compressed context below.
     if ('type' in item && item.type === 'artifact') {
       if (item.artifact.kind === 'cron_trigger') {
         return null;
       }
       return (
         <div key={item.id}>
-          {divider}
+          {revertedDivider}
           <div
             id={`message-${getProcessedItemAnchorId(item)}`}
             data-conversation-artifact-kind={item.artifact.kind}
@@ -469,13 +542,14 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
           >
             <MessageSkillSuggest artifact={item.artifact} />
           </div>
+          {compactionTail}
         </div>
       );
     }
     if ('type' in item && ['file_summary', 'tool_summary'].includes(item.type)) {
       return (
         <div key={item.id}>
-          {divider}
+          {revertedDivider}
           <div
             id={`message-${getProcessedItemAnchorId(item)}`}
             className={classNames('min-w-0 message-item px-6px m-t-4px max-w-full w-full', item.type, {
@@ -488,13 +562,15 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
               <MessageToolGroupSummary messages={item.messages}></MessageToolGroupSummary>
             )}
           </div>
+          {compactionTail}
         </div>
       );
     }
     return (
       <div key={(item as TMessage).id}>
-        {divider}
+        {revertedDivider}
         <MessageItem message={item as TMessage} highlighted={highlighted} inactive={inactive} />
+        {compactionTail}
       </div>
     );
   };

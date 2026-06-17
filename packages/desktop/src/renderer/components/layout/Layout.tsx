@@ -334,73 +334,73 @@ const Layout: React.FC<{
 
               <ArcoLayout className={'size-full layout flex-1 min-h-0'}>
                 {showMainSider ? (
-                <ArcoLayout.Sider
-                  collapsedWidth={isMobile ? 0 : 0}
-                  collapsed={collapsed}
-                  width={siderDragging && !isMobile && !collapsed ? undefined : siderWidth}
-                  className={classNames('!bg-2 layout-sider', isMobile ? mobileSiderClass : undefined, {
-                    'layout-sider--icon-only': siderIconOnly,
-                  })}
-                  style={siderDragStyle}
-                >
-                  <div
-                    role='navigation'
-                    data-layout-region='sider'
-                    tabIndex={-1}
-                    className='size-full flex flex-col min-h-0'
+                  <ArcoLayout.Sider
+                    collapsedWidth={isMobile ? 0 : 0}
+                    collapsed={collapsed}
+                    width={siderDragging && !isMobile && !collapsed ? undefined : siderWidth}
+                    className={classNames('!bg-2 layout-sider', isMobile ? mobileSiderClass : undefined, {
+                      'layout-sider--icon-only': siderIconOnly,
+                    })}
+                    style={siderDragStyle}
                   >
-                    {isMobile && !collapsed ? (
-                      <ArcoLayout.Header
-                        className={classNames(
-                          'flex items-center justify-end pt-6px pb-6px pl-10px pr-8px gap-8px layout-sider-header layout-sider-header--mobile'
-                        )}
-                      >
-                        <button
-                          type='button'
-                          className='app-titlebar__button app-titlebar__button--mobile'
-                          onClick={() => setCollapsed(true)}
-                          title={t('terminal.layout.regionSider', { defaultValue: 'Sidebar navigation' })}
-                          aria-label={t('common.collapse', { defaultValue: 'Collapse' })}
-                        >
-                          <SidebarIcon size={18} strokeWidth={2.5} />
-                        </button>
-                      </ArcoLayout.Header>
-                    ) : null}
-                    <ArcoLayout.Content className='pt-0 px-4px pb-0 layout-sider-content'>
-                      {React.isValidElement(sider)
-                        ? React.cloneElement(sider, {
-                            onSessionClick: () => {
-                              cleanupSiderTooltips();
-                              if (isMobile) setCollapsed(true);
-                            },
-                            collapsed,
-                          } as any)
-                        : sider}
-                    </ArcoLayout.Content>
-                    {!isMobile && (
-                      <div
-                        role='separator'
-                        aria-orientation='vertical'
-                        aria-label={t('common.resizeSidebar', { defaultValue: 'Resize sidebar' })}
-                        aria-valuemin={SIDER_MIN_WIDTH}
-                        aria-valuemax={SIDER_MAX_WIDTH}
-                        aria-valuenow={desktopSiderWidth}
-                        tabIndex={0}
-                        className='absolute top-0 h-full w-12px z-20 cursor-col-resize group flex items-center justify-center'
-                        style={{ right: '-6px' }}
-                        onMouseDown={beginSiderResizeDrag}
-                        onKeyDown={handleSiderResizeKeyDown}
-                      >
-                        <div
+                    <div
+                      role='navigation'
+                      data-layout-region='sider'
+                      tabIndex={-1}
+                      className='size-full flex flex-col min-h-0'
+                    >
+                      {isMobile && !collapsed ? (
+                        <ArcoLayout.Header
                           className={classNames(
-                            'pointer-events-none block h-full w-2px bg-bg-3 opacity-90 rd-full transition-all duration-150 group-hover:w-6px group-hover:bg-brand group-focus-visible:w-6px group-focus-visible:bg-brand group-active:w-6px group-active:bg-brand',
-                            siderDragging && '!w-6px !bg-brand'
+                            'flex items-center justify-end pt-6px pb-6px pl-10px pr-8px gap-8px layout-sider-header layout-sider-header--mobile'
                           )}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </ArcoLayout.Sider>
+                        >
+                          <button
+                            type='button'
+                            className='app-titlebar__button app-titlebar__button--mobile'
+                            onClick={() => setCollapsed(true)}
+                            title={t('terminal.layout.regionSider', { defaultValue: 'Sidebar navigation' })}
+                            aria-label={t('common.collapse', { defaultValue: 'Collapse' })}
+                          >
+                            <SidebarIcon size={18} strokeWidth={2.5} />
+                          </button>
+                        </ArcoLayout.Header>
+                      ) : null}
+                      <ArcoLayout.Content className='pt-0 px-4px pb-0 layout-sider-content'>
+                        {React.isValidElement(sider)
+                          ? React.cloneElement(sider, {
+                              onSessionClick: () => {
+                                cleanupSiderTooltips();
+                                if (isMobile) setCollapsed(true);
+                              },
+                              collapsed,
+                            } as any)
+                          : sider}
+                      </ArcoLayout.Content>
+                      {!isMobile && (
+                        <div
+                          role='separator'
+                          aria-orientation='vertical'
+                          aria-label={t('common.resizeSidebar', { defaultValue: 'Resize sidebar' })}
+                          aria-valuemin={SIDER_MIN_WIDTH}
+                          aria-valuemax={SIDER_MAX_WIDTH}
+                          aria-valuenow={desktopSiderWidth}
+                          tabIndex={0}
+                          className='absolute top-0 h-full w-12px z-20 cursor-col-resize group flex items-center justify-center'
+                          style={{ right: '-6px' }}
+                          onMouseDown={beginSiderResizeDrag}
+                          onKeyDown={handleSiderResizeKeyDown}
+                        >
+                          <div
+                            className={classNames(
+                              'pointer-events-none block h-full w-2px bg-bg-3 opacity-90 rd-full transition-all duration-150 group-hover:w-6px group-hover:bg-brand group-focus-visible:w-6px group-focus-visible:bg-brand group-active:w-6px group-active:bg-brand',
+                              siderDragging && '!w-6px !bg-brand'
+                            )}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </ArcoLayout.Sider>
                 ) : null}
 
                 <div
@@ -436,11 +436,6 @@ const Layout: React.FC<{
                           // pinned rightmost (order 3) in its own component.
                           order: editorDock === 'end' ? 1 : 2,
                           minWidth: 'var(--app-min-width, 360px)',
-                          // Inset the chat content by the width of the overlay
-                          // conversation pane so content stays centered in the
-                          // visible (un-covered) area. Var is published by
-                          // ConversationPaneDesktop; 0 when collapsed.
-                          paddingRight: 'var(--conversation-pane-inset, 0px)',
                         }}
                       >
                         <Outlet />
