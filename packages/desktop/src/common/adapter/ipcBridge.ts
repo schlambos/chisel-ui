@@ -112,7 +112,13 @@ import {
   fromBackendTeamOptional,
   toBackendAgent,
 } from './teamMapper';
-import type { ApprovalRule } from '@process/services/approval/types';
+import type {
+  ApprovalAudit,
+  ApprovalRule,
+  ApprovalRuleCreate,
+  ApprovalRuleScope,
+  ApprovalRuleUpdate,
+} from '@process/services/approval/types';
 import { absoluteToRelativePath, fromBackendWorkspaceList } from './workspaceMapper';
 
 // ---------------------------------------------------------------------------
@@ -2374,4 +2380,10 @@ export const approvalRules = {
   delete: bridge.buildProvider<IBridgeResponse<{ deleted: boolean }>, { id: string; sessionId: string }>(
     'approval-rules.delete'
   ),
+  create: bridge.buildProvider<IBridgeResponse<ApprovalRule>, { input: ApprovalRuleCreate }>('approval-rules.create'),
+  update: bridge.buildProvider<IBridgeResponse<ApprovalRule>, { id: string; update: ApprovalRuleUpdate }>(
+    'approval-rules.update'
+  ),
+  list: bridge.buildProvider<IBridgeResponse<ApprovalRule[]>, { scope?: ApprovalRuleScope }>('approval-rules.list'),
+  listAudits: bridge.buildProvider<IBridgeResponse<ApprovalAudit[]>, { limit?: number }>('approval-rules.list-audits'),
 };

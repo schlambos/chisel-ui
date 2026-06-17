@@ -14,6 +14,7 @@ export {
 } from './evaluator';
 export { matchesApprovalRule } from './matcher';
 export { CHISL_APPROVAL_DB_FILENAME, resolveChislApprovalDbPath } from './paths';
+export { isPatternProtected, PROTECTED_PATH_GLOBS, requestTouchesProtectedPath } from './protectedPaths';
 export {
   appendApprovalAudit,
   createApprovalRule,

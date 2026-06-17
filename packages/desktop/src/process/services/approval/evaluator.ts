@@ -6,6 +6,7 @@
 
 import { mapApprovalActionToDecision, mapApprovalActionToReply, resolveEndpointUsed } from './action';
 import { matchesApprovalRule } from './matcher';
+import { requestTouchesProtectedPath } from './protectedPaths';
 import type {
   ApprovalEvaluationContext,
   ApprovalEvaluationResult,
@@ -82,6 +83,20 @@ export function evaluateApprovalRules(
   now = Date.now()
 ): ApprovalEvaluationResult {
   const started = Date.now();
+
+  if (requestTouchesProtectedPath(request.patterns)) {
+    const replySent = mapApprovalActionToReply('deny');
+    return {
+      decision: 'deny',
+      action: 'deny',
+      rule: null,
+      replySent,
+      endpointUsed: resolveEndpointUsed(replySent),
+      reason: 'Protected path; access cannot be granted',
+      evaluationMs: Date.now() - started,
+    };
+  }
+
   const matching = findMatchingApprovalRules(rules, request, context, now);
 
   if (matching.length === 0) {

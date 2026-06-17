@@ -9,6 +9,7 @@ const Guid = React.lazy(() => import('@renderer/pages/guid'));
 const AgentSettings = React.lazy(() => import('@renderer/pages/settings/AgentSettings'));
 const AssistantSettings = React.lazy(() => import('@renderer/pages/settings/AssistantSettings'));
 const DisplaySettings = React.lazy(() => import('@renderer/pages/settings/DisplaySettings'));
+const PermissionsSettings = React.lazy(() => import('@renderer/pages/settings/PermissionsSettings'));
 const ModeSettings = React.lazy(() => import('@renderer/pages/settings/ModeSettings'));
 const SystemSettings = React.lazy(() => import('@renderer/pages/settings/SystemSettings'));
 const WebuiSettings = React.lazy(() => import('@renderer/pages/settings/WebuiSettings'));
@@ -72,6 +73,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
             <Route path='skills-hub' element={<Navigate to='agent' replace />} />
             <Route path='tools' element={<Navigate to='agent' replace />} />
             <Route path='display' element={withRouteFallback(DisplaySettings)} />
+            <Route path='permissions' element={withRouteFallback(PermissionsSettings)} />
             <Route path='webui' element={withRouteFallback(WebuiSettings)} />
             <Route path='sidecar' element={<Navigate to='agent' replace />} />
             <Route path='pet' element={<Navigate to='display' replace />} />
