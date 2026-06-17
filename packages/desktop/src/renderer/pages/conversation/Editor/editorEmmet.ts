@@ -32,12 +32,7 @@ const MARKUP_LANGUAGES = new Set([
   'php',
 ]);
 
-const STYLESHEET_LANGUAGES = new Set([
-  'css',
-  'scss',
-  'less',
-  'sass',
-]);
+const STYLESHEET_LANGUAGES = new Set(['css', 'scss', 'less', 'sass']);
 
 /** Languages that may be JSX — requires URI extension check to disambiguate. */
 const JSX_LANGUAGES = new Set(['jsx', 'tsx', 'typescript', 'javascript']);
@@ -99,7 +94,7 @@ export function isEmmetLanguage(languageId: string, filePath?: string): boolean 
  * no expandable abbreviation is found.
  */
 export function tryExpandEmmet(
-  editor: monaco.editor.IStandaloneCodeEditor,
+  editor: monaco.editor.IStandaloneCodeEditor
 ): { range: monaco.IRange; text: string } | null {
   const model = editor.getModel();
   if (!model) return null;

@@ -45,10 +45,18 @@ const editorLineDecorationClassNames = (kind: GitLineDecoration['kind']): string
 };
 
 const minimapColorId = (kind: GitLineDecoration['kind']): string =>
-  kind === 'added' ? 'minimapGutter.addedBackground' : kind === 'modified' ? 'minimapGutter.modifiedBackground' : 'minimapGutter.deletedBackground';
+  kind === 'added'
+    ? 'minimapGutter.addedBackground'
+    : kind === 'modified'
+      ? 'minimapGutter.modifiedBackground'
+      : 'minimapGutter.deletedBackground';
 
 const overviewRulerColorId = (kind: GitLineDecoration['kind']): string =>
-  kind === 'added' ? 'editorOverviewRuler.addedForeground' : kind === 'modified' ? 'editorOverviewRuler.modifiedForeground' : 'editorOverviewRuler.deletedForeground';
+  kind === 'added'
+    ? 'editorOverviewRuler.addedForeground'
+    : kind === 'modified'
+      ? 'editorOverviewRuler.modifiedForeground'
+      : 'editorOverviewRuler.deletedForeground';
 
 const applyDecorations = (editor: monaco.editor.IStandaloneCodeEditor, decorations: GitLineDecoration[]): void => {
   const modelDecorations: monaco.editor.IModelDeltaDecoration[] = [];

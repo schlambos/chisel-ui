@@ -22,7 +22,12 @@
  */
 
 import * as monaco from '@aionui/editor-monaco';
-import type { OpenEditor, IEditorOptions, IResolvedTextEditorModel, IReference } from '@codingame/monaco-vscode-editor-service-override';
+import type {
+  OpenEditor,
+  IEditorOptions,
+  IResolvedTextEditorModel,
+  IReference,
+} from '@codingame/monaco-vscode-editor-service-override';
 import type { ICodeEditor } from '@codingame/monaco-vscode-api/vscode/vs/editor/browser/editorBrowser';
 import { fileIdentityKey } from './editorMonacoUri';
 

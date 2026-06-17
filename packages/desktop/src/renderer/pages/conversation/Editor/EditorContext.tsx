@@ -277,9 +277,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         // Untitled buffers have no path, so they're naturally excluded from
         // the persisted group layout — they rehydrate into the focused group.
         const pathForKey = (key: string): string | null =>
-          state.buffers.find(
-            (b) => b.key === key && fileIdentityKey(b.workspace ?? '') === wsKey
-          )?.filePath ?? null;
+          state.buffers.find((b) => b.key === key && fileIdentityKey(b.workspace ?? '') === wsKey)?.filePath ?? null;
         const groups = state.groups
           .map((g) => {
             const entryPaths = g.bufferKeys.map(pathForKey).filter((p): p is string => Boolean(p));

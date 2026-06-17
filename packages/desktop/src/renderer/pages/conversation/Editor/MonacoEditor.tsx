@@ -552,9 +552,7 @@ const MonacoEditor = React.forwardRef<MonacoEditorHandle, Props>(function Monaco
 
         const result = tryExpandEmmet(ed);
         if (result) {
-          ed.executeEdits('emmet', [
-            { range: result.range, text: result.text, forceMoveMarkers: true },
-          ]);
+          ed.executeEdits('emmet', [{ range: result.range, text: result.text, forceMoveMarkers: true }]);
         }
       },
     });

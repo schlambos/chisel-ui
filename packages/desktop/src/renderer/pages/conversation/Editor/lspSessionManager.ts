@@ -16,8 +16,7 @@ import { fileIdentityKey } from './editorMonacoUri';
 
 type SessionKey = string;
 
-const sessionKey = (workspace: string, language: string): SessionKey =>
-  `${fileIdentityKey(workspace)}::${language}`;
+const sessionKey = (workspace: string, language: string): SessionKey => `${fileIdentityKey(workspace)}::${language}`;
 
 type ManagedSession = {
   workspace: string;

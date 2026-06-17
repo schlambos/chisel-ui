@@ -31,10 +31,12 @@ type TsLanguageDefaults = {
   setDiagnosticsOptions(options: { noSemanticValidation: boolean; noSyntaxValidation: boolean }): void;
 };
 
-type TsLanguageNamespace = {
-  typescriptDefaults: TsLanguageDefaults;
-  javascriptDefaults: TsLanguageDefaults;
-} | undefined;
+type TsLanguageNamespace =
+  | {
+      typescriptDefaults: TsLanguageDefaults;
+      javascriptDefaults: TsLanguageDefaults;
+    }
+  | undefined;
 
 const tsDefaults = (monaco.languages as unknown as { typescript?: TsLanguageNamespace }).typescript;
 
