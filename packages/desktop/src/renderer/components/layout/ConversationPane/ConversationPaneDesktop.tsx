@@ -51,7 +51,7 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
 
   // The width transition is ALWAYS on (so a collapse/expand toggle eases in
   // the very same render the width changes — mirrors the left sider's
-  // `--duration-slow` / `--ease-out-expo` slide) and is suppressed only while
+  // `--duration-slow` / `--ease-in-out` slide) and is suppressed only while
   // a resize-drag is in flight, so dragging stays pixel-perfect with no lag.
   const [isResizing, setIsResizing] = useState(false);
   useEffect(() => {

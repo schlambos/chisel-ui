@@ -14,15 +14,17 @@
   border-left: 1px solid color-mix(in srgb, var(--border-base) 50%, transparent);
   box-sizing: border-box;
   overflow: hidden;
+  contain: layout paint;
 }
 
 /* Smooth collapse/expand — width transition mirroring the left sider.
    Suppressed while resize-dragging so pixel-tracking stays pin-sharp. */
 .paneAnimating {
   transition:
-    width var(--motion-slow) var(--ease-out-expo),
-    flex-basis var(--motion-slow) var(--ease-out-expo),
-    border-left-width var(--motion-slow) var(--ease-out-expo);
+    width var(--duration-slow) var(--ease-in-out),
+    flex-basis var(--duration-slow) var(--ease-in-out),
+    border-left-width var(--duration-slow) var(--ease-in-out);
+  will-change: width, flex-basis;
 }
 
 /* Fully collapsed: clip content and drop the divider so no 1px seam shows. */
