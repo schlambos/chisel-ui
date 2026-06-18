@@ -52,7 +52,7 @@ declare module 'emmet' {
   export function extract(
     line: string,
     pos?: number,
-    options?: Partial<{ type: SyntaxType; lookAhead: boolean; prefix: string }>,
+    options?: Partial<{ type: SyntaxType; lookAhead: boolean; prefix: string }>
   ): ExtractedAbbreviation | undefined;
   export function resolveConfig(config?: UserConfig, globals?: Record<string, Partial<Config>>): Config;
 }

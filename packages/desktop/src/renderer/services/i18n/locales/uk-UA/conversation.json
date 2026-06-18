@@ -212,15 +212,15 @@
       "agentModified": "Agent",
       "agentModifiedTooltip": "Modified by the agent in this conversation"
     },
-"files": {
-       "expandFlyout": "Expand file tree",
-       "flyoutTitle": "Project files",
-       "flyoutDescription": "Browse and manage workspace files with more room."
-     },
-     "approvals": {
-       "tab": "Запити",
-       "empty": "Немає запитів, що очікують."
-     },
+    "files": {
+      "expandFlyout": "Expand file tree",
+      "flyoutTitle": "Project files",
+      "flyoutDescription": "Browse and manage workspace files with more room."
+    },
+    "approvals": {
+      "tab": "Запити",
+      "empty": "Немає запитів, що очікують."
+    },
     "todos": {
       "tab": "Завдання",
       "progress": "{{completed}} з {{total}} виконано",

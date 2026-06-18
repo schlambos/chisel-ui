@@ -38,7 +38,7 @@ const ConversationPaneBottomPanel: React.FC<ConversationPaneBottomPanelProps> = 
 
   return (
     <div className='flex flex-col size-full min-h-0' data-testid='conversation-pane-bottom-panel'>
-<Tabs
+      <Tabs
         activeTab={activeTab}
         onChange={(key) => setActiveTab(key as BottomTab)}
         type='line'

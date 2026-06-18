@@ -8,18 +8,18 @@
 //   node scripts/sync-opencode-types.js          # print ok
 //   node scripts/sync-opencode-types.js --check   # exit 0 on match, exit 2 on drift
 
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 // ── Paths ────────────────────────────────────────────────────────────────────
 // This script lives at AionUi/scripts/sync-opencode-types.js.
 // chisl-root is one level above AionUi.
 const scriptDir = path.dirname(__filename);
-const aionUiDir = path.resolve(scriptDir, "..");
-const chislRoot = path.resolve(aionUiDir, "..");
+const aionUiDir = path.resolve(scriptDir, '..');
+const chislRoot = path.resolve(aionUiDir, '..');
 
-const versionJsonPath = path.join(chislRoot, "opencode-sdk-version.json");
-const packageJsonPath = path.join(aionUiDir, "package.json");
+const versionJsonPath = path.join(chislRoot, 'opencode-sdk-version.json');
+const packageJsonPath = path.join(aionUiDir, 'package.json');
 
 // ── Read & parse ─────────────────────────────────────────────────────────────
 if (!fs.existsSync(versionJsonPath)) {
@@ -27,8 +27,8 @@ if (!fs.existsSync(versionJsonPath)) {
   process.exit(2);
 }
 
-const versionJson = JSON.parse(fs.readFileSync(versionJsonPath, "utf8"));
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+const versionJson = JSON.parse(fs.readFileSync(versionJsonPath, 'utf8'));
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 const pinnedPackage = versionJson.package;
 const pinnedVersion = versionJson.version;
@@ -42,7 +42,7 @@ const devDeps = packageJson.devDependencies || {};
 const installedVersion = devDeps[pinnedPackage];
 
 // ── Check ────────────────────────────────────────────────────────────────────
-const isCheck = process.argv.includes("--check");
+const isCheck = process.argv.includes('--check');
 
 if (!installedVersion) {
   const msg = `AionUi/package.json devDependencies missing "${pinnedPackage}" — add it at version "${pinnedVersion}"`;
