@@ -6,5 +6,7 @@
 
 export { default as ApprovalCardBase } from './ApprovalCardBase';
 export type { ApprovalCardBaseProps } from './ApprovalCardBase';
+export { default as ModifyResubmitDialog } from './ModifyResubmitDialog';
+export type { ModifyResubmitDialogProps } from './ModifyResubmitDialog';
 export { classifyKind, fromAcpOptions, fromChislOptions } from './approvalOptions';
 export type { AcpOption, ApprovalOption, ApprovalOptionKind, ChislOption } from './approvalOptions';

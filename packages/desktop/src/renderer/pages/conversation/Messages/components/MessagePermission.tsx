@@ -7,8 +7,9 @@
 import type { IMessagePermission, TMessage } from '@/common/chat/chatLib';
 import { ipcBridge } from '@/common';
 import { useUpdateMessageList } from '@/renderer/pages/conversation/Messages/hooks';
-import { ApprovalCardBase, fromChislOptions } from '@renderer/components/approval';
-import { Checkbox } from '@arco-design/web-react';
+import { ApprovalCardBase, fromChislOptions, ModifyResubmitDialog } from '@renderer/components/approval';
+import { Button, Checkbox } from '@arco-design/web-react';
+import { EditOne } from '@icon-park/react';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import MessageMcpElicitation from './MessageMcpElicitation';
@@ -67,6 +68,10 @@ const MessagePermission: React.FC<MessagePermissionProps> = React.memo(({ messag
   // state visible across transient prop flips.
   const propResponded = Boolean((message.content as { responded?: boolean } | undefined)?.responded);
   const [isResponding, setIsResponding] = useState(false);
+  const [modifyDialogVisible, setModifyDialogVisible] = useState(false);
+
+  const isShellCommand = command_type === 'run_shell';
+  const canEditResend = isShellCommand && !propResponded && !isResponding;
 
   // P1.2a (D6): inheritance row. Only shown for sub-agent-attributed
   // prompts (parent_session_id set), AND for kinds that aren't in the
@@ -96,11 +101,6 @@ const MessagePermission: React.FC<MessagePermissionProps> = React.memo(({ messag
         const payload: Record<string, unknown> = { value: option.id };
         if (extraParams) payload.params = extraParams;
         if (inheritToSubagents && parent_session_id) {
-          // Ride-along so the backend can record the inheritance on the
-          // blessable sub-agent set. The backend reads
-          // `data.inherit_to_subagents` only when `value` is a granting
-          // option (allow_dir / allow_session / always); for once/reject
-          // the flag is ignored.
           payload.inherit_to_subagents = true;
         }
         await ipcBridge.conversation.confirmation.confirm.invoke({
@@ -138,37 +138,100 @@ const MessagePermission: React.FC<MessagePermissionProps> = React.memo(({ messag
     ]
   );
 
-  return (
-    <ApprovalCardBase
-      testIdPrefix='message-permission'
-      parentSessionId={parent_session_id ?? null}
-      sessionId={session_id ?? null}
-      action={action ?? null}
-      title={title ?? null}
-      description={description ?? null}
-      commandType={shellCommandLine ?? command_type ?? null}
-      approvalCallId={call_id ?? null}
-      targetPath={typeof targetPath === 'string' && targetPath.startsWith('/') ? targetPath : null}
-      options={normalized}
-      responded={propResponded}
-      onConfirm={handleConfirm}
-      onReject={() => {
-        void handleConfirm({ id: 'reject' });
-      }}
-      bodySlot={
-        showInheritanceRow ? (
-          <div className='flex items-center gap-8px px-20px' data-testid='message-permission-inheritance-row'>
-            <Checkbox
-              checked={inheritToSubagents}
-              onChange={(v) => setInheritToSubagents(Boolean(v))}
-              disabled={isHighRisk}
-            >
-              {isHighRisk ? t('conversation.approval.inheritanceHighRiskOff') : t('conversation.approval.inheritance')}
-            </Checkbox>
-          </div>
-        ) : null
+  const handleResubmit = useCallback(
+    async (modifiedCommand: string) => {
+      setModifyDialogVisible(false);
+      if (isResponding) return;
+      setIsResponding(true);
+      try {
+        await ipcBridge.conversation.confirmation.confirm.invoke({
+          conversation_id: message.conversation_id,
+          call_id,
+          msg_id: message.msg_id || '',
+          data: { value: 'reject' },
+          always_allow: false,
+        });
+        updateMessageList((list) =>
+          list.map((m) => {
+            if (m.id !== message.id) return m;
+            const next = {
+              ...m,
+              content: { ...(m.content as object), responded: true, response: 'reject' },
+            } as unknown as TMessage;
+            return next;
+          })
+        );
+        await ipcBridge.conversation.resubmitShellCommand.invoke({
+          conversation_id: message.conversation_id,
+          session_id: session_id ?? '',
+          original_call_id: call_id ?? '',
+          modified_command: modifiedCommand,
+        });
+      } catch (error) {
+        console.error('Error resubmitting shell command:', error);
+      } finally {
+        setIsResponding(false);
       }
-    />
+    },
+    [isResponding, call_id, message.conversation_id, message.msg_id, message.id, session_id, updateMessageList]
+  );
+
+  return (
+    <>
+      <ApprovalCardBase
+        testIdPrefix='message-permission'
+        parentSessionId={parent_session_id ?? null}
+        sessionId={session_id ?? null}
+        action={action ?? null}
+        title={title ?? null}
+        description={description ?? null}
+        commandType={shellCommandLine ?? command_type ?? null}
+        approvalCallId={call_id ?? null}
+        targetPath={typeof targetPath === 'string' && targetPath.startsWith('/') ? targetPath : null}
+        options={normalized}
+        responded={propResponded}
+        onConfirm={handleConfirm}
+        onReject={() => {
+          void handleConfirm({ id: 'reject' });
+        }}
+        bodySlot={
+          <>
+            {canEditResend && (
+              <div style={{ paddingLeft: 20 }}>
+                <Button
+                  type='text'
+                  size='mini'
+                  icon={<EditOne theme='outline' size='14' />}
+                  onClick={() => setModifyDialogVisible(true)}
+                  data-testid='message-permission-edit-resend'
+                >
+                  Edit & Resend
+                </Button>
+              </div>
+            )}
+            {showInheritanceRow ? (
+              <div className='flex items-center gap-8px px-20px' data-testid='message-permission-inheritance-row'>
+                <Checkbox
+                  checked={inheritToSubagents}
+                  onChange={(v) => setInheritToSubagents(Boolean(v))}
+                  disabled={isHighRisk}
+                >
+                  {isHighRisk
+                    ? t('conversation.approval.inheritanceHighRiskOff')
+                    : t('conversation.approval.inheritance')}
+                </Checkbox>
+              </div>
+            ) : null}
+          </>
+        }
+      />
+      <ModifyResubmitDialog
+        visible={modifyDialogVisible}
+        command={shellCommandLine ?? description ?? ''}
+        onCancel={() => setModifyDialogVisible(false)}
+        onResubmit={handleResubmit}
+      />
+    </>
   );
 });
 

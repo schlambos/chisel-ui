@@ -11,6 +11,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ApprovalCardBase, fromChislOptions } from '@renderer/components/approval';
 import type { ApprovalOption } from '@renderer/components/approval';
 import styles from '@renderer/components/approval/ApprovalCardBase.module.css';
+import GroupedApprovalCard from './GroupedApprovalCard';
+import { groupPendingApprovals } from './GroupedApprovalCard';
 import type { WorkspaceApproval } from '../hooks/useWorkspaceApprovals';
 
 type ApprovalsListProps = {
@@ -67,6 +69,7 @@ function findQuestionOption(options: ApprovalOption[] | undefined, sentinel: str
 /** The Approvals workspace tab body: a scrollable list of pending approvals. */
 const ApprovalsList: React.FC<ApprovalsListProps> = ({ t, approvals, respond }) => {
   const prefersReducedMotion = prefersReducedMotionNow();
+  const { groups, ungrouped } = useMemo(() => groupPendingApprovals(approvals), [approvals]);
 
   if (approvals.length === 0) {
     return (
@@ -79,7 +82,10 @@ const ApprovalsList: React.FC<ApprovalsListProps> = ({ t, approvals, respond }) 
 
   return (
     <div className='h-full overflow-y-auto px-12px py-8px'>
-      {approvals.map((approval, index) => (
+      {groups.map((group) => (
+        <GroupedApprovalCard key={group.key} group={group} t={t} respond={respond} />
+      ))}
+      {ungrouped.map((approval, index) => (
         <ApprovalCardItem
           key={approval.call_id}
           approval={approval}

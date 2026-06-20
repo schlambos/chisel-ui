@@ -6,6 +6,7 @@
 
 import { ipcBridge } from '@/common';
 import type { IConfirmation } from '@/common/chat/chatLib';
+import { useConversationContextSafe } from '@/renderer/hooks/context/ConversationContext';
 import { dispatchWorkspaceHasApprovalsEvent } from '@/renderer/utils/workspace/workspaceEvents';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -52,9 +53,47 @@ function isTabEligible(c: WorkspaceApproval | undefined): c is WorkspaceApproval
   return Boolean(c && c.call_id && c.command_type !== 'mcp_elicitation');
 }
 
+/**
+ * Permission prompts (action !== 'question') are eligible for auto-accept /
+ * auto-deny via the JS approval evaluator. Question prompts and other
+ * confirmation types must always be shown to the user.
+ */
+function isAutoEvaluatable(c: WorkspaceApproval): boolean {
+  return c.action !== 'question' && c.command_type !== 'mcp_elicitation';
+}
+
+/**
+ * Extract the structured `patterns` array from the confirmation's description
+ * meta marker (P1.2a `[[chisl-meta:{...}]]` tail). The evaluator expects a
+ * `patterns` array; when no marker is present we fall back to an empty array
+ * and let the evaluator match on `permission` / `metadata` alone.
+ */
+const META_MARKER_RE = /\[\[chisl-meta:(\{[\s\S]*?\})\]\]$/;
+
+function extractPatterns(description: string | undefined): string[] {
+  if (!description) return [];
+  const m = META_MARKER_RE.exec(description);
+  if (!m || !m[1]) return [];
+  try {
+    const parsed = JSON.parse(m[1]) as Record<string, unknown>;
+    if (Array.isArray(parsed['patterns'])) {
+      return parsed['patterns'].filter((p): p is string => typeof p === 'string');
+    }
+  } catch {
+    // Malformed marker — fall through to empty patterns.
+  }
+  return [];
+}
+
 export function useWorkspaceApprovals(conversation_id: string | undefined): UseWorkspaceApprovalsReturn {
+  const context = useConversationContextSafe();
+  const sessionId = typeof context?.extra?.sessionKey === 'string' ? context.extra.sessionKey : undefined;
+  const workspaceRef = context?.workspace;
+
   const [approvals, setApprovals] = useState<WorkspaceApproval[]>([]);
   const prevHasRef = useRef(false);
+  /** call_ids we've already auto-evaluated, to avoid double-evaluating re-broadcasts. */
+  const evaluatedRef = useRef<Set<string>>(new Set());
 
   // Seed + reconcile from the backend-authoritative confirmation list, and
   // reset whenever the conversation changes.
@@ -102,6 +141,7 @@ export function useWorkspaceApprovals(conversation_id: string | undefined): UseW
       // Turn boundary: the backend auto-rejects pending approvals on turn end.
       if (message.type === 'finish' || message.type === 'error') {
         setApprovals([]);
+        evaluatedRef.current.clear();
       }
     });
   }, [conversation_id]);
@@ -130,6 +170,45 @@ export function useWorkspaceApprovals(conversation_id: string | undefined): UseW
     },
     [conversation_id]
   );
+
+  // Auto-evaluate new permission prompts against the JS approval evaluator.
+  // For each newly-arrived, auto-evaluatable approval that we haven't seen
+  // yet, ask the process to run `evaluateApprovalRules`. On `allow` we
+  // immediately confirm with `once`; on `deny` we immediately confirm with
+  // `reject`; on `manual`/`fallback` we leave it for the user.
+  useEffect(() => {
+    if (!sessionId) return;
+    const candidates = approvals.filter((a) => isAutoEvaluatable(a) && !evaluatedRef.current.has(a.call_id));
+    if (candidates.length === 0) return;
+
+    let cancelled = false;
+    for (const candidate of candidates) {
+      evaluatedRef.current.add(candidate.call_id);
+      void (async () => {
+        const result = await ipcBridge.approvalEvaluator.check.invoke({
+          callId: candidate.call_id,
+          sessionId,
+          permission: candidate.action ?? candidate.command_type ?? '',
+          patterns: extractPatterns(candidate.description),
+          commandType: candidate.command_type,
+          workspaceRef,
+          metadata: undefined,
+        });
+        if (cancelled || !result.success || !result.data) return;
+
+        const { decision, action } = result.data;
+        if (decision === 'allow' && action === 'once') {
+          await respond(candidate, 'once');
+        } else if (decision === 'deny' && action === 'reject') {
+          await respond(candidate, 'reject');
+        }
+        // manual / fallback → leave for the user
+      })();
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [approvals, sessionId, workspaceRef, respond]);
 
   const hasApprovals = approvals.length > 0;
 

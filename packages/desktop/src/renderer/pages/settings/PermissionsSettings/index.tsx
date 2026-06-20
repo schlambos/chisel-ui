@@ -1,4 +1,5 @@
 import { ipcBridge } from '@/common';
+import type { TChatConversation } from '@/common/config/storage';
 import type {
   ApprovalAudit,
   ApprovalMatcher,
@@ -8,9 +9,10 @@ import type {
   ApprovalRuleScope,
   ApprovalRuleUpdate,
 } from '@process/services/approval/types';
-import { Button, Card, Empty, Modal, Select, Spin, Switch, Table, Tag, Tooltip } from '@arco-design/web-react';
-import { Delete, Edit, Plus, Refresh } from '@icon-park/react';
+import { Button, Card, Empty, Message, Modal, Select, Spin, Switch, Table, Tag, Tooltip } from '@arco-design/web-react';
+import { Delete, Edit, Plus, Refresh, Upload } from '@icon-park/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 import SettingsPageWrapper from '../components/SettingsPageWrapper';
 import RuleFormModal from './RuleFormModal';
 
@@ -62,6 +64,8 @@ const SCOPE_OPTIONS: { label: string; value: ApprovalRuleScope | 'all' }[] = [
   { label: 'Session', value: 'session' },
 ];
 
+type RemoteConversationOption = { value: string; label: string };
+
 const PermissionsSettings: React.FC = () => {
   const [rules, setRules] = useState<ApprovalRule[]>([]);
   const [audits, setAudits] = useState<ApprovalAudit[]>([]);
@@ -72,6 +76,22 @@ const PermissionsSettings: React.FC = () => {
   const [editingRule, setEditingRule] = useState<ApprovalRule | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'rules' | 'audits'>('rules');
+  const [syncing, setSyncing] = useState(false);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | undefined>();
+
+  const { data: remoteConversationOptions } = useSWR<RemoteConversationOption[]>(
+    'remote-conversations.for-permissions-sync',
+    async () => {
+      const result = await ipcBridge.database.getUserConversations.invoke({ limit: 500 });
+      const items = result?.items ?? [];
+      return items
+        .filter((c: TChatConversation) => c.type === 'remote')
+        .map((c: TChatConversation) => ({
+          value: c.id,
+          label: `Remote Agent: ${c.name} (${c.id.slice(0, 8)})`,
+        }));
+    }
+  );
 
   const fetchRules = useCallback(async () => {
     setLoading(true);
@@ -171,10 +191,39 @@ const PermissionsSettings: React.FC = () => {
     await fetchRules();
   };
 
+  const handleSyncToServer = async () => {
+    if (!selectedConversationId) return;
+    setSyncing(true);
+    try {
+      const exportResult = await ipcBridge.approvalRules.exportForOpenCode.invoke();
+      if (!exportResult.success || !exportResult.data) {
+        Message.error(exportResult.msg || 'Failed to prepare permissions for sync');
+        return;
+      }
+
+      const syncResult = await ipcBridge.remoteAgent.syncPermissions.invoke({
+        conversation_id: selectedConversationId,
+        permissions: exportResult.data,
+      });
+
+      if (syncResult.success) {
+        Message.success(`Synced ${syncResult.synced_rules} permission rules to server`);
+      } else {
+        Message.error(syncResult.error || 'Failed to sync permissions');
+      }
+    } catch (err) {
+      Message.error(err instanceof Error ? err.message : 'Failed to sync permissions to server');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const filteredRules = useMemo(() => {
     if (scopeFilter === 'all') return rules;
     return rules.filter((r) => r.scope === scopeFilter);
   }, [rules, scopeFilter]);
+
+  const hasRemoteConversations = (remoteConversationOptions?.length ?? 0) > 0;
 
   const ruleColumns = useMemo(
     () => [
@@ -334,6 +383,29 @@ const PermissionsSettings: React.FC = () => {
         <h2 className='text-18px font-semibold text-t-primary m-0'>Permissions</h2>
         <div className='flex items-center gap-8px'>
           <Select value={scopeFilter} onChange={setScopeFilter} style={{ width: 140 }} options={SCOPE_OPTIONS} />
+          <Select
+            placeholder='Select conversation…'
+            value={selectedConversationId}
+            onChange={setSelectedConversationId}
+            style={{ width: 280 }}
+            showSearch
+            options={remoteConversationOptions ?? []}
+            notFoundContent='No remote-agent conversations'
+          />
+          <Tooltip
+            content={hasRemoteConversations ? undefined : 'Open a remote-agent conversation to sync permissions'}
+          >
+            <Button
+              type='primary'
+              size='small'
+              loading={syncing}
+              onClick={() => void handleSyncToServer()}
+              disabled={!selectedConversationId || syncing}
+              icon={<Upload theme='outline' size='14' />}
+            >
+              Save to Server
+            </Button>
+          </Tooltip>
           <Button type='primary' size='small' icon={<Plus theme='outline' size='14' />} onClick={handleCreate}>
             Add Rule
           </Button>

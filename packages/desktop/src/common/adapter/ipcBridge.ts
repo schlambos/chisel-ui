@@ -648,6 +648,17 @@ export const conversation = {
     ),
     remove: wsEmitter<{ conversation_id: string; id: string }>('confirmation.remove'),
   },
+  resubmitShellCommand: httpPost<
+    { success: boolean },
+    { conversation_id: string; session_id: string; original_call_id: string; modified_command: string }
+  >(
+    (p) => `/api/conversations/${p.conversation_id}/resubmit-shell`,
+    (p) => ({
+      session_id: p.session_id,
+      original_call_id: p.original_call_id,
+      modified_command: p.modified_command,
+    })
+  ),
   approval: {
     check: httpGet<{ approved: boolean }, { conversation_id: string; action: string; command_type?: string }>(
       (p) =>
@@ -1465,6 +1476,14 @@ export const remoteAgent = {
   /** Phase 3 (WS4): pushed on remote `session.idle` / `session.error` — health indicators. */
   sessionHealth:
     wsEmitter<import('@/common/types/agent/bgProcessTypes').RemoteSessionHealthEvent>('remote.sessionHealth'),
+  /** Perm Unit 7: sync approval rules to a remote conversation's OpenCode config (server-side PATCH /config persistence). */
+  syncPermissions: httpPost<
+    { success: boolean; synced_rules: number; error?: string },
+    { conversation_id: string; permissions: Record<string, string[]> }
+  >(
+    (p) => `/api/conversations/${p.conversation_id}/config/permissions/sync`,
+    (p) => ({ permissions: p.permissions })
+  ),
 };
 
 // ---------------------------------------------------------------------------
@@ -2386,4 +2405,50 @@ export const approvalRules = {
   ),
   list: bridge.buildProvider<IBridgeResponse<ApprovalRule[]>, { scope?: ApprovalRuleScope }>('approval-rules.list'),
   listAudits: bridge.buildProvider<IBridgeResponse<ApprovalAudit[]>, { limit?: number }>('approval-rules.list-audits'),
+  /** Perm Unit 7: export approval rules in OpenCode `{ allow: ["Bash(npm run *)", ...], deny: [...] }` format. */
+  exportForOpenCode: bridge.buildProvider<IBridgeResponse<Record<string, string[]>>, void>(
+    'approval-rules.export-for-opencode'
+  ),
+};
+
+/**
+ * Run the JS approval evaluator against a single pending permission
+ * request. Lives on the process side (the evaluator imports from
+ * `@process/services/approval`, which the renderer cannot import
+ * directly) and is exposed here as an IPC provider.
+ *
+ * The renderer passes the raw confirmation-derived request and the
+ * evaluator decides allow / deny / manual / fallback. On `allow` or
+ * `deny` the renderer auto-responds without showing the card; on
+ * `manual` or `fallback` the card is shown as usual.
+ */
+export type ApprovalCheckRequest = {
+  /** The pending confirmation's stable call id (used for request.id). */
+  callId: string;
+  /** OpenCode session id (main or child) that raised the prompt. */
+  sessionId: string;
+  /** Free-form permission string carried by the confirmation. */
+  permission: string;
+  /** Patterns from the confirmation payload (may be empty). */
+  patterns: string[];
+  /** Optional `command_type` from the confirmation, forwarded as `tool`. */
+  commandType?: string;
+  /** Optional workspace path, used as `context.workspaceRef`. */
+  workspaceRef?: string;
+  /** Optional metadata bag from the confirmation. */
+  metadata?: Record<string, unknown>;
+};
+
+export type ApprovalCheckResult = {
+  decision: 'allow' | 'deny' | 'manual' | 'fallback';
+  /** What the renderer should send as the confirmation value ('once' | 'reject'), or null when manual/fallback. */
+  action: 'once' | 'reject' | null;
+  /** Matched rule id, when a rule fired. */
+  ruleId?: string;
+  /** Human-readable reason for the decision. */
+  reason: string;
+};
+
+export const approvalEvaluator = {
+  check: bridge.buildProvider<IBridgeResponse<ApprovalCheckResult>, ApprovalCheckRequest>('approval-evaluator.check'),
 };
