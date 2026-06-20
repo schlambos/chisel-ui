@@ -40,6 +40,20 @@
   transition: none !important;
 }
 
+/* Layout content: padding-right reserves space for the absolutely-positioned
+   ConversationPane. Transitions directly (not a derived flex remainder) so
+   the chat's right edge interpolates in a single smooth pass — same technique
+   as the Sider's width transition. */
+.layout-content {
+  transition: padding-right var(--duration-slow) var(--ease-out-expo);
+}
+
+/* Suppress padding-right transition during pane resize-drag so width tracks
+   the pointer with zero lag (mirrors .layout-sider--dragging). */
+.conversation-pane-dragging .layout-content {
+  transition: none !important;
+}
+
 /* Arco Layout inner container needs flex layout so Header + Content + Footer
    stack vertically and Content fills the remaining space (avoids a fixed
    calc() that breaks when header height changes). */
@@ -162,7 +176,8 @@
   .settings-sider__item,
   .settings-sider__item-label,
   .chat-history__placeholder,
-  .chat-history__section {
+  .chat-history__section,
+  .layout-content {
     transition: none;
   }
 }

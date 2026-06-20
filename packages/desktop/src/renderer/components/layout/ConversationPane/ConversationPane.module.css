@@ -1,33 +1,35 @@
 /* ConversationPane — right-side conversation navigation surface.
    Replaces the conversation list that used to live in the left Sider. */
 
-/* Right-docked nav pane. In-flow flex sibling that reserves its own column
-   in the layout — never overlays chat/terminal/editor. */
+/* Right-docked nav pane. Absolutely positioned out of flow so its width
+   animation doesn't create a derived flex boundary on the chat sibling.
+   Width is driven by --conversation-pane-width (single-source CSS variable
+   written by ConversationPaneDesktop). The chat's space is reserved via
+   padding-right on .layout-content, which transitions directly — mirroring
+   the Sider's "one animated edge, one pinned edge" pattern. */
 .paneRoot {
-  position: relative;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--conversation-pane-width, 0px);
+  z-index: 10;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  flex: 0 1 auto;
-  min-width: 0;
-  background-color: var(--bg-2);
-  border-left: 1px solid color-mix(in srgb, var(--border-base) 50%, transparent);
   box-sizing: border-box;
-  overflow: hidden;
-  contain: layout paint;
+  overflow-x: hidden;
+  background-color: var(--bg-2);
+  border-left: 1px solid var(--border-base);
+  transition: width var(--duration-slow) var(--ease-out-expo);
 }
 
-/* Smooth collapse/expand — width transition mirroring the left sider.
-   Suppressed while resize-dragging so pixel-tracking stays pin-sharp. */
-.paneAnimating {
-  transition:
-    width var(--duration-slow) var(--ease-in-out),
-    flex-basis var(--duration-slow) var(--ease-in-out),
-    border-left-width var(--duration-slow) var(--ease-in-out);
-  will-change: width, flex-basis;
+/* Suppress transition during resize-drag so width tracks the pointer. */
+.paneRootDragging {
+  transition: none !important;
 }
 
-/* Fully collapsed: clip content and drop the divider so no 1px seam shows. */
+/* Fully collapsed: zero-width and click-through. */
 .paneCollapsed {
   border-left-width: 0;
   pointer-events: none;
@@ -158,5 +160,9 @@
 @media (prefers-reduced-motion: reduce) {
   .mobilePanel {
     animation: none;
+  }
+
+  .paneRoot {
+    transition: none;
   }
 }

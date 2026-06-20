@@ -5,7 +5,7 @@
  */
 
 import classNames from 'classnames';
-import React, { Suspense, useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
@@ -49,10 +49,8 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
     storageKey: PANE_WIDTH_STORAGE_KEY,
   });
 
-  // The width transition is ALWAYS on (so a collapse/expand toggle eases in
-  // the very same render the width changes — mirrors the left sider's
-  // `--duration-slow` / `--ease-in-out` slide) and is suppressed only while
-  // a resize-drag is in flight, so dragging stays pixel-perfect with no lag.
+  // Width transition mirrors the left Sider (transition: width on the root).
+  // Suppressed during resize-drag so width tracks the pointer with no lag.
   const [isResizing, setIsResizing] = useState(false);
   useEffect(() => {
     if (!isResizing) return;
@@ -92,15 +90,34 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
   const effectiveMaxWidth = Math.max(MIN_PANE_WIDTH_PX, viewportWidth - (layout?.siderWidth ?? 0) - CHAT_MIN_WIDTH_PX);
   const paneDisplayWidth = Math.min(Math.round(paneWidth), effectiveMaxWidth);
 
+  // Single-source-of-truth: write the effective pane width to a CSS variable on
+  // documentElement. Both the absolute-positioned pane (width:var(--conversation-pane-width))
+  // and .layout-content (padding-right:var(--conversation-pane-width)) read the same
+  // variable, guaranteeing sync. Mirrors the Sider's --layout-sider-width pattern.
+  useLayoutEffect(() => {
+    const value = collapsed ? 0 : paneDisplayWidth;
+    document.documentElement.style.setProperty('--conversation-pane-width', `${value}px`);
+    return () => {
+      document.documentElement.style.setProperty('--conversation-pane-width', '0px');
+    };
+  }, [collapsed, paneDisplayWidth]);
+
+  // Toggle a class on documentElement during drag so .layout-content drops its
+  // padding-right transition (mirrors .layout-sider--dragging). The pane itself
+  // already has .paneRootDragging to kill its own width transition.
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle('conversation-pane-dragging', isResizing);
+    return () => {
+      document.documentElement.classList.remove('conversation-pane-dragging');
+    };
+  }, [isResizing]);
+
   return (
     <div
       className={classNames(styles.paneRoot, {
-        [styles.paneAnimating]: !isResizing,
         [styles.paneCollapsed]: collapsed,
+        [styles.paneRootDragging]: isResizing,
       })}
-      // In-flow flex sibling. Width animates 0 ↔ paneDisplayWidth so neighbors
-      // reflow rather than being overlapped.
-      style={{ width: collapsed ? 0 : paneDisplayWidth, flexBasis: collapsed ? 0 : paneDisplayWidth }}
       aria-hidden={collapsed}
     >
       {!collapsed && (

@@ -416,7 +416,10 @@ const Layout: React.FC<{
                     // chat(2); end → chat(1) editor(2). Conversation pane is
                     // pinned rightmost (order 3) in its own component.
                     order: editorDock === 'end' ? 1 : 2,
-                    ...(isMobile ? { width: '100%' } : {}),
+                    // Reserve space for the absolutely-positioned ConversationPane
+                    // via directly-animated padding (mirrors the Sider pattern).
+                    // On mobile the pane is a separate overlay, so no reservation.
+                    ...(isMobile ? { width: '100%' } : { paddingRight: 'var(--conversation-pane-width, 0px)' }),
                   }}
                 >
                   <TerminalPanelHost isMobile={isMobile} hideTerminal={isSettingsRoute}>
