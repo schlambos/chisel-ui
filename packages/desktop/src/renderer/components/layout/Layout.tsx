@@ -416,10 +416,13 @@ const Layout: React.FC<{
                     // chat(2); end → chat(1) editor(2). Conversation pane is
                     // pinned rightmost (order 3) in its own component.
                     order: editorDock === 'end' ? 1 : 2,
-                    // Reserve space for the absolutely-positioned ConversationPane
-                    // via directly-animated padding (mirrors the Sider pattern).
-                    // On mobile the pane is a separate overlay, so no reservation.
-                    ...(isMobile ? { width: '100%' } : { paddingRight: 'var(--conversation-pane-width, 0px)' }),
+                    // NOTE: the ConversationPane's space is reserved by an EXPLICIT
+                    // width on the TerminalPanelHost root (--conversation-pane-reserved),
+                    // NOT by padding-right here. Padding-right on this flex container
+                    // made Electron re-solve the center's flex widths in incremental
+                    // passes (the "marching" stutter); an explicit child width snaps
+                    // in one frame. On mobile the pane is a separate overlay.
+                    ...(isMobile ? { width: '100%' } : null),
                   }}
                 >
                   <TerminalPanelHost isMobile={isMobile} hideTerminal={isSettingsRoute}>

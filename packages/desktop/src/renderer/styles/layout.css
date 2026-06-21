@@ -28,6 +28,14 @@
   color: var(--text-tertiary);
 }
 
+/* Clip the main layout row horizontally so the collapsed ConversationPane —
+   which now stays at full width and slides off the right edge via
+   translateX(100%) — never produces a horizontal scrollbar or overflow.
+   Arco popups/tooltips render into document.body, so they are unaffected. */
+.layout {
+  overflow: hidden;
+}
+
 /* Layout sider base styles */
 .layout-sider {
   overflow-x: hidden;
@@ -40,19 +48,13 @@
   transition: none !important;
 }
 
-/* Layout content: padding-right reserves space for the absolutely-positioned
-   ConversationPane. Transitions directly (not a derived flex remainder) so
-   the chat's right edge interpolates in a single smooth pass — same technique
-   as the Sider's width transition. */
-.layout-content {
-  transition: padding-right var(--duration-slow) var(--ease-out-expo);
-}
-
-/* Suppress padding-right transition during pane resize-drag so width tracks
-   the pointer with zero lag (mirrors .layout-sider--dragging). */
-.conversation-pane-dragging .layout-content {
-  transition: none !important;
-}
+/* Layout content: padding-right (= --conversation-pane-reserved) reserves
+   space for the absolutely-positioned ConversationPane. It is deliberately
+   NOT transitioned — it snaps to its final value so the center content
+   resolves to its new width in a single frame. Animating it caused the center
+   to be re-laid-out (and the centered /guid block re-centered via auto-margin)
+   on every frame, which read as the content "marching" sideways in steps. The
+   pane's own compositor `transform` slide is the only animated part now. */
 
 /* Arco Layout inner container needs flex layout so Header + Content + Footer
    stack vertically and Content fills the remaining space (avoids a fixed

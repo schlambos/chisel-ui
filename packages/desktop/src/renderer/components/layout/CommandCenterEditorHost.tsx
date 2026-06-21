@@ -98,7 +98,13 @@ const CommandCenterEditorHost: React.FC<CommandCenterEditorHostProps> = ({ works
   return (
     <div
       className={classNames(
-        'editor-pane chat-pane relative layout-sider flex flex-col',
+        // NOTE: intentionally NOT `layout-sider` — that class carries
+        // `transition: width`, which would tween the editor's flex-derived
+        // width when the center column reflows on ConversationPane collapse,
+        // re-introducing the per-frame "march". editor.css requires the
+        // editor's width to change instantly; its borders/overflow are owned
+        // by editor.css + the inner wrapper, so the sider class isn't needed.
+        'editor-pane chat-pane relative flex flex-col',
         isDockEnd ? 'editor-pane--dock-end' : 'editor-pane--dock-start',
         isExpanded && 'editor-pane--expanded editor-pane-enter',
         isBlade && 'editor-pane--blade overflow-hidden',

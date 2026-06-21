@@ -1,12 +1,16 @@
 /* ConversationPane — right-side conversation navigation surface.
    Replaces the conversation list that used to live in the left Sider. */
 
-/* Right-docked nav pane. Absolutely positioned out of flow so its width
-   animation doesn't create a derived flex boundary on the chat sibling.
-   Width is driven by --conversation-pane-width (single-source CSS variable
-   written by ConversationPaneDesktop). The chat's space is reserved via
-   padding-right on .layout-content, which transitions directly — mirroring
-   the Sider's "one animated edge, one pinned edge" pattern. */
+/* Right-docked nav pane. Absolutely positioned out of flow so it never
+   creates a derived flex boundary on the chat sibling. The pane keeps its
+   full (open) width at all times (--conversation-pane-width, written by
+   ConversationPaneDesktop) and expresses the collapsed state by sliding
+   off-screen with `transform: translateX(100%)`. Animating the transform
+   (not width) keeps the slide on the compositor: the pane never reflows and
+   the center content is NOT re-laid-out every frame. The center's reserved
+   gutter (--conversation-pane-reserved, padding-right on .layout-content)
+   snaps instead of tweening, so the center resolves to its final width in a
+   single clean frame. */
 .paneRoot {
   position: absolute;
   top: 0;
@@ -21,16 +25,21 @@
   overflow-x: hidden;
   background-color: var(--bg-2);
   border-left: 1px solid var(--border-base);
-  transition: width var(--duration-slow) var(--ease-out-expo);
+  transform: translateX(0);
+  will-change: transform;
+  transition: transform var(--duration-slow) var(--ease-out-expo);
 }
 
-/* Suppress transition during resize-drag so width tracks the pointer. */
+/* Suppress transition during resize-drag so the pane tracks the pointer. */
 .paneRootDragging {
   transition: none !important;
 }
 
-/* Fully collapsed: zero-width and click-through. */
+/* Collapsed: slid fully off the right edge and click-through. Width is left
+   intact so there is something to translate; translateX(100%) moves it by its
+   own width so it sits just beyond the viewport's right edge. */
 .paneCollapsed {
+  transform: translateX(100%);
   border-left-width: 0;
   pointer-events: none;
 }

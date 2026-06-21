@@ -68,7 +68,25 @@ const TerminalPanelHost: React.FC<Props> = ({ isMobile, hideTerminal = false, ch
   }
 
   return (
-    <div ref={containerRef} className='relative flex flex-col flex-1 min-h-0'>
+    <div
+      ref={containerRef}
+      className='relative flex flex-col min-h-0'
+      style={{
+        // Reserve the right ConversationPane's gutter by giving this host an
+        // EXPLICIT width (100% minus the snapped --conversation-pane-reserved
+        // gutter) instead of padding-right on the flex parent. In Electron,
+        // animating/changing padding-right on a flex container makes Chromium
+        // re-solve the flex children's widths across multiple incremental
+        // passes — the center content "marches" sideways in ~16px steps over
+        // ~1s even though padding snaps instantly. An explicit width gives the
+        // flex solver one fixed number, so the center resolves in a single
+        // frame. The var is 0px when no pane is present, so this is a no-op
+        // everywhere else. flex:none lets the explicit width win over the
+        // parent's flex-1.
+        flex: 'none',
+        width: 'calc(100% - var(--conversation-pane-reserved, 0px))',
+      }}
+    >
       <div className='flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col'>{children}</div>
       {panel.open && (
         <div

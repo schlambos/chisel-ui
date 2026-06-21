@@ -90,21 +90,40 @@ const ConversationPaneDesktop: React.FC<ConversationPaneDesktopProps> = ({ colla
   const effectiveMaxWidth = Math.max(MIN_PANE_WIDTH_PX, viewportWidth - (layout?.siderWidth ?? 0) - CHAT_MIN_WIDTH_PX);
   const paneDisplayWidth = Math.min(Math.round(paneWidth), effectiveMaxWidth);
 
-  // Single-source-of-truth: write the effective pane width to a CSS variable on
-  // documentElement. Both the absolute-positioned pane (width:var(--conversation-pane-width))
-  // and .layout-content (padding-right:var(--conversation-pane-width)) read the same
-  // variable, guaranteeing sync. Mirrors the Sider's --layout-sider-width pattern.
+  // Two CSS variables on documentElement drive the layout:
+  //
+  //   --conversation-pane-width    The pane element's *rendered* width. It is
+  //                                ALWAYS the open width (never 0), so the
+  //                                collapsed state can be expressed by sliding
+  //                                the pane off-screen with a compositor
+  //                                `transform: translateX(100%)` (see
+  //                                ConversationPane.module.css) — a GPU-only
+  //                                animation that never reflows the center.
+  //
+  //   --conversation-pane-reserved The gutter the center content reserves
+  //                                (padding-right on .layout-content). It SNAPS
+  //                                between 0 (collapsed) and the open width —
+  //                                no CSS transition — so the center reaches
+  //                                its final width in a single frame instead of
+  //                                being re-laid-out (and re-centered) on every
+  //                                animation frame, which previously read as the
+  //                                center content "marching" sideways in steps.
+  //
+  // Net effect (#1): the pane glides on the compositor; the center content
+  // resolves to its new width in one clean movement.
   useLayoutEffect(() => {
-    const value = collapsed ? 0 : paneDisplayWidth;
-    document.documentElement.style.setProperty('--conversation-pane-width', `${value}px`);
+    const root = document.documentElement.style;
+    root.setProperty('--conversation-pane-width', `${paneDisplayWidth}px`);
+    root.setProperty('--conversation-pane-reserved', collapsed ? '0px' : `${paneDisplayWidth}px`);
     return () => {
-      document.documentElement.style.setProperty('--conversation-pane-width', '0px');
+      root.setProperty('--conversation-pane-width', '0px');
+      root.setProperty('--conversation-pane-reserved', '0px');
     };
   }, [collapsed, paneDisplayWidth]);
 
-  // Toggle a class on documentElement during drag so .layout-content drops its
-  // padding-right transition (mirrors .layout-sider--dragging). The pane itself
-  // already has .paneRootDragging to kill its own width transition.
+  // Mark the document as mid-drag (mirrors .layout-sider--dragging). The pane's
+  // own width tracks the pointer with no transition; .paneRootDragging also
+  // suppresses the transform slide so a collapse toggled mid-drag can't tween.
   useLayoutEffect(() => {
     document.documentElement.classList.toggle('conversation-pane-dragging', isResizing);
     return () => {
