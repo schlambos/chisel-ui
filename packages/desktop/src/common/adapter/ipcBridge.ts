@@ -90,6 +90,13 @@ import type {
   UpdateDownloadResult,
 } from '../update/updateTypes';
 import type { ProtocolDetectionRequest, ProtocolDetectionResponse } from '../utils/protocolDetector';
+import type {
+  EditInverse,
+  RevertFileRequest,
+  RevertFileResponse,
+  RevertHunkRequest,
+  RevertHunkResponse,
+} from '../types/agent/editInverseTypes';
 import { fromApiConversation, fromApiPaginatedConversations, toApiModelOptional } from './apiModelMapper';
 import {
   httpDelete,
@@ -663,6 +670,18 @@ export const conversation = {
     check: httpGet<{ approved: boolean }, { conversation_id: string; action: string; command_type?: string }>(
       (p) =>
         `/api/conversations/${p.conversation_id}/approvals/check?action=${encodeURIComponent(p.action)}${p.command_type ? `&command_type=${encodeURIComponent(p.command_type)}` : ''}`
+    ),
+  },
+  editInverses: {
+    list: httpGet<EditInverse[], { conversation_id: string }>(
+      (p) => `/api/conversations/${p.conversation_id}/edit-inverses`
+    ),
+    revertHunk: httpPost<RevertHunkResponse, RevertHunkRequest>(
+      (p) => `/api/conversations/${p.conversation_id}/edit-inverses/${encodeURIComponent(p.tool_call_id)}/revert-hunk`,
+      (p) => ({ hunk_index: p.hunk_index })
+    ),
+    revertFile: httpPost<RevertFileResponse, RevertFileRequest>(
+      (p) => `/api/conversations/${p.conversation_id}/edit-inverses/${encodeURIComponent(p.tool_call_id)}/revert-file`
     ),
   },
 };

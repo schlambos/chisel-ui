@@ -5,7 +5,7 @@
  */
 
 import { ipcBridge } from '@/common';
-import type { AvailableCommand, TMessage, ToolProgress } from '@/common/chat/chatLib';
+import type { AvailableCommand, TMessage, ToolProgress, VerifyResultEvent } from '@/common/chat/chatLib';
 import { transformMessage } from '@/common/chat/chatLib';
 import type { SlashCommandItem } from '@/common/chat/slash/types';
 import type { IResponseMessage } from '@/common/adapter/ipcBridge';
@@ -15,7 +15,7 @@ import { getConversationOrNull, refreshConversationCache } from '@/renderer/page
 import type { ThoughtData } from '@/renderer/components/chat/ThoughtDisplay';
 import { uuid } from '@/common/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Notification } from '@arco-design/web-react';
+import { Message, Notification } from '@arco-design/web-react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -560,6 +560,17 @@ export const useRemoteMessage = (conversation_id: string): UseRemoteMessageRetur
             void refreshConversationCache(conversation_id).catch((err) =>
               console.warn('[useRemoteMessage] compaction cache refresh failed:', err)
             );
+          }
+          break;
+        }
+        case 'verify_result': {
+          const data = message.data as VerifyResultEvent;
+          if (!data || typeof data.success !== 'boolean' || !data.command) break;
+          if (data.success) {
+            Message.success(`Verify passed: ${data.command} (${data.duration_ms} ms)`);
+          } else {
+            const exitSuffix = data.exit_code != null ? ` (exit ${data.exit_code})` : '';
+            Message.error({ content: `Verify failed: ${data.command}${exitSuffix}`, duration: 5000 });
           }
           break;
         }

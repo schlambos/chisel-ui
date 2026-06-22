@@ -1,0 +1,41 @@
+.fileCard {
+  background: var(--bg-1);
+  margin-bottom: 12px;
+  border: 1px solid var(--border-1);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.hunkRow {
+  border-top: 1px solid var(--border-1);
+  padding: 8px 0 4px;
+}
+
+.hunkHeader {
+  font-size: 11px;
+  color: var(--text-tertiary, var(--color-text-4));
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  margin-bottom: 4px;
+}
+
+.diffBody {
+  font-size: 12px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  overflow-x: auto;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.lineAdded {
+  color: rgb(var(--success-6));
+  background: color-mix(in srgb, rgb(var(--success-6)) 8%, transparent);
+}
+
+.lineRemoved {
+  color: rgb(var(--danger-6));
+  background: color-mix(in srgb, rgb(var(--danger-6)) 8%, transparent);
+}
+
+.lineContext {
+  color: var(--text-secondary, var(--color-text-2));
+}

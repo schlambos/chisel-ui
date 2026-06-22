@@ -18,6 +18,7 @@ import { Right } from '@icon-park/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ApprovalsList from './components/ApprovalsList';
+import PendingEditsPanel from './components/PendingEditsPanel';
 import GitChangeList from './components/GitChangeList';
 import PasteConfirmModal from './components/PasteConfirmModal';
 import TodoList from './components/TodoList';
@@ -38,6 +39,7 @@ import { useWorkspacePaste } from './hooks/useWorkspacePaste';
 import { useAbortUploadsOnConversationChange } from '@/renderer/hooks/file/useAbortUploadsOnConversationChange';
 import { useWorkspaceSearch } from './hooks/useWorkspaceSearch';
 import { useWorkspaceApprovals } from './hooks/useWorkspaceApprovals';
+import { useWorkspacePendingEdits } from './hooks/useWorkspacePendingEdits';
 import { useWorkspaceTodos } from './hooks/useWorkspaceTodos';
 import { useWorkspaceTree } from './hooks/useWorkspaceTree';
 import { useEditorRevealInTree } from './hooks/useEditorRevealInTree';
@@ -97,6 +99,7 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
   const nativeVcsHook = useWorkspaceNativeVcs();
   const todosHook = useWorkspaceTodos(conversation_id);
   const approvalsHook = useWorkspaceApprovals(conversation_id);
+  const pendingEditsHook = useWorkspacePendingEdits(conversation_id);
 
   const changesCount = gitChangesHook.changeCount;
 
@@ -479,6 +482,8 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
             todoPendingCount={todosHook.totalCount - todosHook.completedCount}
             hasApprovals={approvalsHook.hasApprovals}
             approvalPendingCount={approvalsHook.approvals.length}
+            hasPendingEdits={pendingEditsHook.hasPendingEdits}
+            pendingEditsCount={pendingEditsHook.pendingEdits.length}
             showChangesTab={showChangesTab}
           />
         )}
@@ -839,6 +844,17 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
         {!isChangesMode && !isWorkspaceCollapsed && activeTab === 'approvals' && approvalsHook.hasApprovals && (
           <FlexFullContainer containerClassName='overflow-hidden'>
             <ApprovalsList t={t} approvals={approvalsHook.approvals} respond={approvalsHook.respond} />
+          </FlexFullContainer>
+        )}
+
+        {/* Pending Edits tab content — suppressed in dedicated changes pane */}
+        {!isChangesMode && !isWorkspaceCollapsed && activeTab === 'pendingEdits' && pendingEditsHook.hasPendingEdits && (
+          <FlexFullContainer containerClassName='overflow-hidden'>
+            <PendingEditsPanel
+              pendingEdits={pendingEditsHook.pendingEdits}
+              revertFile={pendingEditsHook.revertFile}
+              revertHunk={pendingEditsHook.revertHunk}
+            />
           </FlexFullContainer>
         )}
       </div>

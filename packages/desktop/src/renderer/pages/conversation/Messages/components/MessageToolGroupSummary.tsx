@@ -8,6 +8,7 @@ import StatusPill, { STATE_LABEL_FALLBACK, STATE_LABEL_KEY, statusPillFromNormal
 import './MessageToolGroupSummary.css';
 import { useConversationContextSafe } from '@/renderer/hooks/context/ConversationContext';
 import RestorePlanPreview from './RestorePlanPreview';
+import UndoToolCall from './UndoToolCall';
 
 const ToolItemRow: React.FC<{ item: NormalizedToolCall }> = ({ item }) => {
   const { t } = useTranslation();
@@ -39,6 +40,13 @@ const ToolItemRow: React.FC<{ item: NormalizedToolCall }> = ({ item }) => {
         </span>
         {showRestorePlan && item.key && conversationContext?.conversation_id && (
           <RestorePlanPreview
+            conversationId={conversationContext.conversation_id}
+            toolCallId={item.key}
+            disabled={item.status !== 'completed'}
+          />
+        )}
+        {showRestorePlan && item.key && conversationContext?.conversation_id && (
+          <UndoToolCall
             conversationId={conversationContext.conversation_id}
             toolCallId={item.key}
             disabled={item.status !== 'completed'}
@@ -76,15 +84,26 @@ const ToolItemRow: React.FC<{ item: NormalizedToolCall }> = ({ item }) => {
   );
 };
 
-const MessageToolGroupSummary: React.FC<{ messages: ToolMessage[] }> = ({ messages }) => {
+const MessageToolGroupSummary: React.FC<{ messages: ToolMessage[]; toolName?: string }> = ({ messages, toolName }) => {
   const { t } = useTranslation();
   const hasRunning = hasRunningToolMessages(messages);
   const tools = useMemo(() => normalizeToolMessages(messages), [messages]);
 
   const groupState = hasRunning ? 'running' : 'success';
   const stateLabel = t(STATE_LABEL_KEY[groupState], { defaultValue: STATE_LABEL_FALLBACK[groupState] });
-  const title = t('messages.toolShell.viewSteps', { defaultValue: 'View Steps' });
-  const meta = tools.length > 0 ? `· ${tools.length}` : undefined;
+  // When every tool in the group shares one name (same-type grouping), show
+  // "<count> <toolName>" as the title so the badge reads naturally — e.g.
+  // "3 grep searches". Otherwise fall back to the generic "View Steps".
+  const uniformName = tools.length > 1 && tools.every((tool) => tool.name === tools[0].name) ? tools[0].name : null;
+  const count = tools.length;
+  const title = uniformName
+    ? t('messages.toolShell.countedSteps', {
+        defaultValue: '{{count}} {{name}}',
+        count,
+        name: uniformName,
+      })
+    : t('messages.toolShell.viewSteps', { defaultValue: 'View Steps' });
+  const meta = count > 0 ? `· ${count}` : undefined;
 
   return (
     <ToolShell

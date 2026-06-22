@@ -20,6 +20,8 @@ type WorkspaceTabBarProps = {
   todoPendingCount?: number;
   hasApprovals?: boolean;
   approvalPendingCount?: number;
+  hasPendingEdits?: boolean;
+  pendingEditsCount?: number;
   /** Whether to render the Changes tab. false for panelMode='files' (top tree pane) */
   showChangesTab?: boolean;
   /** Left Sider: wrap tabs in ConversationPane-style strip */
@@ -36,6 +38,8 @@ const WorkspaceTabBar: React.FC<WorkspaceTabBarProps> = ({
   todoPendingCount,
   hasApprovals,
   approvalPendingCount,
+  hasPendingEdits,
+  pendingEditsCount,
   showChangesTab = true,
   siderTabStripClassName,
 }) => {
@@ -107,6 +111,22 @@ const WorkspaceTabBar: React.FC<WorkspaceTabBarProps> = ({
       {showChangesTab && <Tabs.TabPane key='changes' title={changesTitle} />}
       {hasTodos && <Tabs.TabPane key='todos' title={todosTitle} />}
       {hasApprovals && <Tabs.TabPane key='approvals' title={approvalsTitle} />}
+      {hasPendingEdits && (
+        <Tabs.TabPane
+          key='pendingEdits'
+          title={
+            <span className='flex items-center'>
+              Edits
+              {pendingEditsCount !== undefined &&
+                pendingEditsCount > 0 && (
+                  <span className='ml-2px text-t-tertiary'>
+                    ({pendingEditsCount > 99 ? '99+' : pendingEditsCount})
+                  </span>
+                )}
+            </span>
+          }
+        />
+      )}
     </Tabs>
   );
 

@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import MarkdownView from '@renderer/components/Markdown';
 import StatusPill, { type StatusPillState, STATE_LABEL_KEY, STATE_LABEL_FALLBACK } from '../components/StatusPill';
 import RestorePlanPreview from '../components/RestorePlanPreview';
+import UndoToolCall from '../components/UndoToolCall';
 
 /**
  * Pure helper: map an ACP tool call's (status, kind, exitCode) tuple to the
@@ -301,6 +302,13 @@ const MessageAcpToolCall: React.FC<{ message: IMessageAcpToolCall }> = ({ messag
               <div className='flex items-center gap-4px'>
                 {showRestorePlan && tool_call_id && conversationContext?.conversation_id && (
                   <RestorePlanPreview
+                    conversationId={conversationContext.conversation_id}
+                    toolCallId={tool_call_id}
+                    disabled={status !== 'completed'}
+                  />
+                )}
+                {showRestorePlan && tool_call_id && conversationContext?.conversation_id && (
+                  <UndoToolCall
                     conversationId={conversationContext.conversation_id}
                     toolCallId={tool_call_id}
                     disabled={status !== 'completed'}

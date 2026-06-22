@@ -66,7 +66,8 @@ type TMessageType =
   | 'available_commands'
   | 'opencode_subtask'
   | 'opencode_retry'
-  | 'opencode_error';
+  | 'opencode_error'
+  | 'verify_result';
 
 interface IMessage<T extends TMessageType, Content extends Record<string, any>> {
   /**
@@ -447,6 +448,18 @@ export type IMessageAvailableCommands = IMessage<
   }
 >;
 
+export type VerifyResultEvent = {
+  success: boolean;
+  command: string;
+  exit_code?: number;
+  output: string;
+  duration_ms: number;
+  conversation_id: string;
+  tool_call_id?: string;
+};
+
+export type IMessageVerifyResult = IMessage<'verify_result', VerifyResultEvent>;
+
 // eslint-disable-next-line max-len
 export type TMessage =
   | IMessageText
@@ -462,7 +475,8 @@ export type TMessage =
   | IMessageAvailableCommands
   | IMessageOpencodeSubtask
   | IMessageRetry
-  | IMessageOpencodeError;
+  | IMessageOpencodeError
+  | IMessageVerifyResult;
 
 // 统一所有需要用户交互的用户类型
 export interface IConfirmation<Option extends any = any> {
@@ -743,6 +757,7 @@ export const transformMessage = (message: IResponseMessage): TMessage => {
     case 'request_trace': // Request trace events, logged to F12 console (not persisted)
     case 'session_status':
     case 'session_idle':
+    case 'verify_result': // Verify-hook pass/fail result, shown as toast by platform hooks
       break;
     default: {
       console.warn(

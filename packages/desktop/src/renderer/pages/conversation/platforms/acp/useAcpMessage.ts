@@ -6,7 +6,7 @@
 
 import { ipcBridge } from '@/common';
 import { transformMessage } from '@/common/chat/chatLib';
-import type { AvailableCommand } from '@/common/chat/chatLib';
+import type { AvailableCommand, VerifyResultEvent } from '@/common/chat/chatLib';
 import type { SlashCommandItem } from '@/common/chat/slash/types';
 import type { IResponseMessage } from '@/common/adapter/ipcBridge';
 import type { TokenUsageData } from '@/common/config/storage';
@@ -14,6 +14,7 @@ import { useAddOrUpdateMessage } from '@/renderer/pages/conversation/Messages/ho
 import { getConversationOrNull } from '@/renderer/pages/conversation/utils/conversationCache';
 import type { ThoughtData } from '@/renderer/components/chat/ThoughtDisplay';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Message } from '@arco-design/web-react';
 
 export type UseAcpMessageReturn = {
   thought: ThoughtData;
@@ -333,6 +334,17 @@ export const useAcpMessage = (conversation_id: string, options?: { skipWarmup?: 
             );
           }
           break;
+        case 'verify_result': {
+          const data = message.data as VerifyResultEvent;
+          if (!data || typeof data.success !== 'boolean' || !data.command) break;
+          if (data.success) {
+            Message.success(`Verify passed: ${data.command} (${data.duration_ms} ms)`);
+          } else {
+            const exitSuffix = data.exit_code != null ? ` (exit ${data.exit_code})` : '';
+            Message.error({ content: `Verify failed: ${data.command}${exitSuffix}`, duration: 5000 });
+          }
+          break;
+        }
         case 'error':
           // Stop all loading states when error occurs
           turnFinishedRef.current = true;

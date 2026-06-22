@@ -59,6 +59,7 @@ type IMessageVO =
       id: string;
       messages: Array<IMessageToolGroup | IMessageAcpToolCall | IMessageToolCall>;
       sourceMessageIds: string[];
+      toolName: string;
       created_at: number;
     };
 type IArtifactVO = { type: 'artifact'; id: string; artifact: IConversationArtifact; created_at: number };
@@ -112,12 +113,18 @@ const getUnhandledMessageType = (_message: never): string => 'unknown';
 // Image preview context
 export const ImagePreviewContext = createContext<{ inPreviewGroup: boolean }>({ inPreviewGroup: false });
 
-const MessageItem: React.FC<{ message: TMessage; highlighted?: boolean; inactive?: boolean }> = React.memo(
+const MessageItem: React.FC<{
+  message: TMessage;
+  highlighted?: boolean;
+  inactive?: boolean;
+  turnPosition?: 'first' | 'middle' | 'last' | 'solo';
+}> = React.memo(
   HOC((props) => {
-    const { message, highlighted, inactive } = props as {
+    const { message, highlighted, inactive, turnPosition } = props as {
       message: TMessage;
       highlighted?: boolean;
       inactive?: boolean;
+      turnPosition?: 'first' | 'middle' | 'last' | 'solo';
     };
     return (
       <div
@@ -126,6 +133,7 @@ const MessageItem: React.FC<{ message: TMessage; highlighted?: boolean; inactive
         data-message-type={message.type}
         data-message-position={message.position}
         data-message-inactive={inactive ? 'true' : undefined}
+        data-turn-position={turnPosition}
         className={classNames(
           'min-w-0 flex items-start message-item [&>div]:max-w-full px-6px m-t-4px max-w-full w-full',
           message.type,
@@ -178,6 +186,8 @@ const MessageItem: React.FC<{ message: TMessage; highlighted?: boolean; inactive
         return <MessageThinking message={message}></MessageThinking>;
       case 'available_commands':
         return null;
+      case 'verify_result':
+        return null;
       default:
         return <div>{t('messages.unknownMessageType', { type: getUnhandledMessageType(message) })}</div>;
     }
@@ -188,10 +198,18 @@ const MessageItem: React.FC<{ message: TMessage; highlighted?: boolean; inactive
     prev.message.position === next.message.position &&
     prev.message.type === next.message.type &&
     prev.highlighted === next.highlighted &&
-    prev.inactive === next.inactive
+    prev.inactive === next.inactive &&
+    prev.turnPosition === next.turnPosition
 );
 
-const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }> = ({ emptySlot }) => {
+const MessageList: React.FC<{
+  className?: string;
+  emptySlot?: React.ReactNode;
+  loadMore?: () => Promise<void>;
+  isLoadingMore?: boolean;
+  hasMore?: boolean;
+  prependedCount?: React.RefObject<number>;
+}> = ({ emptySlot, loadMore, isLoadingMore, hasMore, prependedCount }) => {
   const list = useMessageList();
   const artifacts = useConversationArtifacts();
   const conversationContext = useConversationContextSafe();
@@ -231,8 +249,47 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     let diffsSourceMessageIds: string[] = [];
     let toolList: Array<IMessageToolGroup | IMessageAcpToolCall | IMessageToolCall> = [];
     let toolSourceMessageIds: string[] = [];
+    let currentToolName: string | null = null;
+
+    // Extract the canonical tool name for grouping. Each tool message
+    // variant tucks its name in a different spot, so narrow by `type`:
+    //   - tool_group → content[].name (use first item as group identity)
+    //   - tool_call  → content.name
+    //   - acp_tool_call → content.update.title
+    const getToolName = (message: IMessageToolGroup | IMessageAcpToolCall | IMessageToolCall): string => {
+      switch (message.type) {
+        case 'tool_group':
+          return Array.isArray(message.content) ? (message.content[0]?.name ?? 'unknown') : 'unknown';
+        case 'tool_call':
+          return message.content?.name ?? 'unknown';
+        case 'acp_tool_call':
+          return message.content?.update?.title ?? 'unknown';
+        default:
+          return 'unknown';
+      }
+    };
+
+    // Flush the current tool group as a tool_summary. No-op when the group
+    // is empty. Resets accumulators so the next tool call starts fresh.
+    const flushToolList = () => {
+      if (toolList.length === 0) return;
+      result.push({
+        type: 'tool_summary',
+        id: `tool-summary-${toolList[0].id}`,
+        messages: toolList,
+        sourceMessageIds: toolSourceMessageIds,
+        toolName: currentToolName ?? 'unknown',
+        created_at: toolList[0].created_at ?? 0,
+      });
+      toolList = [];
+      toolSourceMessageIds = [];
+      currentToolName = null;
+    };
 
     const pushFileDffChanges = (changes: FileChangeInfo, sourceMessageId: string, created_at: number) => {
+      // A WriteFile diff belongs to the file_summary stream, not the tool
+      // stream — close any open tool group before accumulating it.
+      flushToolList();
       if (!diffsChanges.length) {
         diffsSourceMessageIds = [];
         result.push({
@@ -245,19 +302,13 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
       }
       diffsChanges.push(changes);
       diffsSourceMessageIds.push(sourceMessageId);
-      toolList = [];
-      toolSourceMessageIds = [];
     };
     const pushToolList = (message: IMessageToolGroup | IMessageAcpToolCall | IMessageToolCall) => {
-      if (!toolList.length) {
-        toolSourceMessageIds = [];
-        result.push({
-          type: 'tool_summary',
-          id: `tool-summary-${message.id}`,
-          messages: toolList,
-          sourceMessageIds: toolSourceMessageIds,
-          created_at: message.created_at ?? 0,
-        });
+      const toolName = getToolName(message);
+      // A change in tool name starts a new group: flush the previous one.
+      if (toolName !== currentToolName) {
+        flushToolList();
+        currentToolName = toolName;
       }
       toolList.push(message);
       toolSourceMessageIds.push(message.id);
@@ -302,12 +353,14 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
         pushToolList(message);
         continue;
       }
-      toolList = [];
-      toolSourceMessageIds = [];
+      // Non-tool message: close any open tool group before emitting it.
+      flushToolList();
       diffsChanges = [];
       diffsSourceMessageIds = [];
       result.push(message);
     }
+    // Flush any tool group still open at the end of the list.
+    flushToolList();
     const visibleArtifacts = artifacts
       .filter((artifact) => {
         if (artifact.kind === 'cron_trigger') return artifact.status === 'active';
@@ -326,6 +379,54 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     );
   }, [artifacts, conversationContext?.extra, list]);
 
+  // Turn-group metadata: assign consecutive same-sender messages to groups
+  const processedListWithTurns = useMemo(() => {
+    let turnId = 0;
+    let prevSender: 'agent' | 'user' | null = null;
+
+    // First pass: assign turnGroup
+    const withGroups = processedList.map((item) => {
+      if ('type' in item && ['file_summary', 'tool_summary', 'artifact'].includes(item.type)) {
+        // Summary items belong to the agent's turn
+        if (prevSender !== 'agent') {
+          turnId++;
+          prevSender = 'agent';
+        }
+        return { ...item, turnGroup: turnId };
+      }
+      const msg = item as TMessage;
+      // Neutral messages (tips, agent_status, plan) don't break turns
+      if (msg.type === 'tips' || msg.type === 'agent_status' || msg.type === 'plan') {
+        return { ...item, turnGroup: turnId };
+      }
+      const sender: 'agent' | 'user' = msg.position === 'right' ? 'user' : 'agent';
+      if (sender !== prevSender) {
+        turnId++;
+        prevSender = sender;
+      }
+      return { ...item, turnGroup: turnId };
+    });
+
+    // Second pass: assign turnPosition per group
+    const groups = new Map<number, number>();
+    withGroups.forEach((item) => {
+      groups.set(item.turnGroup, (groups.get(item.turnGroup) || 0) + 1);
+    });
+
+    const seenInGroup = new Map<number, number>();
+    return withGroups.map((item) => {
+      const count = groups.get(item.turnGroup) || 1;
+      const seen = (seenInGroup.get(item.turnGroup) || 0) + 1;
+      seenInGroup.set(item.turnGroup, seen);
+      let turnPosition: 'first' | 'middle' | 'last' | 'solo';
+      if (count === 1) turnPosition = 'solo';
+      else if (seen === 1) turnPosition = 'first';
+      else if (seen === count) turnPosition = 'last';
+      else turnPosition = 'middle';
+      return { ...item, turnPosition };
+    });
+  }, [processedList]);
+
   // Use auto-scroll hook
   const {
     virtuosoRef,
@@ -338,11 +439,11 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     hideScrollButton,
   } = useAutoScroll({
     messages: list,
-    itemCount: processedList.length,
+    itemCount: processedListWithTurns.length,
   });
 
   useEffect(() => {
-    if (!targetMessageId || processedList.length === 0 || !virtuosoRef.current) {
+    if (!targetMessageId || processedListWithTurns.length === 0 || !virtuosoRef.current) {
       return;
     }
 
@@ -351,7 +452,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
       return;
     }
 
-    const targetIndex = processedList.findIndex((item) => matchesTargetMessage(item, targetMessageId));
+    const targetIndex = processedListWithTurns.findIndex((item) => matchesTargetMessage(item, targetMessageId));
     if (targetIndex === -1) {
       return;
     }
@@ -373,7 +474,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     }, 2400);
 
     return () => window.clearTimeout(timer);
-  }, [hideScrollButton, location.key, processedList, targetMessageId, virtuosoRef]);
+  }, [hideScrollButton, location.key, processedListWithTurns, targetMessageId, virtuosoRef]);
 
   useEffect(() => {
     const handleMessageJump = (event: Event) => {
@@ -382,7 +483,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
       if (!conversationContext?.conversation_id || detail.conversation_id !== conversationContext.conversation_id)
         return;
 
-      const targetIndex = processedList.findIndex((item) => {
+      const targetIndex = processedListWithTurns.findIndex((item) => {
         if (
           (item as { type?: string }).type === 'file_summary' ||
           (item as { type?: string }).type === 'tool_summary' ||
@@ -411,7 +512,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     return () => {
       window.removeEventListener(CHAT_MESSAGE_JUMP_EVENT, handleMessageJump);
     };
-  }, [conversationContext?.conversation_id, hideScrollButton, processedList, virtuosoRef]);
+  }, [conversationContext?.conversation_id, hideScrollButton, processedListWithTurns, virtuosoRef]);
 
   // Click scroll button
   const handleScrollButtonClick = () => {
@@ -430,30 +531,34 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
   // is well below any perceptible cost.
   const findFirstInactiveProcessedIndex = (): number | null => {
     if (revertedRegion === null) return null;
-    for (let i = 0; i < processedList.length; i++) {
-      const item = processedList[i];
+    for (let i = 0; i < processedListWithTurns.length; i++) {
+      const item = processedListWithTurns[i];
       if (isItemInactive(item, list, revertedRegion)) return i;
     }
     return null;
   };
-  const firstInactiveProcessedIndex = useMemo(findFirstInactiveProcessedIndex, [revertedRegion, processedList, list]);
+  const firstInactiveProcessedIndex = useMemo(findFirstInactiveProcessedIndex, [
+    revertedRegion,
+    processedListWithTurns,
+    list,
+  ]);
 
   // Find first compaction item for divider (mirrors reverted pattern)
   const findFirstCompactionProcessedIndex = (): number | null => {
     if (compactionRegion === null) return null;
-    for (let i = 0; i < processedList.length; i++) {
-      const item = processedList[i];
+    for (let i = 0; i < processedListWithTurns.length; i++) {
+      const item = processedListWithTurns[i];
       if (isItemCompactionStart(item, list, compactionRegion)) return i;
     }
     return null;
   };
   const firstCompactionProcessedIndex = useMemo(findFirstCompactionProcessedIndex, [
     compactionRegion,
-    processedList,
+    processedListWithTurns,
     list,
   ]);
 
-  const renderItem = (index: number, item: (typeof processedList)[0]) => {
+  const renderItem = (index: number, item: (typeof processedListWithTurns)[0]) => {
     const highlighted = matchesTargetMessage(item, highlightedMessageId);
     const inactive = revertedRegion !== null && isItemInactive(item, list, revertedRegion);
     // Prepend the divider only on the first inactive item so it appears
@@ -535,6 +640,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
             id={`message-${getProcessedItemAnchorId(item)}`}
             data-conversation-artifact-kind={item.artifact.kind}
             data-testid={`conversation-artifact-${item.artifact.kind}`}
+            data-turn-position={(item as any).turnPosition}
             className={classNames('min-w-0 message-item px-6px m-t-4px max-w-full w-full', {
               'message-item--inactive': inactive,
             })}
@@ -552,6 +658,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
           {revertedDivider}
           <div
             id={`message-${getProcessedItemAnchorId(item)}`}
+            data-turn-position={(item as any).turnPosition}
             className={classNames('min-w-0 message-item px-6px m-t-4px max-w-full w-full', item.type, {
               'message-item--inactive': inactive,
             })}
@@ -559,7 +666,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
           >
             {item.type === 'file_summary' && <MessageFileChanges diffsChanges={item.diffs} />}
             {item.type === 'tool_summary' && (
-              <MessageToolGroupSummary messages={item.messages}></MessageToolGroupSummary>
+              <MessageToolGroupSummary messages={item.messages} toolName={item.toolName} />
             )}
           </div>
           {compactionTail}
@@ -569,13 +676,18 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     return (
       <div key={(item as TMessage).id}>
         {revertedDivider}
-        <MessageItem message={item as TMessage} highlighted={highlighted} inactive={inactive} />
+        <MessageItem
+          message={item as TMessage}
+          highlighted={highlighted}
+          inactive={inactive}
+          turnPosition={(item as any).turnPosition}
+        />
         {compactionTail}
       </div>
     );
   };
 
-  if (processedList.length === 0 && emptySlot) {
+  if (processedListWithTurns.length === 0 && emptySlot) {
     return <div className='relative flex-1 h-full flex items-center justify-center'>{emptySlot}</div>;
   }
 
@@ -588,8 +700,9 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
             ref={virtuosoRef}
             scrollerRef={handleScrollerRef}
             className='flex-1 h-full pb-10px box-border'
-            data={processedList}
-            initialTopMostItemIndex={processedList.length - 1}
+            data={processedListWithTurns}
+            firstItemIndex={prependedCount?.current ?? 0}
+            initialTopMostItemIndex={Math.max(0, processedListWithTurns.length - 1)}
             defaultItemHeight={40}
             atBottomThreshold={100}
             increaseViewportBy={1200}
@@ -598,7 +711,20 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
             onScroll={handleScroll}
             atBottomStateChange={handleAtBottomStateChange}
             components={{
-              Header: () => <div className='h-4px' />,
+              Header: () =>
+                hasMore ? (
+                  <div className='flex justify-center py-2'>
+                    <button
+                      onClick={() => void loadMore?.()}
+                      disabled={isLoadingMore}
+                      className='px-4 py-1 text-sm rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
+                    >
+                      {isLoadingMore ? 'Loading...' : 'Load earlier messages'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className='h-4px' />
+                ),
               Footer: () => <div className='h-8px' />,
             }}
           />
