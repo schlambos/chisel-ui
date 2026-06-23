@@ -198,6 +198,11 @@ worktrees/
 # Superpowers brainstorm tool (runtime files, session data)
 .superpowers/
 docs/superpowers/
+
+# Local one-off patch scripts and omo workspace (never committed)
+patch.js
+patch-*.js
+.omo/
 resources/bundled-bun
 resources/bundled-aioncore
 resources/hub
