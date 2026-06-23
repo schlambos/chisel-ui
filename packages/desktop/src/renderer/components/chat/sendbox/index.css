@@ -1,0 +1,23 @@
+@import './sendbox-button.css';
+@import './sendbox-rail.css';
+@import './sendbox-speech.css';
+@import './sendbox-highlight.css';
+@import './sendbox-mobile.css';
+
+.sendbox-panel ::placeholder {
+  color: var(--text-disabled); /* Arco specificity no longer requires !important for plain elements */
+}
+
+/* Sendbox focus ring — clean 1px brand border, no soft halo glow */
+.sendbox-panel--focused {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 40%, transparent);
+}
+
+/* Allow sendbox tools area to shrink so the send button stays visible */
+.sendbox-tools {
+  min-width: 0;
+}
+
+.sendbox-tools .arco-btn-shape-circle {
+  flex-shrink: 0;
+}

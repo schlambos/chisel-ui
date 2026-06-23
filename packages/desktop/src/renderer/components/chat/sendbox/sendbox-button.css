@@ -1,0 +1,151 @@
+/* Sendbox component styles */
+
+/* Phase 5 (remediated, second pass) — send button is a clean icon-only
+   affordance. No border. No fill. The rust arrow carries the entire visual
+   signal: rust when ready, gray when disabled. Hover gets a soft bg-2 tint
+   and a 1px upward lift; that's it. Stop button stays bordered for clear
+   state contrast (see below).
+   Transitions cover every property that changes between disabled/idle/running
+   so state changes never snap — color, opacity, background, border-color,
+   transform, and shadow all share the same motion-base curve. */
+.send-button-custom {
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  border-radius: var(--radius-control);
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--brand);
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    color var(--motion-base) var(--motion-ease-emphasized),
+    opacity var(--motion-base) var(--motion-ease-emphasized),
+    background-color var(--motion-base) var(--motion-ease-emphasized),
+    border-color var(--motion-base) var(--motion-ease-emphasized),
+    transform var(--motion-base) var(--motion-ease-emphasized),
+    box-shadow var(--motion-base) var(--motion-ease-emphasized);
+}
+
+.send-button-custom:hover:not(:disabled) {
+  background-color: var(--bg-2);
+  border-color: transparent;
+  color: var(--brand);
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+.send-button-custom:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+.send-button-custom:disabled {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--text-disabled);
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.send-button-custom svg {
+  color: currentColor;
+  fill: currentColor;
+  stroke-width: 5;
+}
+
+/* Phase 5 — stop button: outline-style rust border, brand-coloured icon,
+    same 26×26 footprint as the send button. The breathing animation is
+    preserved (existing 1.4s ambient pulse — no Phase 0 motion token matches
+    a long ambient pulse, so the duration literal stays; only the easing
+    routes through the new motion vocabulary). Property transitions match
+    the send button so cross-fade hand-off feels like one continuous motion. */
+.sendbox-stop-button {
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  border-radius: var(--radius-control);
+  background-color: transparent;
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    color var(--motion-base) var(--motion-ease-emphasized),
+    background-color var(--motion-base) var(--motion-ease-emphasized),
+    border-color var(--motion-base) var(--motion-ease-emphasized),
+    transform var(--motion-base) var(--motion-ease-emphasized);
+}
+
+.sendbox-stop-button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+.sendbox-stop-button.bg-animate {
+  animation: sendbox-stop-breathe 1.4s var(--motion-ease-standard) infinite alternate;
+}
+
+.sendbox-stop-button.bg-animate svg {
+  color: var(--brand);
+  fill: var(--brand);
+}
+
+/* Phase 5 (remediated) — breathing pulse animates ground tint + a tight 2px
+    outer halo only. The earlier 1.04 scale + 6px ring blew past the cross-fade
+    wrap's 26×26 footprint and the panel's 8px right-edge padding, clipping
+    the right and bottom sides of the pulse. The pulse now stays within bounds. */
+@keyframes sendbox-stop-breathe {
+  0% {
+    background-color: transparent;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 0%, transparent);
+  }
+
+  100% {
+    background-color: color-mix(in srgb, var(--brand) 10%, transparent);
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 22%, transparent);
+  }
+}
+
+/* Send/stop button cross-fade container — overflow visible so the stop
+   button's breathing halo isn't clipped by the wrap or the panel edge. */
+.sendbox-action-btn-wrap {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* Phase 5 (remediated, third pass) — send ↔ stop cross-fade. Duration
+   bumped from --duration-fast (150ms, spring) to a longer paired
+   transition so the swap reads as one continuous motion instead of a
+   1/0 snap. Opacity transitions over motion-slow (320ms) so the cross-
+   fade overlap is generous; transform uses motion-base (200ms) with
+   emphasized easing — no spring overshoot. */
+.sendbox-action-btn-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity var(--motion-slow) var(--motion-ease-emphasized),
+    transform var(--motion-base) var(--motion-ease-emphasized);
+}
+
+.sendbox-action-btn-layer--hidden {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+.sendbox-action-btn-layer--visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}

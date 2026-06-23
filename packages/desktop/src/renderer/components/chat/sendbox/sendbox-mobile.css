@@ -1,0 +1,85 @@
+/* Mobile: cap pill width in the conversation header slot. Collapsed from
+   header-model-btn max-width rule. Round pills on mobile for visual compactness
+   (collapsed from agent-mode-compact-pill mobile sizing). */
+@media (max-width: 767px) {
+  .composerPill {
+    /* intentional: 999px pill geometry — kept per Phase 0 audit */
+    border-radius: 999px;
+  }
+
+  .composerPill .arco-btn-content {
+    line-height: 1;
+  }
+
+  .composerPill--compact {
+    max-width: 140px;
+  }
+}
+
+/* Mobile: allow horizontal scrolling for sendbox tools (model/permission pills) */
+@media (max-width: 767px) {
+  .sendbox-tools-scroll-mobile {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    max-width: calc(100vw - 140px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    touch-action: pan-x;
+  }
+
+  .sendbox-tools-scroll-mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Sendbox input — 14px to match desktop body type (per product call;
+     accept the iOS auto-zoom trade-off). One-line resting height; autoSize
+     still expands the textarea as soon as the user wraps. The wrapping
+     container shares the same floor, and we trim the gap below the textarea
+     (default inline 8px → 4px) so the toolbar sits closer. */
+  .sendbox-input--mobile {
+    font-size: 14px !important; /* fights Arco input font-size */
+    line-height: 20px !important; /* fights Arco input line-height */
+    min-height: 20px !important; /* fights Arco input min-height */
+  }
+
+  .sendbox-highlight-container {
+    min-height: 20px !important; /* fights desktop min-height */
+    margin-bottom: 4px !important; /* fights desktop margin */
+  }
+
+  /* Mobile placeholder shares the input's 14px font for consistency. */
+  .sendbox-input--mobile::placeholder,
+  .sendbox-input--mobile::-webkit-input-placeholder,
+  .sendbox-highlight-textarea.sendbox-input--mobile::placeholder {
+    font-size: 14px !important; /* fights Arco placeholder font-size */
+  }
+
+  /* Tighter mobile sendbox: reduce outer padding so the bottom input takes
+     less vertical space on narrow screens. */
+  .sendbox-panel {
+    padding: 8px 10px !important; /* fights desktop padding */
+    border-radius: var(--radius-panel) !important; /* fights desktop border-radius */
+  }
+
+  .speech-input-feedback {
+    grid-template-columns: clamp(56px, 20vw, 92px) auto;
+    gap: 8px;
+  }
+
+  .speech-input-feedback__waveform {
+    gap: 2px;
+  }
+
+  .speech-input-feedback__bar {
+    width: 1.5px;
+  }
+
+  .speech-input-feedback__label {
+    min-width: 28px;
+  }
+}

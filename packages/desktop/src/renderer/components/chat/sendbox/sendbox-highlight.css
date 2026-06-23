@@ -1,0 +1,65 @@
+/* Pill marquee animation for overflowing text */
+@keyframes pill-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(var(--pill-marquee-scroll));
+  }
+}
+
+.pill-marquee-track {
+  animation-name: pill-marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.sendbox-highlight-container {
+  position: relative;
+}
+
+.sendbox-highlight-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 20px;
+}
+
+.sendbox-highlight-layer--single {
+  white-space: nowrap;
+}
+
+.sendbox-highlight-text {
+  color: var(--text-primary);
+}
+
+.sendbox-highlight-mention {
+  color: rgb(var(--primary-6));
+}
+
+.sendbox-highlight-textarea {
+  background: transparent !important; /* fights Arco textarea bg */
+}
+
+.sendbox-highlight-textarea {
+  position: relative;
+  z-index: 1;
+  color: transparent !important; /* fights Arco textarea color */
+  -webkit-text-fill-color: transparent !important; /* fights WebKit text fill */
+  caret-color: var(--text-primary) !important; /* fights default caret color */
+}
+
+.sendbox-highlight-textarea::selection {
+  background: rgba(var(--primary-6), 0.2);
+}
+
+.sendbox-highlight-textarea::placeholder {
+  color: var(--text-disabled) !important; /* fights Arco placeholder color */
+  -webkit-text-fill-color: var(--text-disabled) !important; /* fights WebKit placeholder fill */
+}
