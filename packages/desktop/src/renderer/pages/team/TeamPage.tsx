@@ -20,6 +20,10 @@ import { TeamTabsProvider, useTeamTabs } from './hooks/TeamTabsContext';
 import { TeamPermissionProvider } from './hooks/TeamPermissionContext';
 import { useTeamSession } from './hooks/useTeamSession';
 import { getConversationOrNull } from '@/renderer/pages/conversation/utils/conversationCache';
+import AgentModeSelector from '@/renderer/components/agent/AgentModeSelector';
+import { Shield } from '@icon-park/react';
+import { iconColors } from '@/renderer/styles/colors';
+import { useTeamPermission } from './hooks/TeamPermissionContext';
 
 type Props = {
   team: TTeam;
@@ -144,6 +148,48 @@ const AgentChatSlot: React.FC<{
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+/** Renders the AgentModeSelector in the toolbar row for team/command-center mode.
+ *  Must be rendered inside TeamPermissionProvider. */
+const TeamToolbarExtra: React.FC<{
+  activeAgent: TeamAgent | undefined;
+}> = ({ activeAgent }) => {
+  const { t } = useTranslation();
+  const teamPermission = useTeamPermission();
+
+  const { data: conversation } = useSWR(
+    activeAgent?.conversation_id ? ['team-toolbar-conversation', activeAgent.conversation_id] : null,
+    () => getConversationOrNull(activeAgent!.conversation_id)
+  );
+
+  if (!activeAgent?.conversation_id) return null;
+
+  const isAcpLike =
+    activeAgent.conversation_type === 'acp' ||
+    activeAgent.conversation_type === 'codex' ||
+    conversation?.type === 'acp';
+  if (!isAcpLike) return null;
+
+  return (
+    <div className='flex items-center gap-8px'>
+      <AgentModeSelector
+        backend={activeAgent.agent_type || 'opencode'}
+        conversation_id={activeAgent.conversation_id}
+        compact
+        initialMode={(conversation?.extra as { session_mode?: string } | undefined)?.session_mode}
+         compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
+         modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
+         compactLabelPrefix={t('agentMode.agent')}
+         hideCompactLabelPrefixOnMobile
+        onModeChanged={
+          teamPermission && activeAgent.conversation_id === teamPermission.leaderConversationId
+            ? teamPermission.propagateMode
+            : undefined
+        }
+      />
     </div>
   );
 };
@@ -350,6 +396,7 @@ const TeamPageContent: React.FC<TeamPageContentProps> = ({ team, onRenameTeam })
         isTemporaryWorkspace={isTeamWorkspaceTemporary}
         workspacePreferenceKey={team.id}
         onRenameTitle={onRenameTeam}
+        toolbarExtra={<TeamToolbarExtra activeAgent={activeAgent} />}
         headerLeading={
           <span className='inline-flex w-16px h-16px items-center justify-center shrink-0 leading-none text-t-primary'>
             <Peoples theme='outline' size='16' fill='currentColor' style={{ lineHeight: 0 }} />

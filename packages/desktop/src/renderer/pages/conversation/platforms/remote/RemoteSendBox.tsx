@@ -6,7 +6,6 @@
 
 import { ipcBridge } from '@/common';
 import type { TMessage } from '@/common/chat/chatLib';
-import AgentModeSelector from '@/renderer/components/agent/AgentModeSelector';
 import ContextUsageIndicator from '@/renderer/components/agent/ContextUsageIndicator';
 import RemoteSkillsPicker from '@/renderer/components/agent/RemoteSkillsPicker';
 import CommandQueuePanel from '@/renderer/components/chat/CommandQueuePanel';
@@ -15,8 +14,6 @@ import ThoughtDisplay from '@/renderer/components/chat/ThoughtDisplay';
 import FileAttachButton from '@/renderer/components/media/FileAttachButton';
 import FilePreview from '@/renderer/components/media/FilePreview';
 import HorizontalFileList from '@/renderer/components/media/HorizontalFileList';
-import { iconColors } from '@/renderer/styles/colors';
-import { Shield } from '@icon-park/react';
 import { useAutoTitle } from '@/renderer/hooks/chat/useAutoTitle';
 import { getSendBoxDraftHook, type FileOrFolderItem } from '@/renderer/hooks/chat/useSendBoxDraft';
 import { createSetUploadFile } from '@/renderer/hooks/chat/useSendBoxFiles';
@@ -59,10 +56,8 @@ const useRemoteSendBoxDraft = getSendBoxDraftHook('remote', {
 const EMPTY_AT_PATH: Array<string | FileOrFolderItem> = [];
 const EMPTY_UPLOAD_FILES: string[] = [];
 
-const RemoteSendBox: React.FC<{ conversation_id: string; session_mode?: string; modelSelector?: React.ReactNode }> = ({
+const RemoteSendBox: React.FC<{ conversation_id: string }> = ({
   conversation_id,
-  session_mode,
-  modelSelector,
 }) => {
   const [workspacePath, setWorkspacePath] = useState('');
   const { t } = useTranslation();
@@ -483,27 +478,11 @@ const RemoteSendBox: React.FC<{ conversation_id: string; session_mode?: string; 
           <div className='flex items-center gap-8px'>
             {/* Self-hides until the backend reports usage (OpenCode emits it on
                 turn finish; other remote protocols may not — then it stays hidden). */}
-            <ContextUsageIndicator
-              tokenUsage={tokenUsage}
-              context_limit={context_limit > 0 ? context_limit : undefined}
-            />
-            {modelSelector}
-            {protocol === 'opencode' ? (
-              <AgentModeSelector
-                backend='opencode'
-                conversation_id={conversation_id}
-                compact
-                initialMode={session_mode}
-                compactLeadingIcon={
-                  <Shield theme='outline' size='14' fill={iconColors.secondary} className='shrink-0' />
-                }
-                modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
-                compactLabelPrefix={t('agentMode.agent')}
-                groupTitleOverride={t('agentMode.agent')}
-                hideCompactLabelPrefixOnMobile
-              />
-            ) : null}
-            {protocol === 'opencode' ? (
+             <ContextUsageIndicator
+               tokenUsage={tokenUsage}
+               context_limit={context_limit > 0 ? context_limit : undefined}
+             />
+             {protocol === 'opencode' ? (
               <RemoteSkillsPicker
                 available={availableSkills}
                 selected={selectedSkills}

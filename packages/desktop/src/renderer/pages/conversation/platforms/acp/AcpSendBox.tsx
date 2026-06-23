@@ -2,7 +2,6 @@ import { ipcBridge } from '@/common';
 import { isBackendHttpError } from '@/common/adapter/httpBridge';
 import { isSideQuestionSupported } from '@/common/chat/sideQuestion';
 import { uuid } from '@/common/utils';
-import AgentModeSelector from '@/renderer/components/agent/AgentModeSelector';
 import CommandQueuePanel from '@/renderer/components/chat/CommandQueuePanel';
 import PendingApprovalsBanner from '@/renderer/pages/conversation/components/PendingApprovalsBanner';
 import SendBox from '@/renderer/components/chat/sendbox';
@@ -24,12 +23,10 @@ import {
 import { usePreviewContext } from '@/renderer/pages/conversation/Preview';
 import { useTeamPermission } from '@/renderer/pages/team/hooks/TeamPermissionContext';
 import { allSupportedExts } from '@/renderer/services/FileService';
-import { iconColors } from '@/renderer/styles/colors';
 import { emitter, useAddEventListener } from '@/renderer/utils/emitter';
 import { mergeFileSelectionItems } from '@/renderer/utils/file/fileSelection';
 import { buildDisplayMessage } from '@/renderer/utils/file/messageFiles';
 import { Message, Tag } from '@arco-design/web-react';
-import { Shield } from '@icon-park/react';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAcpInitialMessage } from './useAcpInitialMessage';
@@ -80,12 +77,10 @@ const useSendBoxDraft = (conversation_id: string) => {
 const AcpSendBox: React.FC<{
   conversation_id: string;
   backend: string;
-  session_mode?: string;
   agent_name?: string;
   workspacePath?: string;
   messageState: UseAcpMessageReturn;
-  modelSelector?: React.ReactNode;
-}> = ({ conversation_id, backend, session_mode, agent_name, workspacePath, messageState, modelSelector }) => {
+}> = ({ conversation_id, backend, agent_name, workspacePath, messageState }) => {
   const {
     running,
     hasHydratedRunningState,
@@ -98,9 +93,6 @@ const AcpSendBox: React.FC<{
   } = messageState;
   const { t } = useTranslation();
   const teamPermission = useTeamPermission();
-  // In team mode, all agents show the permission mode selector (members don't propagate)
-  const showModeSelector = true;
-  const isLeaderInTeam = teamPermission && conversation_id === teamPermission.leaderConversationId;
   const { checkAndUpdateTitle } = useAutoTitle();
   const { atPath, uploadFile, setAtPath, setUploadFile, content, setContent } = useSendBoxDraft(conversation_id);
 
@@ -381,24 +373,7 @@ Please check your local CLI tool authentication status`,
         defaultMultiLine={true}
         lockMultiLine={true}
         tools={<FileAttachButton openFileSelector={openFileSelector} onLocalFilesAdded={handleFilesAdded} />}
-        rightTools={
-          <div className='flex items-center gap-8px'>
-            {showModeSelector ? (
-              <AgentModeSelector
-                backend={backend}
-                conversation_id={conversation_id}
-                compact
-                initialMode={session_mode}
-                compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-                modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
-                compactLabelPrefix={t('agentMode.permission')}
-                hideCompactLabelPrefixOnMobile
-                onModeChanged={isLeaderInTeam ? teamPermission?.propagateMode : undefined}
-              />
-            ) : undefined}
-            {modelSelector}
-          </div>
-        }
+        rightTools={<div className='flex items-center gap-8px' />}
         prefix={
           <>
             {uploadFile.length > 0 && (
