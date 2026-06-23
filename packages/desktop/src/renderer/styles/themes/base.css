@@ -27,6 +27,13 @@
   --radius-panel: 10px; /* preview, editor, workspace, modals */
   --radius-card: 12px; /* card surfaces (aligned to de-facto 12px usage) */
 
+  /* Spacing scale (Phase 3) — for raw CSS files; complements UnoCSS p-*/m-* utilities. */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+
   /* Motion tokens — Phase 0 vocabulary.
      Distinct from the existing duration- and ease- tokens above.
      Phases 4, 6, 7, 10 will reference these for new motion.
