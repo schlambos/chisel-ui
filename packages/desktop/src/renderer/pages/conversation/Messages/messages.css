@@ -5,6 +5,7 @@
  * 8px gap to content. */
 .message-agent {
   position: relative;
+  box-sizing: border-box;
   width: 100%;
   padding-left: 16px;
   border-left: 3px solid var(--msg-agent-edge, var(--brand));
@@ -17,6 +18,7 @@
  * + Catppuccin + any future user preset) so the recessed ground always
  * renders. Falls back to bg-2 for safety. */
 .message-user {
+  box-sizing: border-box;
   width: 100%;
   padding: 12px;
   background: var(--message-user-bg, var(--bg-2)) !important;
