@@ -1,25 +1,17 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import EmptyState from '@/renderer/components/base/feedback/EmptyState';
+import styles from './ConversationEmptyState.module.css';
 
 const ConversationEmptyState: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className='flex-center size-full' style={{ position: 'relative' }}>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'radial-gradient(circle, var(--bg-4) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-          opacity: 0.3,
-          maskImage: 'radial-gradient(circle, black 30%, transparent 70%)',
-          WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 70%)',
-        }}
-      />
-      <p style={{ color: 'var(--text-disabled)', fontSize: 14, zIndex: 1, margin: 0 }}>
-        {t('conversation.emptyState', 'Start a conversation...')}
-      </p>
+    <div className={styles.root} data-testid='conversation-empty-state'>
+      <div className={styles.backdrop} data-testid='conversation-empty-state-backdrop' aria-hidden='true' />
+      <div className={`${styles.content} flex-center`}>
+        <EmptyState title={t('conversation.emptyState', 'Start a conversation...')} />
+      </div>
     </div>
   );
 };
