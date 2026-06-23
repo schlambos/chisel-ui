@@ -9,8 +9,32 @@
 }
 
 /* Sendbox focus ring — clean 1px brand border, no soft halo glow */
+.sendbox-panel {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  border-top: 1px solid var(--border-base);
+}
+
 .sendbox-panel--focused {
+  border-top-color: rgb(var(--primary-6));
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 40%, transparent);
+}
+
+.sendbox-panel--dragging {
+  border-top-color: rgb(var(--primary-3));
+  background-color: color-mix(in srgb, var(--brand) 8%, transparent);
+}
+
+.sendbox-export-panel {
+  border-color: var(--color-border-2);
+  background: color-mix(in srgb, var(--color-bg-1) 88%, transparent);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+}
+
+.sendbox-reply-icon {
+  line-height: 0;
 }
 
 /* Allow sendbox tools area to shrink so the send button stays visible */

@@ -51,7 +51,6 @@ const constVoid = (): void => undefined;
 // Threshold: switch to multi-line mode directly when character count exceeds this value to avoid heavy layout work
 const MAX_SINGLE_LINE_CHARACTERS = 800;
 const BTW_COMMAND_RE = /^\/btw(?:\s+([\s\S]*))?$/i;
-const AT_FILE_HIGHLIGHT_COLOR = theme.Color.PrimaryColor;
 
 const getSelectedItemMatchKeys = (item: FileSelectionItem): string[] => {
   if (typeof item === 'string') {
@@ -611,15 +610,7 @@ const SendBox: React.FC<{
 
   const renderExportFileNamePanel = () => {
     return (
-      <div
-        className='rounded-10px border border-solid overflow-hidden p-6px flex flex-col gap-6px'
-        style={{
-          borderColor: 'var(--color-border-2)',
-          background: 'color-mix(in srgb, var(--color-bg-1) 88%, transparent)',
-          backdropFilter: 'blur(14px) saturate(1.1)',
-          WebkitBackdropFilter: 'blur(14px) saturate(1.1)',
-        }}
-      >
+      <div className='sendbox-export-panel rounded-10px border border-solid overflow-hidden p-6px flex flex-col gap-6px'>
         <div className='text-13px font-semibold text-t-primary'>{t('messages.export.file_nameLabel')}</div>
         <Input
           autoFocus
@@ -1404,11 +1395,7 @@ const SendBox: React.FC<{
       }
 
       segments.push(
-        <span
-          className='sendbox-highlight-mention'
-          key={`mention-${match.start}-${index}`}
-          style={{ color: AT_FILE_HIGHLIGHT_COLOR }}
-        >
+        <span className='sendbox-highlight-mention' key={`mention-${match.start}-${index}`}>
           {input.slice(match.start, match.end)}
         </span>
       );
@@ -1431,16 +1418,6 @@ const SendBox: React.FC<{
       <div
         ref={containerRef}
         className={`sendbox-panel relative px-8px pt-6px pb-8px bg-1 flex flex-col ${isOverlayOpen ? 'overflow-visible' : 'overflow-hidden'} ${isFileDragging ? 'sendbox-panel--dragging' : ''} ${isInputFocused ? 'sendbox-panel--focused' : ''}`}
-        style={{
-          transition: 'background-color 0.2s ease, border-color 0.2s ease',
-          borderTop: '1px solid',
-          borderTopColor: isFileDragging
-            ? 'rgb(var(--primary-3))'
-            : isInputActive
-              ? 'rgb(var(--primary-6))'
-              : 'var(--border-base)',
-          ...(isFileDragging ? { backgroundColor: 'color-mix(in srgb, var(--brand) 8%, transparent)' } : null),
-        }}
         {...dragHandlers}
       >
         <BtwOverlay
@@ -1508,22 +1485,21 @@ const SendBox: React.FC<{
             )}
           </div>
         )}
-        <div style={{ width: '100%' }}>
+        <div className='w-full'>
           {prefix}
           {context}
           {/* Reply quote preview */}
           {replyQuote && (
             <div className='flex items-start gap-8px mb-4px px-8px py-6px rd-6px bg-fill-1 b-1 b-solid b-border-2'>
-              <div className='flex-shrink-0 mt-2px' style={{ lineHeight: 0 }}>
+              <div className='flex-shrink-0 mt-2px sendbox-reply-icon'>
                 <Quote theme='filled' size='16' fill='rgb(var(--primary-6))' />
               </div>
               <div className='flex-1 min-w-0 text-13px text-t-primary line-clamp-3 lh-20px whitespace-pre-wrap break-all'>
                 {replyQuote.content}
               </div>
               <div
-                className='flex-shrink-0 mt-2px p-2px rd-full cursor-pointer hover:bg-fill-3 transition-colors'
+                className='flex-shrink-0 mt-2px p-2px rd-full cursor-pointer hover:bg-fill-3 transition-colors sendbox-reply-icon'
                 onClick={() => setReplyQuote(null)}
-                style={{ lineHeight: 0 }}
               >
                 <CloseSmall theme='outline' size='14' />
               </div>
@@ -1577,21 +1553,13 @@ const SendBox: React.FC<{
         <UploadProgressBar source='sendbox' />
         <div className='w-full overflow-hidden'>
           <div
-            className='sendbox-highlight-container'
-            style={{
-              width: '100%',
-              minWidth: 0,
-              maxWidth: '100%',
-              marginBottom: '8px',
-              minHeight: isSingleLine ? '20px' : '40px',
-            }}
+            className={`sendbox-highlight-container ${isSingleLine ? 'sendbox-highlight-container--single' : 'sendbox-highlight-container--multi'}`}
           >
             <div
               ref={highlightScrollRef}
               aria-hidden='true'
-              className={`sendbox-highlight-layer text-13px ${isMobile ? 'sendbox-input--mobile' : ''} ${isSingleLine ? 'sendbox-highlight-layer--single' : ''}`}
+              className={`sendbox-highlight-layer text-13px ${isMobile ? 'sendbox-input--mobile' : ''} ${isSingleLine ? 'sendbox-highlight-layer--single' : ''} ${!shouldUseHighlightOverlay ? 'sendbox-highlight-layer--hidden' : ''}`}
               data-testid='sendbox-highlight-layer'
-              style={!shouldUseHighlightOverlay ? { visibility: 'hidden' } : undefined}
             >
               {renderHighlightedInputValue()}
             </div>
@@ -1606,22 +1574,8 @@ const SendBox: React.FC<{
                   : ((bottomHint as string | undefined) ??
                     t('conversation.sendbox.hint', { defaultValue: 'Type / for commands, @ to reference files' }))
               }
-              className={`${shouldUseHighlightOverlay ? 'sendbox-highlight-textarea ' : ''}pl-0 pr-0 !b-none focus:shadow-none m-0 !bg-transparent !focus:bg-transparent !hover:bg-transparent lh-[18px] !resize-none text-13px ${isMobile ? 'sendbox-input--mobile' : ''}`}
+              className={`${shouldUseHighlightOverlay ? 'sendbox-highlight-textarea ' : ''}pl-0 pr-0 !b-none focus:shadow-none m-0 !bg-transparent !focus:bg-transparent !hover:bg-transparent lh-[18px] !resize-none text-13px ${isMobile ? 'sendbox-input--mobile' : ''} sendbox-textarea ${isSingleLine ? 'sendbox-textarea--single' : 'sendbox-textarea--multi'}`}
               data-testid='sendbox-input'
-              style={{
-                width: '100%',
-                minWidth: 0,
-                maxWidth: '100%',
-                margin: 0,
-                height: isSingleLine ? '20px' : 'auto',
-                minHeight: isSingleLine ? '20px' : '40px',
-                overflowY: isSingleLine ? 'hidden' : 'auto',
-                overflowX: 'hidden',
-                whiteSpace: isSingleLine ? 'nowrap' : 'pre-wrap',
-                textOverflow: isSingleLine ? 'ellipsis' : 'clip',
-                wordBreak: isSingleLine ? 'normal' : 'break-word',
-                overflowWrap: 'break-word',
-              }}
               onChange={handleTextAreaChange}
               onPaste={onPaste}
               onTouchStart={markMobileFocusIntent}

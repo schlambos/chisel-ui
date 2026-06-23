@@ -16,6 +16,18 @@
 
 .sendbox-highlight-container {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin-bottom: var(--space-sm, 8px);
+}
+
+.sendbox-highlight-container--single {
+  min-height: 20px;
+}
+
+.sendbox-highlight-container--multi {
+  min-height: 40px;
 }
 
 .sendbox-highlight-layer {
@@ -33,6 +45,10 @@
 
 .sendbox-highlight-layer--single {
   white-space: nowrap;
+}
+
+.sendbox-highlight-layer--hidden {
+  visibility: hidden;
 }
 
 .sendbox-highlight-text {
@@ -62,4 +78,35 @@
 .sendbox-highlight-textarea::placeholder {
   color: var(--text-disabled) !important; /* fights Arco placeholder color */
   -webkit-text-fill-color: var(--text-disabled) !important; /* fights WebKit placeholder fill */
+}
+
+.sendbox-textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  transition:
+    height 0.2s ease,
+    min-height 0.2s ease;
+}
+
+.sendbox-textarea--single {
+  height: 20px;
+  min-height: 20px;
+  overflow-y: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.sendbox-textarea--multi {
+  height: auto;
+  min-height: 40px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  text-overflow: clip;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
