@@ -7,7 +7,7 @@
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  padding-left: 16px;
+  padding-left: var(--space-lg);
   border-left: 3px solid var(--msg-agent-edge, var(--brand));
   background: transparent;
   color: var(--text-primary);
@@ -20,7 +20,7 @@
 .message-user {
   box-sizing: border-box;
   width: 100%;
-  padding: 12px;
+  padding: var(--space-md);
   background: var(--message-user-bg, var(--bg-2)) !important;
   border-radius: var(--radius-card);
   border: 0;
@@ -40,7 +40,7 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   font-size: 12px;
   line-height: 1.4;
   color: var(--text-secondary) !important;
@@ -94,7 +94,7 @@
   border: 1px solid var(--border-light);
   border-radius: var(--radius-card);
   background: var(--bg-1);
-  padding: 8px 12px;
+  padding: var(--space-sm) var(--space-md);
   margin: 4px 0;
   overflow: hidden;
 }
@@ -102,7 +102,7 @@
 .tool-shell__header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   min-height: 22px;
 }
 
@@ -158,7 +158,7 @@
 }
 
 .tool-shell__body {
-  margin-top: 8px;
+  margin-top: var(--space-sm);
 }
 
 /* Compact variant: inline row, no card chrome */
@@ -242,8 +242,8 @@
 .reverted-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px 4px;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg) var(--space-xs);
   color: var(--text-secondary);
   user-select: none;
 }
@@ -258,7 +258,7 @@
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
+  padding: var(--space-xs) var(--space-md);
   border-radius: 999px;
   font-size: 12px;
   line-height: 1.4;
@@ -285,8 +285,8 @@
 .compaction-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px 4px;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg) var(--space-xs);
   color: var(--text-secondary);
   user-select: none;
 }
@@ -301,7 +301,7 @@
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
+  padding: var(--space-xs) var(--space-md);
   border-radius: 999px;
   font-size: 12px;
   line-height: 1.4;
@@ -364,7 +364,7 @@
      bubble; that row is hidden on mobile, so add the spacing back here so
      bubbles don't visually merge. */
   .message-item {
-    margin-top: 8px !important;
+    margin-top: var(--space-sm) !important;
   }
 
   /* Apply consistent line-height to user message text */
@@ -377,7 +377,7 @@
 
 /* First message in a turn: top padding + author label visible */
 .message-item[data-turn-position="first"] {
-  margin-top: 12px;
+  margin-top: var(--space-md);
 }
 
 /* Middle messages: no extra top margin, author label hidden */
@@ -390,13 +390,13 @@
 
 /* Last message in a turn: bottom padding */
 .message-item[data-turn-position="last"] {
-  margin-bottom: 4px;
+  margin-bottom: var(--space-xs);
 }
 
 /* Solo message: both top and bottom padding */
 .message-item[data-turn-position="solo"] {
-  margin-top: 12px;
-  margin-bottom: 4px;
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-xs);
 }
 
 /* Subtle horizontal divider between turns */
@@ -406,7 +406,7 @@
   display: block;
   height: 1px;
   background: var(--border-light, var(--bg-3));
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
   opacity: 0.5;
 }
 
@@ -417,8 +417,8 @@
  * required to win against the generated utility class. */
 .message-item {
   box-sizing: border-box;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  padding-left: var(--space-lg) !important;
+  padding-right: var(--space-lg) !important;
 }
 
 /* Virtuoso scroller — prevent horizontal scrollbar from message padding */
