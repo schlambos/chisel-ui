@@ -68,7 +68,9 @@ import { useTranslation } from 'react-i18next';
 // Styles
 import './styles/fonts.css';
 import 'uno.css';
-import './styles/arco-override.css';
+import './styles/arco/arco-density.css';
+import './styles/arco/arco-theme.css';
+import './styles/arco/arco-components.css';
 import './styles/themes/index.css';
 
 // Config service — kick off initialization before i18n / theme modules load,
