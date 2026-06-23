@@ -291,15 +291,14 @@ const AionModal: React.FC<AionModalProps> = ({
           <div className='flex justify-end gap-10px mt-10px'>
             {/* 默认按钮提供统一圆角，文案可通过 cancelText/okText 覆盖 */}
             {/* Default buttons ship with rounded corners; text can be overridden via cancelText/okText */}
-            <Button onClick={onCancel} className='px-20px min-w-80px' style={{ borderRadius: 'var(--radius-control)' }}>
+            <Button onClick={onCancel} className='px-20px min-w-80px rounded-control'>
               {cancelLabel}
             </Button>
             <Button
               type='primary'
               onClick={props.onOk}
               loading={props.confirmLoading}
-              className='px-20px min-w-80px'
-              style={{ borderRadius: 'var(--radius-control)' }}
+              className='px-20px min-w-80px rounded-control'
             >
               {okLabel}
             </Button>
@@ -382,7 +381,7 @@ const AionModal: React.FC<AionModalProps> = ({
       style={finalStyle}
       getPopupContainer={() => document.body}
     >
-      <div className='aionui-modal-wrapper' style={{ borderRadius: borderRadiusVal }}>
+      <div className='aionui-modal-wrapper rounded-[var(--modal-radius)]' style={{ '--modal-radius': borderRadiusVal } as React.CSSProperties}>
         {renderHeader()}
         <div className='aionui-modal-body-content' style={bodyInlineStyle}>
           {children}
