@@ -1,0 +1,63 @@
+.root {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-base);
+  border-left-width: 3px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.error {
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  border-left-color: var(--danger);
+}
+
+.warning {
+  background: color-mix(in srgb, var(--warning) 8%, transparent);
+  border-left-color: var(--warning);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.message {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.retry {
+  background: var(--brand) !important;
+  border-color: var(--brand) !important;
+  color: var(--text-white) !important;
+}
+
+.retry:hover {
+  background: var(--brand-hover) !important;
+  border-color: var(--brand-hover) !important;
+}
