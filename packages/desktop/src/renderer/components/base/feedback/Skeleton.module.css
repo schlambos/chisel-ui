@@ -1,0 +1,59 @@
+/**
+ * @license
+ * Copyright 2025 AionUi (aionui.com)
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Skeleton primitive — shimmer placeholder used by feature screens during
+ * data fetches. Tokens (--bg-2, --bg-3, --radius-card, --radius-control)
+ * come from the Chisl theme so the skeleton tracks light/dark automatically.
+ */
+
+.skeleton {
+  display: inline-block;
+  background-color: var(--bg-2);
+  background-image: linear-gradient(90deg, var(--bg-2) 25%, var(--bg-3) 50%, var(--bg-2) 75%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  will-change: background-position;
+}
+
+.animated {
+  animation: chisl-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.reduced {
+  background-image: none;
+  animation: none;
+}
+
+.block {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-card);
+}
+
+.pill {
+  display: inline-block;
+  border-radius: var(--radius-control);
+}
+
+.circle {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+@keyframes chisl-skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated {
+    animation: none;
+    background-image: none;
+  }
+}
