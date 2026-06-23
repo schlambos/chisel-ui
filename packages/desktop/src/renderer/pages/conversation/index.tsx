@@ -1,5 +1,5 @@
 import { ipcBridge } from '@/common';
-import { Message, Spin } from '@arco-design/web-react';
+import { Message } from '@arco-design/web-react';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,6 +8,18 @@ import ChatConversation from './components/ChatConversation';
 import { usePreviewContext } from '@/renderer/pages/conversation/Preview';
 import { useAutoTitle } from '@/renderer/hooks/chat/useAutoTitle';
 import { getConversationOrNull } from '@/renderer/pages/conversation/utils/conversationCache';
+import Skeleton from '@/renderer/components/base/feedback/Skeleton';
+import ErrorBanner from '@/renderer/components/base/feedback/ErrorBanner';
+
+const ConversationLoadingSkeleton: React.FC = () => (
+  <div className='flex flex-col gap-16px p-16px w-full'>
+    <Skeleton variant='block' width='70%' height={48} />
+    <Skeleton variant='block' width='90%' height={80} />
+    <Skeleton variant='block' width='55%' height={36} />
+    <Skeleton variant='block' width='85%' height={64} />
+    <Skeleton variant='block' width='60%' height={40} />
+  </div>
+);
 
 const ChatConversationIndex: React.FC = () => {
   const { id } = useParams();
@@ -32,7 +44,7 @@ const ChatConversationIndex: React.FC = () => {
     previousConversationIdRef.current = id;
   }, [id, closePreview]);
 
-  const { data, isLoading, mutate } = useSWR(id ? `conversation/${id}` : null, () => {
+  const { data, isLoading, mutate, error } = useSWR(id ? `conversation/${id}` : null, () => {
     return getConversationOrNull(id!);
   });
 
@@ -62,13 +74,25 @@ const ChatConversationIndex: React.FC = () => {
   // browser history): show a toast and replace the route with home, so we
   // don't render an empty skeleton. Fire at most once per id.
   useEffect(() => {
-    if (!id || isLoading || data || notFoundHandledIdRef.current === id) return;
+    if (!id || isLoading || data || error || notFoundHandledIdRef.current === id) return;
     notFoundHandledIdRef.current = id;
     Message.warning(t('conversation.notFound'));
     navigate('/', { replace: true });
-  }, [id, isLoading, data, navigate, t]);
+  }, [id, isLoading, data, error, navigate, t]);
 
-  if (isLoading) return <Spin loading></Spin>;
+  if (error) {
+    const errorMessage = error instanceof Error ? error.message : typeof error === 'string' ? error : undefined;
+    return (
+      <ErrorBanner
+        title='Failed to load conversation'
+        message={errorMessage}
+        onRetry={() => {
+          void mutate();
+        }}
+      />
+    );
+  }
+  if (isLoading) return <ConversationLoadingSkeleton />;
   return <ChatConversation conversation={data ?? undefined}></ChatConversation>;
 };
 
