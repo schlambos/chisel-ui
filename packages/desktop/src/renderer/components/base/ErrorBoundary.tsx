@@ -27,6 +27,7 @@
  */
 
 import React from 'react';
+import ErrorBanner from '@/renderer/components/base/feedback/ErrorBanner';
 
 export type ErrorBoundaryFallback = (error: Error, reset: () => void) => React.ReactNode;
 
@@ -78,43 +79,11 @@ const ErrorBoundaryDefaultFallback: React.FC<{ error: Error; label?: string; onR
   label,
   onRetry,
 }) => (
-  <div
-    role='alert'
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 12,
-      padding: 24,
-      width: '100%',
-      height: '100%',
-      color: 'var(--text-secondary, #6b5f48)',
-      fontSize: 13,
-      textAlign: 'center',
-      boxSizing: 'border-box',
-    }}
-  >
-    <strong style={{ color: 'var(--brand, #b4480c)', fontSize: 14 }}>
-      {label ? `${label} unavailable` : 'This section is unavailable'}
-    </strong>
-    <span style={{ maxWidth: 360, wordBreak: 'break-word' }}>{error.message || String(error)}</span>
-    <button
-      type='button'
-      onClick={onRetry}
-      style={{
-        padding: '4px 12px',
-        borderRadius: 4,
-        border: '1px solid var(--bg-3, #d4d4d4)',
-        background: 'var(--bg-2, #ececec)',
-        color: 'inherit',
-        cursor: 'pointer',
-        font: 'inherit',
-      }}
-    >
-      Retry
-    </button>
-  </div>
+  <ErrorBanner
+    title={label ? `${label} unavailable` : 'This section is unavailable'}
+    message={error.message || String(error)}
+    onRetry={onRetry}
+  />
 );
 
 export default ErrorBoundary;
