@@ -414,6 +414,7 @@
  * padding for more breathing room inside each message row. !important is
  * required to win against the generated utility class. */
 .message-item {
+  box-sizing: border-box;
   padding-left: 16px !important;
   padding-right: 16px !important;
 }
