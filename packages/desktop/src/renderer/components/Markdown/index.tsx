@@ -26,6 +26,8 @@ import LocalImageView from '@renderer/components/media/LocalImageView';
 import CodeBlock from './CodeBlock';
 import ShadowView from './ShadowView';
 import { splitMarkdownBlocks } from './splitMarkdownBlocks';
+import codeStyles from './CodeBlock.module.css';
+import styles from './Markdown.module.css';
 
 const REMARK_PLUGINS = [remarkGfm, remarkMath, remarkBreaks];
 
@@ -42,24 +44,14 @@ const StreamingCode: React.FC<Record<string, unknown>> = (props) => {
   const text = String(children ?? '');
   if (!text.includes('\n')) {
     return (
-      <code className={className} style={{ fontWeight: 'bold' }}>
+      <code className={classNames(className, codeStyles.inlineCode)}>
         {text}
       </code>
     );
   }
   return (
-    <pre
-      style={{
-        background: 'var(--bg-2)',
-        borderRadius: '8px',
-        borderLeft: '3px solid var(--brand)',
-        padding: '8px 12px',
-        margin: 0,
-        overflowX: 'auto',
-        maxWidth: '100%',
-      }}
-    >
-      <code style={{ background: 'transparent', color: 'var(--text-primary)' }}>{text}</code>
+    <pre className={styles.streamingCodeBlock}>
+      <code className={styles.streamingCodeInner}>{text}</code>
     </pre>
   );
 };
@@ -173,28 +165,20 @@ const MarkdownView: React.FC<MarkdownViewProps> = React.memo(
             onClick={handleLinkClick}
           />
         ),
-        table: ({ node: _node, ...rest }: Record<string, unknown>) => (
-          <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+        table: ({ node: _node, className: cn, ...rest }: Record<string, unknown>) => (
+          <div className={styles.tableWrapper}>
             <table
               {...(rest as React.TableHTMLAttributes<HTMLTableElement>)}
-              style={{
-                ...(rest as { style?: React.CSSProperties }).style,
-                borderCollapse: 'collapse',
-                border: '1px solid var(--bg-3)',
-                minWidth: '100%',
-              }}
+              className={classNames(cn as string | undefined, styles.table)}
+              style={{ ...(rest as { style?: React.CSSProperties }).style }}
             />
           </div>
         ),
-        td: ({ node: _node, ...rest }: Record<string, unknown>) => (
+        td: ({ node: _node, className: cn, ...rest }: Record<string, unknown>) => (
           <td
             {...(rest as React.TdHTMLAttributes<HTMLTableCellElement>)}
-            style={{
-              ...(rest as { style?: React.CSSProperties }).style,
-              padding: '8px',
-              border: '1px solid var(--bg-3)',
-              minWidth: '120px',
-            }}
+            className={classNames(cn as string | undefined, styles.td)}
+            style={{ ...(rest as { style?: React.CSSProperties }).style }}
           />
         ),
         img: ({ node: _node, ...rest }: Record<string, unknown>) => {
