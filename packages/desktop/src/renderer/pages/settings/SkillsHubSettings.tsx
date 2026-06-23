@@ -1,9 +1,11 @@
 import { ipcBridge } from '@/common';
 import { Button, Message, Modal, Typography } from '@arco-design/web-react';
-import { Delete, FolderOpen, Info, Lightning, Puzzle, Search, Refresh } from '@icon-park/react';
+import { Book, Delete, FolderOpen, Info, Lightning, Puzzle, Search, Refresh } from '@icon-park/react';
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import EmptyState from '@/renderer/components/base/feedback/EmptyState';
+import Skeleton from '@/renderer/components/base/feedback/Skeleton';
 import SettingsPageWrapper from './components/SettingsPageWrapper';
 
 // Skill 信息类型 / Skill info type
@@ -285,14 +287,23 @@ const SkillsHubSettings: React.FC<SkillsHubSettingsProps> = ({ withWrapper = tru
                 </div>
               ))}
             </div>
-          ) : (
-            <div className='text-center text-t-secondary text-13px py-40px bg-fill-1 rounded-card border border-b-base border-dashed relative z-10'>
-              {loading
-                ? t('common.loading', { defaultValue: 'Please wait...' })
-                : t('settings.skillsHub.noSkills', {
-                    defaultValue: 'No skills found. Import some to get started.',
-                  })}
+          ) : loading ? (
+            <div
+              data-testid='my-skills-loading-skeletons'
+              className='w-full flex flex-col gap-6px relative z-10'
+            >
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton key={i} variant='pill' width='100%' height={72} />
+              ))}
             </div>
+          ) : (
+            <EmptyState
+              icon={<Book size={28} />}
+              title={t('settings.skillsHub.noSkills', {
+                defaultValue: 'No skills found. Import some to get started.',
+              })}
+              className='bg-fill-1 rounded-card border border-b-base border-dashed relative z-10'
+            />
           )}
         </div>
 

@@ -1,9 +1,11 @@
 import { Button, Collapse, Modal, Dropdown, Menu } from '@arco-design/web-react';
-import { Plus, Down } from '@icon-park/react';
+import { Plus, Down, Tool } from '@icon-park/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type IMcpServer, BUILTIN_IMAGE_GEN_ID } from '@/common/config/storage';
 import { getAgents } from '@/renderer/hooks/agent/useAgents';
+import EmptyState from '@/renderer/components/base/feedback/EmptyState';
+import Skeleton from '@/renderer/components/base/feedback/Skeleton';
 import AddMcpServerModal from '../components/AddMcpServerModal';
 import McpServerItem from './McpServerItem';
 import {
@@ -26,7 +28,7 @@ const McpManagement: React.FC<McpManagementProps> = ({ message }) => {
   const { t } = useTranslation();
 
   // 使用自定义hooks管理各种状态和操作
-  const { mcpServers, extensionMcpServers, saveMcpServers } = useMcpServers();
+  const { mcpServers, extensionMcpServers, saveMcpServers, isLoading } = useMcpServers();
   const visibleMcpServers = React.useMemo(() => mcpServers.filter(isVisibleMcpServer), [mcpServers]);
   const {
     agentInstallStatus,
@@ -267,8 +269,18 @@ const McpManagement: React.FC<McpManagementProps> = ({ message }) => {
         name={'mcp-servers'}
       >
         <div>
-          {visibleMcpServers.length === 0 && extensionMcpServers.length === 0 ? (
-            <div className='text-center py-8 text-t-secondary'>{t('settings.mcpNoServersFound')}</div>
+          {isLoading && visibleMcpServers.length === 0 && extensionMcpServers.length === 0 ? (
+            <div data-testid='mcp-servers-loading-skeletons' className='flex flex-col gap-12px'>
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton key={i} variant='block' height={52} />
+              ))}
+            </div>
+          ) : visibleMcpServers.length === 0 && extensionMcpServers.length === 0 ? (
+            <EmptyState
+              icon={<Tool size={28} />}
+              title={t('settings.mcpNoServersFound')}
+              className='bg-fill-1 rounded-card border border-b-base border-dashed'
+            />
           ) : (
             visibleMcpServers.map((server) => (
               <McpServerItem
