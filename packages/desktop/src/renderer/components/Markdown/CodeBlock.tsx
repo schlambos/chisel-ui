@@ -14,6 +14,7 @@ import { forgeDark, forgeLight } from './codeThemes';
 import { copyText } from '@/renderer/utils/ui/clipboard';
 import MermaidBlock from './MermaidBlock';
 import { formatCode, getDiffLineStyle } from './markdownUtils';
+import styles from './CodeBlock.module.css';
 
 const PREVIEW_LINES = 3;
 // code span: font-size 13px, line-height 20px (per ShadowView injection)
@@ -96,7 +97,7 @@ function CodeBlockImpl(props: CodeBlockProps) {
   // Inline code (single line)
   if (!String(children).includes('\n')) {
     return (
-      <code {...rest} className={className} style={{ fontWeight: 'bold' }}>
+      <code {...rest} className={`${className || ''} ${styles.inlineCode}`.trim()}>
         {children}
       </code>
     );
@@ -124,81 +125,52 @@ function CodeBlockImpl(props: CodeBlockProps) {
       });
   };
 
-  const iconFill = isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.45)';
-  const footerTextColor = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.35)';
-  const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-  const bgColor = isDark ? 'rgba(255,255,255,0.04)' : 'var(--bg-2)';
+  const dynamicStyles = {
+    '--cb-max-height': canCollapse && !expanded ? `${COLLAPSED_HEIGHT}px` : 'none',
+    ...props.codeStyle,
+  } as React.CSSProperties;
 
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', minWidth: 0, maxWidth: '100%', ...props.codeStyle }}
-      className='group'
+      style={dynamicStyles}
+      className={`group ${styles.container}`}
     >
-      <div
-        style={{
-          backgroundColor: bgColor,
-          borderRadius: '8px',
-          overflow: 'hidden',
-          borderLeft: '3px solid var(--brand)',
-        }}
-      >
+      <div className={styles.block}>
         {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '8px 12px',
-          }}
-        >
-          <span
-            style={{
-              color: footerTextColor,
-              fontSize: '10px',
-              lineHeight: '14px',
-              fontWeight: 600,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-            }}
-          >
+        <div className={styles.header}>
+          <span className={styles.language}>
             {language.toLocaleLowerCase()}
           </span>
           {/* Buttons: always visible on touch devices, hover-only on pointer devices */}
-          <div
-            className='opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity'
-            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-          >
+          <div className={`opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ${styles.actions}`}>
             {canCollapse && (
-              <span title={expanded ? t('common.collapse') : t('common.expand')} style={{ display: 'flex' }}>
+              <span title={expanded ? t('common.collapse') : t('common.expand')} className={styles.actionBtn}>
                 {expanded ? (
                   <Up
                     theme='outline'
                     size='14'
-                    style={{ cursor: 'pointer', display: 'block' }}
-                    fill={iconFill}
+                    className={styles.icon}
+                    fill="var(--text-secondary)"
                     onClick={toggleExpanded}
                   />
                 ) : (
                   <Down
                     theme='outline'
                     size='14'
-                    style={{ cursor: 'pointer', display: 'block' }}
-                    fill={iconFill}
+                    className={styles.icon}
+                    fill="var(--text-secondary)"
                     onClick={toggleExpanded}
                   />
                 )}
               </span>
             )}
-            <span title={t('common.copy')} style={{ display: 'flex' }}>
+            <span title={t('common.copy')} className={styles.actionBtn}>
               <Copy
                 theme='outline'
                 size='14'
-                style={{ cursor: 'pointer', display: 'block' }}
-                fill={iconFill}
+                className={styles.icon}
+                fill="var(--text-secondary)"
                 onClick={handleCopy}
               />
             </span>
@@ -206,14 +178,7 @@ function CodeBlockImpl(props: CodeBlockProps) {
         </div>
 
         {/* Code content — always full content, clipped by maxHeight when collapsed */}
-        <div
-          style={{
-            position: 'relative',
-            maxHeight: canCollapse && !expanded ? `${COLLAPSED_HEIGHT}px` : 'none',
-            overflowY: 'hidden',
-            overflowX: 'visible',
-          }}
-        >
+        <div className={styles.content}>
           <SyntaxHighlighter
             children={formattedContent}
             language={language}
@@ -230,59 +195,26 @@ function CodeBlockImpl(props: CodeBlockProps) {
                   })
                 : undefined
             }
-            customStyle={{
-              margin: 0,
-              padding: '0 12px 8px',
-              borderRadius: 0,
-              border: 'none',
-              background: 'transparent',
-              color: 'var(--text-primary)',
-              overflowX: 'auto',
-              maxWidth: '100%',
-            }}
+            className={styles.syntaxPre}
             codeTagProps={{
-              style: {
-                color: 'var(--text-primary)',
-                background: 'transparent',
-              },
+              className: styles.syntaxCode,
             }}
           />
           {canCollapse && !expanded && (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '40px',
-                background: `linear-gradient(transparent, ${bgColor})`,
-                pointerEvents: 'none',
-              }}
-            />
+            <div className={styles.gradient} />
           )}
         </div>
 
         {/* Footer */}
         {canCollapse && (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: '6px 12px',
-              cursor: 'pointer',
-              gap: '4px',
-              borderTop: `1px solid ${borderColor}`,
-            }}
-            onClick={toggleExpanded}
-          >
-            <span style={{ color: footerTextColor, fontSize: '12px' }}>
+          <div className={styles.footer} onClick={toggleExpanded}>
+            <span className={styles.footerText}>
               {expanded ? t('common.collapse') : t('common.viewMoreLines', { count: totalLines - PREVIEW_LINES })}
             </span>
             {expanded ? (
-              <Up theme='outline' size='12' fill={footerTextColor} />
+              <Up theme='outline' size='12' fill="var(--text-tertiary)" />
             ) : (
-              <Down theme='outline' size='12' fill={footerTextColor} />
+              <Down theme='outline' size='12' fill="var(--text-tertiary)" />
             )}
           </div>
         )}

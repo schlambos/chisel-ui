@@ -1,0 +1,98 @@
+.inlineCode {
+  font-weight: bold;
+}
+
+.container {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.block {
+  background-color: var(--bg-2);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border-left: 3px solid var(--brand);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+}
+
+.language {
+  color: var(--text-tertiary);
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: var(--radius-control);
+  background: var(--bg-3);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.actionBtn {
+  display: flex;
+}
+
+.icon {
+  cursor: pointer;
+  display: block;
+}
+
+.content {
+  position: relative;
+  max-height: var(--cb-max-height);
+  overflow-y: hidden;
+  overflow-x: visible;
+}
+
+.syntaxPre {
+  margin: 0 !important;
+  padding: 0 var(--space-md) var(--space-sm) !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  overflow-x: auto !important;
+  max-width: 100% !important;
+}
+
+.syntaxCode {
+  color: var(--text-primary) !important;
+  background: transparent !important;
+}
+
+.gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(transparent, var(--bg-2));
+  pointer-events: none;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px var(--space-md);
+  cursor: pointer;
+  gap: var(--space-xs);
+  border-top: 1px solid var(--color-border-1);
+}
+
+.footerText {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
