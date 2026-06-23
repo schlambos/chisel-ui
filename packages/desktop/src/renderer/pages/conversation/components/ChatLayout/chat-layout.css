@@ -1,8 +1,12 @@
-/* Chat layout header styles */
+/* Chat layout header styles - Professional Redesign */
 
-/* Phase 10 — Path C: active-pane signal. A 1px rust inset draws the active
-   pane's outer edge without shifting layout. Inactive panes carry no extra
-   accent — they keep their existing borders. */
+/* Header container - clean, professional appearance */
+.chat-layout-header {
+  background: var(--color-bg-1);
+  border-bottom: 1px solid var(--color-border-2);
+}
+
+/* Phase 10 — Path C: active-pane signal */
 .chat-pane {
   transition: box-shadow var(--motion-fast) var(--motion-ease-standard);
 }
@@ -11,55 +15,75 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 60%, transparent);
 }
 
-/* Phase 10 — context-strip consolidation. The conversation header IS the strip:
-   one thin dense row carrying the agent logo, editable title, file activity, and
-   the right-side controls. De-bubble those controls (server picker, tool-host,
-   overflow) — drop the filled-pill background/border so they read as flat inline
-   controls, keeping their semantic text color as a subtle accent. */
+/* Header tag styling - flat, modern look */
 .chat-layout-header .arco-tag {
   background-color: transparent !important;
   border-color: transparent !important;
-  height: 20px;
-  line-height: 18px;
-  padding: 0 4px;
-  transition: background-color var(--motion-fast) var(--motion-ease-standard);
+  border-radius: 4px;
+  height: 24px;
+  line-height: 22px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all var(--motion-fast) var(--motion-ease-standard);
 }
 
 .chat-layout-header .arco-tag:hover {
-  background-color: var(--bg-2) !important;
+  background-color: var(--color-fill-2) !important;
 }
 
+/* Button styling - compact and professional */
+.chat-layout-header .arco-btn-size-small {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chat-layout-header .arco-btn-shape-circle.arco-btn-size-small {
+  width: 28px;
+  padding: 0;
+}
+
+/* De-bubbled secondary buttons */
 .chat-layout-header .arco-btn-secondary {
   background-color: transparent !important;
   border-color: transparent !important;
 }
 
 .chat-layout-header .arco-btn-secondary:hover {
-  background-color: var(--bg-2) !important;
+  background-color: var(--color-fill-2) !important;
 }
 
-/* Densify the controls so the whole strip collapses to ~24px instead of being
-   propped open by Arco's default small-button height. */
-.chat-layout-header .arco-btn-size-small {
-  height: 22px;
-  min-width: 22px;
-  padding: 0 4px;
+/* Title editor styling */
+.chat-layout-header .chat-title-editor {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-1);
 }
 
-.chat-layout-header .arco-btn-shape-circle.arco-btn-size-small {
-  width: 22px;
+.chat-layout-header .chat-title-editor:hover {
+  color: var(--color-text-1);
 }
 
+.chat-layout-header .chat-title-editor:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+/* Mobile header */
 .chat-layout-header--mobile-unified {
   height: 46px !important;
   min-height: 46px;
   padding: 0 12px !important;
-  /* Mobile fade lives here; the conversation titlebar stays flat above it. */
   background: linear-gradient(180deg, var(--bg-2) 0%, transparent 100%) !important;
   border-bottom: none;
   box-shadow: none;
 }
 
+/* Glass effect header */
 .chat-layout-header--glass {
   position: relative;
   isolation: isolate;
@@ -97,7 +121,7 @@
   }
 }
 
-/* Workspace open button dropdown styles */
+/* Workspace dropdown */
 .workspace-open-dropdown {
   background-color: var(--color-bg-2);
   border-radius: var(--radius-control);
@@ -105,14 +129,43 @@
   color: var(--color-text-1);
 }
 
-/* R3: header-model-btn, agent-mode-compact-pill, and
-   agent-mode-compact-pill--readonly collapsed into .composerPill
-   with modifiers in sendbox.css. The mobile pill sizing rules are
-   now handled by .composerPill base + .composerPill--compact
-   and .composerPill--readonly. No local overrides needed. */
-
+/* Composer pill references */
 @media (max-width: 767px) {
   .chat-header-cron-pill {
     margin-right: 4px;
   }
+}
+
+/* Header right side - allows natural overflow with scrolling */
+.chat-header-right {
+  flex: 0 1 auto;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+/* Header controls container */
+.chat-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Control group styling for visual hierarchy */
+.chat-header-control-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--color-fill-1);
+  border-radius: 6px;
+}
+
+/* Primary controls (permission, model) - more prominent */
+.chat-header-primary-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--color-border-2);
 }

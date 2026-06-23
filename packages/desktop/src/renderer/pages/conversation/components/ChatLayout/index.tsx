@@ -1,21 +1,15 @@
-import { AgentLogoIcon } from '@/renderer/components/agent/AgentBadge';
 import type { PresetAssistantInfo } from '@/renderer/hooks/agent/usePresetAssistantInfo';
-import FlexFullContainer from '@/renderer/components/layout/FlexFullContainer';
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
 import { useResizableSplit } from '@/renderer/hooks/ui/useResizableSplit';
-import ChatTitleEditor from '@/renderer/pages/conversation/components/ChatTitleEditor';
-import ConversationTitleMinimap from '@/renderer/pages/conversation/components/ConversationTitleMinimap';
 import { useGitChanges } from '@/renderer/pages/conversation/Workspace/hooks/useGitChanges';
 import MobileWorkspaceOverlay from './MobileWorkspaceOverlay';
 import WorkspacePanelHeader, { DesktopWorkspaceToggle } from './WorkspacePanelHeader';
 import { useContainerWidth } from '@/renderer/pages/conversation/hooks/useContainerWidth';
 import { useLayoutConstraints } from '@/renderer/pages/conversation/hooks/useLayoutConstraints';
 import { usePreviewAutoCollapse } from '@/renderer/pages/conversation/hooks/usePreviewAutoCollapse';
-import { useTitleRename } from '@/renderer/pages/conversation/hooks/useTitleRename';
 import { useWorkspaceCollapse } from '@/renderer/pages/conversation/hooks/useWorkspaceCollapse';
 import { PreviewPanel, usePreviewContext } from '@/renderer/pages/conversation/Preview';
 import { dispatchWorkspaceToggleEvent } from '@/renderer/utils/workspace/workspaceEvents';
-import { useConversationAgents } from '@/renderer/pages/conversation/hooks/useConversationAgents';
 import classNames from 'classnames';
 import { isMacEnvironment, isWindowsEnvironment } from '@/renderer/pages/conversation/utils/detectPlatform';
 import {
@@ -30,7 +24,6 @@ import { Layout as ArcoLayout } from '@arco-design/web-react';
 import { ExpandLeft, ExpandRight } from '@icon-park/react';
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useTranslation } from 'react-i18next';
 import './chat-layout.css';
 
 // headerExtra allows injecting custom actions (e.g., model picker) into the header's right area
@@ -65,9 +58,7 @@ const ChatLayout: React.FC<{
   /** Optional override for the leading icon shown before the title (e.g. team Peoples icon) */
   headerLeading?: React.ReactNode;
 }> = (props) => {
-  const { conversation_id, workspacePath, isTemporaryWorkspace } = props;
-  const { backend, presetAssistant, agent_name, workspaceEnabled = true, workspacePreferenceKey } = props;
-  const { t } = useTranslation();
+  const { conversation_id, workspacePath, isTemporaryWorkspace, workspaceEnabled = true, workspacePreferenceKey } = props;
   const layout = useLayoutContext();
   const isMacRuntime = isMacEnvironment();
   const isWindowsRuntime = isWindowsEnvironment();
@@ -89,25 +80,7 @@ const ChatLayout: React.FC<{
   // --- Hook B: container width ---
   const { containerRef, containerWidth } = useContainerWidth();
 
-  // --- Hook C: title rename ---
-  const { editingTitle, setEditingTitle, titleDraft, setTitleDraft, renameLoading, canRenameTitle, submitTitleRename } =
-    useTitleRename({
-      title: props.title,
-      conversation_id,
-      onRename: props.onRenameTitle,
-    });
 
-  // Resolve backend display name from detected agents catalog (backend-authoritative).
-  // Custom ACP agents live in the same catalog with `agent_source === 'custom'`,
-  // so we no longer need a separate `acp.customAgents` ConfigStorage fallback.
-  const { cliAgents } = useConversationAgents();
-  const backendAgentName = backend
-    ? cliAgents.find((a) => a.backend === backend || a.agent_type === backend)?.name
-    : undefined;
-  const capitalizedBackend = backend ? backend.charAt(0).toUpperCase() + backend.slice(1) : backend;
-
-  // Compute display name with fallback chain
-  const display_name = presetAssistant?.name || agent_name || backendAgentName || capitalizedBackend;
 
   const {
     splitRatio: workspaceWidthPxPref,
@@ -145,7 +118,7 @@ const ChatLayout: React.FC<{
   });
 
   // Full metrics with real chatSplitRatio
-  const { chatFlex, workspaceWidthPx, titleAreaMaxWidth, mobileWorkspaceHandleRight } = calcLayoutMetrics({
+  const { chatFlex, workspaceWidthPx, mobileWorkspaceHandleRight } = calcLayoutMetrics({
     containerWidth,
     workspaceWidthPx: workspaceWidthPxPref,
     chatSplitRatio,
@@ -215,17 +188,9 @@ const ChatLayout: React.FC<{
     return () => observer.disconnect();
   }, [layout?.isMobile]);
 
-  const changesLabel =
-    changeCount === 1
-      ? t('conversation.contextStrip.changeCount', { defaultValue: '1 change' })
-      : t('conversation.contextStrip.changesCountPlural', {
-          count: changeCount,
-          defaultValue: '{{count}} changes',
-        });
-
   const desktopHeader = (
     <ArcoLayout.Header
-      className='min-h-24px flex items-center justify-between px-12px py-2px gap-10px !bg-1 chat-layout-header chat-layout-strip overflow-hidden border-b border-b-light cursor-pointer'
+      className='min-h-32px flex items-center justify-between px-12px py-4px !bg-1 chat-layout-header border-b border-color-border-2'
       role='button'
       tabIndex={0}
       onClick={(e) => {
@@ -242,52 +207,21 @@ const ChatLayout: React.FC<{
         }
       }}
     >
-      <FlexFullContainer className='h-full min-w-0' containerClassName='flex items-center gap-8px min-w-0'>
-        <ChatTitleEditor
-          editingTitle={editingTitle}
-          titleDraft={titleDraft}
-          setTitleDraft={setTitleDraft}
-          setEditingTitle={setEditingTitle}
-          renameLoading={renameLoading}
-          canRenameTitle={canRenameTitle}
-          submitTitleRename={submitTitleRename}
-          titleAreaMaxWidth={Math.min(titleAreaMaxWidth, 240)}
-          title={props.title}
-          conversation_id={conversation_id}
-          leading={
-            props.headerLeading ??
-            ((backend || presetAssistant) && (
-              <AgentLogoIcon
-                backend={backend}
-                agent_name={display_name}
-                agentLogo={presetAssistant?.logo}
-                agentLogoIsEmoji={presetAssistant?.isEmoji}
-              />
-            ))
-          }
-        />
-        <span className='shrink-0 flex items-center gap-4px text-xs whitespace-nowrap'>
-          <span className='text-t-tertiary' aria-hidden='true'>
-            ·
-          </span>
-          <span className='text-t-secondary'>{changesLabel}</span>
-        </span>
-      </FlexFullContainer>
-      <div className='flex items-center gap-8px shrink-0' onClick={(e) => e.stopPropagation()}>
-        {conversation_id && <ConversationTitleMinimap conversation_id={conversation_id} />}
-        {props.headerExtra}
-        {isWindowsRuntime && workspaceEnabled && !WORKSPACE_PANE_GHOSTED && (
-          <button
-            type='button'
-            className='workspace-header__toggle'
-            aria-label='Toggle workspace'
-            onClick={() => dispatchWorkspaceToggleEvent()}
-          >
-            {rightSiderCollapsed ? <ExpandRight size={16} /> : <ExpandLeft size={16} />}
-          </button>
-        )}
-      </div>
-    </ArcoLayout.Header>
+
+       <div className='flex items-center gap-8px' onClick={(e) => e.stopPropagation()}>
+         {props.headerExtra}
+         {isWindowsRuntime && workspaceEnabled && !WORKSPACE_PANE_GHOSTED && (
+           <button
+             type='button'
+             className='workspace-header__toggle hover:bg-color-fill-2 rounded-4px p-4px transition-colors'
+             aria-label='Toggle workspace'
+             onClick={() => dispatchWorkspaceToggleEvent()}
+           >
+             {rightSiderCollapsed ? <ExpandRight size={16} /> : <ExpandLeft size={16} />}
+           </button>
+         )}
+       </div>
+     </ArcoLayout.Header>
   );
 
   const headerBlock = (

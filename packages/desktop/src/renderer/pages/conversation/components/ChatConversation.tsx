@@ -10,8 +10,9 @@ import { uuid } from '@/common/utils';
 import addChatIcon from '@/renderer/assets/icons/add-chat.svg';
 import { usePresetAssistantInfo, resolveAssistantConfigId } from '@/renderer/hooks/agent/usePresetAssistantInfo';
 import { iconColors } from '@/renderer/styles/colors';
+import { useTeamPermission } from '@/renderer/pages/team/hooks/TeamPermissionContext';
 import { Button, Dropdown, Menu, Tooltip, Typography } from '@arco-design/web-react';
-import { History } from '@icon-park/react';
+import { History, Shield } from '@icon-park/react';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +29,9 @@ import RemoteLspBadge from '../platforms/remote/RemoteLspBadge';
 import RemoteVcsBadge from '../platforms/remote/RemoteVcsBadge';
 import RemoteSessionActions from '../platforms/remote/RemoteSessionActions';
 import RemoteSessionBadge from '../platforms/remote/RemoteSessionBadge';
-import RemoteServerBadge from '../platforms/remote/RemoteServerBadge';
 import AcpModelSelector from '@/renderer/components/agent/AcpModelSelector';
-import BgProcesses from '../components/BgProcesses';
+import AgentModeSelector from '@/renderer/components/agent/AgentModeSelector';
+import ConversationTitleMinimap from '@/renderer/pages/conversation/components/ConversationTitleMinimap';
 import { getConversationOrNull } from '@/renderer/pages/conversation/utils/conversationCache';
 import GoogleModelSelector from '../platforms/gemini/GoogleModelSelector';
 import AionrsChat from '../platforms/aionrs/AionrsChat';
@@ -198,6 +199,7 @@ const ChatConversation: React.FC<{
   const { t } = useTranslation();
   const { openPreview } = usePreviewContext();
   const workspaceEnabled = Boolean(conversation?.extra?.workspace);
+  const teamPermission = useTeamPermission();
 
   const isAionrsConversation = conversation?.type === 'aionrs';
 
@@ -237,13 +239,11 @@ const ChatConversation: React.FC<{
             conversation_id={conversation.id}
             workspace={conversation.extra?.workspace}
             backend={conversation.extra?.backend || 'claude'}
-            session_mode={conversation.extra?.session_mode}
             agent_name={assistantDisplayName}
             cron_job_id={(conversation.extra as { cron_job_id?: string })?.cron_job_id}
             hideSendBox={hideSendBox}
             loadedSkills={(conversation.extra as { skills?: string[] } | undefined)?.skills}
             emptySlot={<ConversationEmptyState />}
-            modelSelector={modelSelector}
           ></AcpChat>
         );
       case 'gemini':
@@ -264,7 +264,6 @@ const ChatConversation: React.FC<{
             hideSendBox={hideSendBox}
             loadedSkills={(conversation.extra as { skills?: string[] } | undefined)?.skills}
             emptySlot={<ConversationEmptyState />}
-            modelSelector={modelSelector}
           />
         );
       case 'codex': // Legacy: codex now uses ACP protocol
@@ -278,7 +277,6 @@ const ChatConversation: React.FC<{
             hideSendBox={hideSendBox}
             loadedSkills={(conversation.extra as { skills?: string[] } | undefined)?.skills}
             emptySlot={<ConversationEmptyState />}
-            modelSelector={modelSelector}
           />
         );
       case 'openclaw-gateway':
@@ -315,13 +313,12 @@ const ChatConversation: React.FC<{
             history_loaded={(conversation.extra as { history_loaded?: boolean } | undefined)?.history_loaded}
             extra={conversation.extra}
             emptySlot={<ConversationEmptyState />}
-            modelSelector={modelSelector}
           />
         );
       default:
         return null;
     }
-  }, [conversation, isAionrsConversation, assistantDisplayName, hideSendBox, modelSelector]);
+  }, [conversation, isAionrsConversation, assistantDisplayName, hideSendBox]);
 
   const sliderTitle = useMemo(() => {
     return (
@@ -362,64 +359,78 @@ const ChatConversation: React.FC<{
         };
 
   const headerExtraNode = (
-    <div className='flex items-center gap-8px'>
+    <div className='chat-header-controls flex items-center'>
+      {/* Remote conversation: session badges group */}
       {conversation?.type === 'remote' && conversation && (
-        <div className='shrink-0'>
-          <BgProcesses
-            remoteAgentId={
-              (conversation.extra as { remoteAgentId?: string; remote_agent_id?: string } | undefined)?.remoteAgentId ||
-              (conversation.extra as { remoteAgentId?: string; remote_agent_id?: string } | undefined)
-                ?.remote_agent_id ||
-              null
-            }
-          />
+        <div className='chat-header-control-group'>
+          <div className='shrink-0'>
+            <RemoteSessionBadge conversation={conversation} />
+          </div>
+          <div className='shrink-0'>
+            <ConversationTitleMinimap conversation_id={conversation.id} />
+          </div>
+          <div className='shrink-0'>
+            <RemoteToolHostBadge conversation_id={conversation.id} />
+          </div>
+          <div className='shrink-0'>
+            <RemoteVcsBadge conversation_id={conversation.id} />
+          </div>
+          <div className='shrink-0'>
+            <RemoteLspBadge conversation_id={conversation.id} />
+          </div>
+          <div className='shrink-0'>
+            <RemoteSessionActions conversation={conversation} />
+          </div>
         </div>
       )}
-      {conversation?.type === 'remote' && conversation && (
+      
+      {/* Primary controls group: permission + model selector */}
+      <div className='chat-header-primary-controls'>
+        {(conversation?.type === 'acp' || conversation?.type === 'remote') && conversation && (
+          <div className='shrink-0'>
+            <AgentModeSelector
+              backend={(conversation.extra as { backend?: string } | undefined)?.backend || 'opencode'}
+              conversation_id={conversation.id}
+              compact
+              initialMode={(conversation.extra as { session_mode?: string } | undefined)?.session_mode}
+               compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
+               modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
+               compactLabelPrefix={t('agentMode.agent')}
+               hideCompactLabelPrefixOnMobile
+              onModeChanged={
+                teamPermission && conversation.id === teamPermission.leaderConversationId
+                  ? teamPermission.propagateMode
+                  : undefined
+              }
+            />
+          </div>
+        )}
+        {modelSelector && (conversation?.type === 'acp' || conversation?.type === 'remote') && (
+          <div className='shrink-0'>{modelSelector}</div>
+        )}
+        {modelSelector &&
+          conversation?.type !== 'acp' &&
+          conversation?.type !== 'remote' &&
+          conversation?.type !== 'gemini' &&
+          conversation?.type !== 'codex' && <div className='shrink-0'>{modelSelector}</div>}
+      </div>
+      
+      {/* ACP minimap */}
+      {conversation?.type === 'acp' && conversation && (
         <div className='shrink-0'>
-          <RemoteSessionBadge conversation={conversation} />
+          <ConversationTitleMinimap conversation_id={conversation.id} />
         </div>
       )}
-      {conversation?.type === 'remote' && conversation && (
-        <div className='shrink-0'>
-          <RemoteServerBadge conversation={conversation} />
-        </div>
-      )}
-      {conversation?.type === 'remote' && (
-        <div className='shrink-0'>
-          <RemoteToolHostBadge conversation_id={conversation.id} />
-        </div>
-      )}
-      {conversation?.type === 'remote' && (
-        <div className='shrink-0'>
-          <RemoteVcsBadge conversation_id={conversation.id} />
-        </div>
-      )}
-      {conversation?.type === 'remote' && (
-        <div className='shrink-0'>
-          <RemoteLspBadge conversation_id={conversation.id} />
-        </div>
-      )}
-      {conversation?.type === 'remote' && (
-        <div className='shrink-0'>
-          <RemoteSessionActions conversation={conversation} />
-        </div>
-      )}
-      {conversation?.type === 'openclaw-gateway' && (
+      
+      {/* StarOfficeMonitorCard for openclaw-gateway */}
+      {conversation?.type === 'openclaw-gateway' && conversation && (
         <div className='shrink-0'>
           <StarOfficeMonitorCard
             conversation_id={conversation.id}
-            onOpenUrl={(url, metadata) => {
-              openPreview(url, 'url', metadata);
-            }}
+            onOpenUrl={(url, metadata) => openPreview(url, 'url', metadata)}
           />
         </div>
       )}
-      {modelSelector &&
-        conversation?.type !== 'acp' &&
-        conversation?.type !== 'remote' &&
-        conversation?.type !== 'gemini' &&
-        conversation?.type !== 'codex' && <div className='shrink-0'>{modelSelector}</div>}
     </div>
   );
 
