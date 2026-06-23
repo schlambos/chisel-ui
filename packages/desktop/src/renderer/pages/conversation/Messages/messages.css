@@ -422,6 +422,6 @@
 }
 
 /* Virtuoso scroller — prevent horizontal scrollbar from message padding */
-[data-testid='virtuoso-scroller'] {
+[data-testid='virtuoso-scroller'][data-virtuoso-scroller] {
   overflow-x: hidden !important;
 }
