@@ -7,13 +7,14 @@
 import { ipcBridge } from '@/common';
 import type { TChatConversation } from '@/common/config/storage';
 import AionModal from '@/renderer/components/base/AionModal';
+import EmptyState from '@/renderer/components/base/feedback/EmptyState';
 import DirectorySelectionModal from '@/renderer/components/settings/DirectorySelectionModal';
 import { addRecentWorkspace } from '@/renderer/components/workspace';
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
 import { useCronJobsMap } from '@/renderer/pages/cron';
 import { DndContext, DragOverlay, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Button, Dropdown, Empty, Input, Menu, Modal, Tooltip } from '@arco-design/web-react';
+import { Button, Dropdown, Input, Menu, Modal, Tooltip } from '@arco-design/web-react';
 import { Delete, FolderOpen, MoreOne, Plus, Right } from '@icon-park/react';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo } from 'react';
@@ -710,7 +711,7 @@ const WorkspaceGroupedHistory: React.FC<WorkspaceGroupedHistoryProps> = ({
 
         {isEmpty && !collapsed && (
           <div className='py-48px flex-center'>
-            <Empty description={t('conversation.history.noHistory')} />
+            <EmptyState title={t('conversation.history.noHistory')} />
           </div>
         )}
       </div>

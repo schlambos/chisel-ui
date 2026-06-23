@@ -7,8 +7,9 @@
 import { ipcBridge } from '@/common';
 import type { IMessageSearchItem } from '@/common/types/team/database';
 import AionModal from '@/renderer/components/base/AionModal';
+import EmptyState from '@/renderer/components/base/feedback/EmptyState';
 import { blockMobileInputFocus, blurActiveElement } from '@/renderer/utils/ui/focus';
-import { Empty, Spin, Typography } from '@arco-design/web-react';
+import { Spin, Typography } from '@arco-design/web-react';
 import { Close, CloseSmall, FolderClose, MessageOne, Search } from '@icon-park/react';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -331,7 +332,10 @@ const ConversationSearchPopover: React.FC<ConversationSearchPopoverProps> = ({
     if (items.length === 0) {
       return (
         <div className='conversation-search-modal__state'>
-          <Empty className='py-2px' description={t('conversation.historySearch.empty')} />
+          <EmptyState
+            icon={<Search theme='outline' size='32' fill='currentColor' />}
+            title={t('conversation.historySearch.empty')}
+          />
         </div>
       );
     }
