@@ -12,14 +12,264 @@ import { getConversationOrNull, refreshConversationCache } from '@/renderer/page
 import { findShadowedPaths } from './configShadowDiff';
 import { useRemoteMessage } from './useRemoteMessage';
 import { iconColors } from '@/renderer/styles/colors';
-import { Button, Dropdown, Input, Menu, Message, Modal, Tooltip } from '@arco-design/web-react';
-import { Branch, Copy, More, Refresh, ShareTwo, FileText, Setting } from '@icon-park/react';
+import { Button, Dropdown, Input, Menu, Message, Modal, Spin, Tag, Tooltip, Typography } from '@arco-design/web-react';
+import { Branch, Copy, More, Refresh, ShareTwo, FileText, Setting, LinkCloud } from '@icon-park/react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { emitter } from '@/renderer/utils/emitter';
 import { copyText } from '@/renderer/utils/ui/clipboard';
 import { dispatchWorkspaceOpenRemoteChangesEvent } from '@/renderer/utils/workspace/workspaceEvents';
+
+/**
+ * Remote Session Details Panel - shows attached processes and server details in an overlay
+ */
+const RemoteSessionDetailsPanel: React.FC<{
+  visible: boolean;
+  onClose: () => void;
+  conversation: TChatConversation;
+}> = ({ visible, onClose, conversation }) => {
+  const { t } = useTranslation();
+  const [agents, setAgents] = useState<Array<{ id: string; name: string; protocol?: string }>>([]);
+  const [currentAgentId, setCurrentAgentId] = useState<string | undefined>();
+  const [currentAgentName, setCurrentAgentName] = useState<string | undefined>();
+  const [health, setHealth] = useState<Record<string, { healthy: boolean; error?: string; latency_ms?: number }>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!visible || conversation.type !== 'remote') {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+
+    const fetchData = async () => {
+      const extra = conversation.extra as { remoteAgentId?: string; remote_agent_id?: string } | undefined;
+      const remoteAgentId = extra?.remoteAgentId || extra?.remote_agent_id;
+
+      if (!remoteAgentId) {
+        if (!cancelled) setLoading(false);
+        return;
+      }
+
+      try {
+        const [agent, agentList, healthData] = await Promise.all([
+          ipcBridge.remoteAgent.get.invoke({ id: remoteAgentId }),
+          ipcBridge.remoteAgent.list.invoke({}),
+          ipcBridge.remoteAgent.health.invoke({}),
+        ]);
+
+        if (cancelled) return;
+
+        if (agent) {
+          setCurrentAgentId(remoteAgentId);
+          setCurrentAgentName(agent.name);
+        }
+
+        setAgents(agentList || []);
+        setHealth(healthData || {});
+      } catch {
+        // Best effort
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    void fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, conversation.id, conversation.type, conversation.extra]);
+
+  if (!visible) return null;
+
+  const currentHealth = currentAgentId ? health[currentAgentId] : undefined;
+  const currentIsHealthy = currentHealth?.healthy;
+  const latency = currentHealth?.latency_ms;
+
+  return (
+    <AionModal
+      visible={visible}
+      size='medium'
+      header={{
+        title: t('conversation.session.remoteSessionDetails', { defaultValue: 'Remote Session Details' }),
+        showClose: true,
+      }}
+      contentStyle={{ padding: '16px 24px' }}
+      onCancel={onClose}
+      footer={null}
+    >
+      <div className='flex flex-col gap-16px'>
+        {loading ? (
+          <div className='flex-center p-40px'>
+            <Spin size={24} />
+          </div>
+        ) : (
+          <>
+            {/* Server/Agent Information */}
+            <div className='flex flex-col gap-12px'>
+              <div>
+                <Typography.Text className='text-11px text-color-text-3 uppercase tracking-wide'>
+                  {t('conversation.session.serverAgent', { defaultValue: 'Server / Agent' })}
+                </Typography.Text>
+                <div className='mt-4px flex items-center gap-8px'>
+                  <Tag size='small' color={currentIsHealthy === false ? 'red' : 'arcoblue'}>
+                    <span className='flex items-center gap-4px'>
+                      <LinkCloud theme='outline' size='12' />
+                      <Typography.Ellipsis className='max-w-[200px]'>{currentAgentName || t('common.unknown')}</Typography.Ellipsis>
+                    </span>
+                  </Tag>
+                  {latency && (
+                    <Tag size='small' color='gray'>
+                      {latency}ms
+                    </Tag>
+                  )}
+                  {currentHealth?.error && (
+                    <Tooltip content={currentHealth.error}>
+                      <Tag size='small' color='red'>
+                        {t('common.error')}
+                      </Tag>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+
+              {/* Attached Processes */}
+              <div>
+                <Typography.Text className='text-11px text-color-text-3 uppercase tracking-wide'>
+                  {t('conversation.session.attachedProcesses', { defaultValue: 'Attached Processes' })}
+                </Typography.Text>
+                <div className='mt-4px'>
+                  <BgProcessIndicatorForDetails remoteAgentId={currentAgentId || null} />
+                </div>
+              </div>
+
+              {/* Available Agents */}
+              {agents.length > 0 && (
+                <div>
+                  <Typography.Text className='text-11px text-color-text-3 uppercase tracking-wide'>
+                    {t('conversation.session.availableAgents', { defaultValue: 'Available Agents' })}
+                  </Typography.Text>
+                  <div className='mt-8px flex flex-wrap gap-6px'>
+                    {agents.map((agent) => {
+                      const agentHealth = health[agent.id];
+                      const isHealthy = agentHealth?.healthy;
+                      const isCurrent = agent.id === currentAgentId;
+                      return (
+                        <Tag
+                          key={agent.id}
+                          size='small'
+                          color={isCurrent ? 'arcoblue' : agentHealth?.healthy === false ? 'red' : 'gray'}
+                          className={isCurrent ? 'opacity-100' : 'opacity-80'}
+                        >
+                          <span className='flex items-center gap-4px'>
+                            <span
+                              className={`inline-block h-6px w-6px shrink-0 rounded-full ${
+                                agentHealth === 'loading'
+                                  ? 'bg-[var(--color-text-3)]'
+                                  : isHealthy === false
+                                  ? 'bg-[rgb(var(--danger-6))]'
+                                  : 'bg-[rgb(var(--success-6))]'
+                              }`}
+                            />
+                            <Typography.Ellipsis className='max-w-[140px]'>{agent.name}</Typography.Ellipsis>
+                          </span>
+                        </Tag>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </AionModal>
+  );
+};
+
+/** Simple indicator for bg processes without the full drawer */
+const BgProcessIndicatorForDetails: React.FC<{ remoteAgentId: string | null }> = ({ remoteAgentId }) => {
+  const { t } = useTranslation();
+  const { running, processCount } = useBgProcessesForDetails(remoteAgentId);
+
+  if (!remoteAgentId) {
+    return (
+      <Tag size='small' color='gray'>
+        {t('conversation.session.noAgent', { defaultValue: 'No agent attached' })}
+      </Tag>
+    );
+  }
+
+  if (running === 0) {
+    return (
+      <Tag size='small' color='gray'>
+        {t('conversation.session.noProcesses', { defaultValue: 'No background processes' })}
+      </Tag>
+    );
+  }
+
+  return (
+    <Tag size='small' color='arcoblue'>
+      <span className='flex items-center gap-4px'>
+        {processCount > 0 && (
+          <span className='text-10px'>{processCount}</span>
+        )}
+        <span>{t('conversation.session.processesRunning', { defaultValue: 'processes running' })}</span>
+      </span>
+    </Tag>
+  );
+};
+
+/** Hook for bg processes in details panel */
+const useBgProcessesForDetails = (remoteAgentId: string | null) => {
+  const [running, setRunning] = useState(0);
+  const [processCount, setProcessCount] = useState(0);
+
+  useEffect(() => {
+    if (!remoteAgentId) {
+      setRunning(0);
+      setProcessCount(0);
+      return;
+    }
+
+    let cancelled = false;
+    const interval = setInterval(async () => {
+      try {
+        const result = await ipcBridge.remoteAgent.processes.invoke({ id: remoteAgentId });
+        if (cancelled) return;
+        const processes = result?.processes || [];
+        setRunning(processes.filter((p: { status: string }) => p.status === 'running').length);
+        setProcessCount(processes.length);
+      } catch {
+        // Best effort
+      }
+    }, 2000);
+
+    // Initial fetch
+    void (async () => {
+      try {
+        const result = await ipcBridge.remoteAgent.processes.invoke({ id: remoteAgentId });
+        if (cancelled) return;
+        const processes = result?.processes || [];
+        setRunning(processes.filter((p: { status: string }) => p.status === 'running').length);
+        setProcessCount(processes.length);
+      } catch {
+        // Best effort
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [remoteAgentId]);
+
+  return { running, processCount };
+};
 
 /**
  * Session-level OpenCode actions surfaced in the conversation header (M01–M05):
@@ -35,8 +285,8 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
 
   const [busy, setBusy] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [toolHost, setToolHost] = useState<'local' | 'server' | undefined>(undefined);
   const [protocol, setProtocol] = useState<string | undefined>(undefined);
+  const [showSessionDetails, setShowSessionDetails] = useState(false);
 
   // Count user text messages (position === 'right') from local DB to decide
   // whether Compact should be enabled. Remote sessions may have zero local
@@ -305,12 +555,15 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
     }
   };
 
-  const isReverted = (conversation.extra as any)?.is_reverted === true;
+  const isReverted = (conversation.extra as { is_reverted?: boolean })?.is_reverted === true;
 
   const menu = (
     <Menu
       onClickMenuItem={(key) => {
         switch (key) {
+          case 'sessionDetails':
+            setShowSessionDetails(true);
+            break;
           case 'fork':
             void handleFork();
             break;
@@ -334,13 +587,19 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
             break;
         }
       }}
-    >
-      <Menu.Item key='fork'>
-        <div className='flex items-center gap-8px'>
-          <Branch theme='outline' size='14' fill={iconColors.secondary} />
-          <span>{t('conversation.session.fork', { defaultValue: 'Fork session' })}</span>
-        </div>
-      </Menu.Item>
+      >
+        <Menu.Item key='sessionDetails'>
+          <div className='flex items-center gap-8px'>
+            <LinkCloud theme='outline' size='14' fill={iconColors.secondary} />
+            <span>{t('conversation.session.remoteSessionDetails', { defaultValue: 'Remote session details' })}</span>
+          </div>
+        </Menu.Item>
+        <Menu.Item key='fork'>
+          <div className='flex items-center gap-8px'>
+            <Branch theme='outline' size='14' fill={iconColors.secondary} />
+            <span>{t('conversation.session.fork', { defaultValue: 'Fork session' })}</span>
+          </div>
+        </Menu.Item>
       <Menu.Item key='changes'>
         <div className='flex items-center gap-8px'>
           <FileText theme='outline' size='14' fill={iconColors.secondary} />
@@ -399,6 +658,13 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
           />
         </Tooltip>
       </Dropdown>
+
+      {/* Remote session details panel */}
+      <RemoteSessionDetailsPanel
+        visible={showSessionDetails}
+        onClose={() => setShowSessionDetails(false)}
+        conversation={conversation}
+      />
 
       {/* M03: share URL modal */}
       <AionModal
