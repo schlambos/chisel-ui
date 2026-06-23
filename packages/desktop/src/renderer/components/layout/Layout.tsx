@@ -433,7 +433,7 @@ const Layout: React.FC<{
                         </Suspense>
                       )}
                       <div
-                        className={classNames('flex-1 min-h-0 flex flex-col overflow-auto', {
+                        className={classNames('flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-hidden', {
                           'justify-center': !isSettingsRoute,
                         })}
                         style={{
