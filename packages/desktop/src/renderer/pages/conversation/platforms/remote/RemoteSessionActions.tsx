@@ -169,7 +169,7 @@ const RemoteSessionDetailsPanel: React.FC<{
                             <span
                               className={`inline-block h-6px w-6px shrink-0 rounded-full ${
                                 agentHealth === 'loading'
-                                  ? 'bg-[var(--color-text-3)]'
+                                  ? 'bg-[var(--brand)]'
                                   : isHealthy === false
                                   ? 'bg-[rgb(var(--danger-6))]'
                                   : 'bg-[rgb(var(--success-6))]'

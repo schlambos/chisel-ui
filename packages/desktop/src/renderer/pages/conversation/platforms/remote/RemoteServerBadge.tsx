@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 const healthDotColor = (healthy: boolean | undefined, loading: boolean): string => {
-  if (loading) return 'bg-[var(--color-text-3)]';
+  if (loading) return 'bg-[var(--brand)]';
   return healthy ? 'bg-[rgb(var(--success-6))]' : 'bg-[rgb(var(--danger-6))]';
 };
 
