@@ -14,6 +14,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ToolShell from './ToolShell';
 import { STATE_LABEL_FALLBACK, STATE_LABEL_KEY, statusPillFromNormalized } from './StatusPill';
+import { getToolCategoryIcon } from './toolCategoryIcon';
 import './MessageToolGroupSummary.css';
 
 const ReplacePreview: React.FC<{ message: IMessageToolCall }> = ({ message }) => {
@@ -68,10 +69,17 @@ const MessageToolCall: React.FC<{ message: IMessageToolCall }> = ({ message }) =
   const state = statusPillFromNormalized(normalized.status);
   const stateLabel = t(STATE_LABEL_KEY[state], { defaultValue: STATE_LABEL_FALLBACK[state] });
 
+  const preview = useMemo(() => {
+    if (!normalized.output) return undefined;
+    const firstLine = normalized.output.split('\n')[0]?.trim();
+    return firstLine || undefined;
+  }, [normalized.output]);
+
   return (
     <ToolShell
       state={state}
       stateLabel={stateLabel}
+      icon={getToolCategoryIcon(name)}
       title={
         <>
           <span className='font-medium'>{normalized.name}</span>
@@ -79,6 +87,7 @@ const MessageToolCall: React.FC<{ message: IMessageToolCall }> = ({ message }) =
         </>
       }
       collapsible={hasDetail}
+      preview={preview}
     >
       {hasDetail && (
         <div className='tool-detail-panel'>

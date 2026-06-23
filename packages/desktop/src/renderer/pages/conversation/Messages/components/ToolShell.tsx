@@ -15,6 +15,7 @@ interface ToolShellProps {
   title: React.ReactNode;
   meta?: React.ReactNode;
   children?: React.ReactNode;
+  icon?: React.ReactElement;
   /** When true, the body is collapsible. Default-collapsed unless state is "failed". */
   collapsible?: boolean;
   /** Override the auto-expand for failed state (e.g., when the body is critical to read on success too). */
@@ -23,6 +24,8 @@ interface ToolShellProps {
   variant?: 'default' | 'compact';
   /** Forwarded for direct DOM access; rarely needed. */
   className?: string;
+  /** Inline preview of the output, shown only when collapsed. */
+  preview?: string;
 }
 
 const ToolShell: React.FC<ToolShellProps> = ({
@@ -31,10 +34,12 @@ const ToolShell: React.FC<ToolShellProps> = ({
   title,
   meta,
   children,
+  icon,
   collapsible = true,
   defaultExpanded,
   variant = 'default',
   className,
+  preview,
 }) => {
   const bodyId = useId();
   const hasBody = children !== undefined && children !== null && children !== false;
@@ -69,6 +74,11 @@ const ToolShell: React.FC<ToolShellProps> = ({
   if (variant === 'compact') {
     return (
       <div className={classNames('tool-shell', 'tool-shell--compact', className)}>
+        {icon && (
+          <span className="w-14px h-14px shrink-0 flex items-center justify-center">
+            {icon}
+          </span>
+        )}
         <StatusPill state={state} label={stateLabel} />
         <span
           className={classNames('tool-shell__title', 'tool-shell__title--compact', {
@@ -84,6 +94,11 @@ const ToolShell: React.FC<ToolShellProps> = ({
   return (
     <div className={classNames('tool-shell', className)}>
       <header className='tool-shell__header'>
+        {icon && (
+          <span className="w-14px h-14px shrink-0 flex items-center justify-center">
+            {icon}
+          </span>
+        )}
         <StatusPill state={state} label={stateLabel} />
         <span
           className={classNames('tool-shell__title', {
@@ -92,6 +107,9 @@ const ToolShell: React.FC<ToolShellProps> = ({
         >
           {title}
         </span>
+        {collapsible && !expanded && preview && (
+          <span className='max-w-300px truncate text-t-tertiary text-12px ml-8px'>{preview}</span>
+        )}
         {meta && <span className='tool-shell__meta'>{meta}</span>}
         {showExpander && (
           <button

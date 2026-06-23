@@ -25,6 +25,7 @@ import { ImagePreviewContext } from '../MessageList';
 import { COLLAPSE_CONFIG, TEXT_CONFIG } from '../constants';
 import type { ImageGenerationResult, WriteFileResult } from '../types';
 import ToolShell from './ToolShell';
+import { getToolCategoryIcon } from './toolCategoryIcon';
 import type { StatusPillState } from './StatusPill';
 import { STATE_LABEL_FALLBACK, STATE_LABEL_KEY } from './StatusPill';
 
@@ -505,6 +506,7 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
               key={call_id}
               state={confirmState}
               stateLabel={t(STATE_LABEL_KEY[confirmState], { defaultValue: STATE_LABEL_FALLBACK[confirmState] })}
+              icon={getToolCategoryIcon(name)}
               title={<span className='font-medium'>{name}</span>}
               defaultExpanded
               collapsible={false}
@@ -556,6 +558,7 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
                 key={call_id}
                 state={imgState}
                 stateLabel={t(STATE_LABEL_KEY[imgState], { defaultValue: STATE_LABEL_FALLBACK[imgState] })}
+                icon={getToolCategoryIcon(name)}
                 title={<span className='font-medium'>{name}</span>}
                 meta={result.relative_path}
               >
@@ -576,8 +579,14 @@ const MessageToolGroup: React.FC<IMessageToolGroupProps> = ({ message }) => {
           </span>
         );
 
+        let preview: string | undefined;
+        if (result_display) {
+          const displayStr = typeof result_display === 'string' ? result_display : JSON.stringify(result_display);
+          preview = displayStr.split('\n')[0]?.trim() || undefined;
+        }
+
         return (
-          <ToolShell key={call_id} state={pillState} stateLabel={stateLabel} title={titleNode} collapsible={hasBody}>
+          <ToolShell key={call_id} state={pillState} stateLabel={stateLabel} icon={getToolCategoryIcon(name)} title={titleNode} collapsible={hasBody} preview={preview}>
             {hasBody && (
               <div>
                 {description && (

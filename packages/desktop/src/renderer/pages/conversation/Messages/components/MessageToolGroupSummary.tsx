@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { NormalizedToolCall, ToolMessage } from '@/common/chat/normalizeToolCall';
 import { normalizeToolMessages, hasRunningToolMessages } from '@/common/chat/normalizeToolCall';
 import ToolShell from './ToolShell';
+import { getToolCategoryIcon } from './toolCategoryIcon';
 import StatusPill, { STATE_LABEL_FALLBACK, STATE_LABEL_KEY, statusPillFromNormalized } from './StatusPill';
 import './MessageToolGroupSummary.css';
 import { useConversationContextSafe } from '@/renderer/hooks/context/ConversationContext';
@@ -24,6 +25,9 @@ const ToolItemRow: React.FC<{ item: NormalizedToolCall }> = ({ item }) => {
   return (
     <div className='flex flex-col' data-tool-id={item.key}>
       <div className='flex items-center gap-8px'>
+        <span className="w-14px h-14px shrink-0 flex items-center justify-center">
+          {getToolCategoryIcon(item.name)}
+        </span>
         <StatusPill state={state} label={stateLabel} />
         <span
           className={
@@ -105,6 +109,13 @@ const MessageToolGroupSummary: React.FC<{ messages: ToolMessage[]; toolName?: st
     : t('messages.toolShell.viewSteps', { defaultValue: 'View Steps' });
   const meta = count > 0 ? `· ${count}` : undefined;
 
+  const preview = useMemo(() => {
+    if (tools.length === 0) return undefined;
+    const firstTool = tools[0];
+    if (!firstTool.output) return undefined;
+    return firstTool.output.split('\n')[0]?.trim() || undefined;
+  }, [tools]);
+
   return (
     <ToolShell
       state={groupState}
@@ -113,6 +124,7 @@ const MessageToolGroupSummary: React.FC<{ messages: ToolMessage[]; toolName?: st
       meta={meta}
       defaultExpanded={hasRunning}
       collapsible
+      preview={preview}
     >
       <div className='flex flex-col gap-8px'>
         {tools.map((item) => (
