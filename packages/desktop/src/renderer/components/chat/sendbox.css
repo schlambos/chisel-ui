@@ -115,20 +115,9 @@
   color: var(--text-disabled); /* Arco specificity no longer requires !important for plain elements */
 }
 
-/* Sendbox focus glow */
+/* Sendbox focus ring — clean 1px brand border, no soft halo glow */
 .sendbox-panel--focused {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--brand) 40%, transparent),
-    0 0 16px color-mix(in srgb, var(--brand) 10%, transparent);
-}
-
-/* Sendbox glass effect */
-@supports ((-webkit-backdrop-filter: blur(6px)) or (backdrop-filter: blur(6px))) {
-  .sendbox-panel {
-    -webkit-backdrop-filter: saturate(120%) blur(8px);
-    backdrop-filter: saturate(120%) blur(8px);
-    background-color: color-mix(in srgb, var(--bg-1) 88%, transparent) !important; /* fights .sendbox-panel solid bg */
-  }
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 40%, transparent);
 }
 
 /* Send/stop button cross-fade container — overflow visible so the stop

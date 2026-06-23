@@ -19,6 +19,8 @@ interface ToolShellProps {
   collapsible?: boolean;
   /** Override the auto-expand for failed state (e.g., when the body is critical to read on success too). */
   defaultExpanded?: boolean;
+  /** Render mode: 'default' is the full card; 'compact' is an inline status dot + title only. */
+  variant?: 'default' | 'compact';
   /** Forwarded for direct DOM access; rarely needed. */
   className?: string;
 }
@@ -31,6 +33,7 @@ const ToolShell: React.FC<ToolShellProps> = ({
   children,
   collapsible = true,
   defaultExpanded,
+  variant = 'default',
   className,
 }) => {
   const bodyId = useId();
@@ -62,6 +65,21 @@ const ToolShell: React.FC<ToolShellProps> = ({
 
   const showExpander = hasBody && collapsible;
   const isCancelled = state === 'cancelled';
+
+  if (variant === 'compact') {
+    return (
+      <div className={classNames('tool-shell', 'tool-shell--compact', className)}>
+        <StatusPill state={state} label={stateLabel} />
+        <span
+          className={classNames('tool-shell__title', 'tool-shell__title--compact', {
+            'tool-shell__title--cancelled': isCancelled,
+          })}
+        >
+          {title}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className={classNames('tool-shell', className)}>

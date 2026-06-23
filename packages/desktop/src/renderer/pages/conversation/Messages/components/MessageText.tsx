@@ -18,7 +18,7 @@ import { getConversationOrNull, refreshConversationCache } from '@/renderer/page
 import { Alert, Button, Message, Tooltip } from '@arco-design/web-react';
 import { Branch, Copy, Delete, Undo } from '@icon-park/react';
 import classNames from 'classnames';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { emitter } from '@/renderer/utils/emitter';
@@ -172,6 +172,25 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Author label: static for short messages, sticky for tall ones
+  const messageRef = useRef<HTMLDivElement>(null);
+  const [isTallMessage, setIsTallMessage] = useState(false);
+
+  useEffect(() => {
+    const el = messageRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const height = entry.contentRect.height;
+        setIsTallMessage(height > 400);
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // 过滤空内容，避免渲染空DOM
   if (!message.content.content || (typeof message.content.content === 'string' && !message.content.content.trim())) {
@@ -372,7 +391,9 @@ const MessageText: React.FC<{ message: IMessageText }> = ({ message }) => {
   return (
     <>
       <div
+        ref={messageRef}
         className={classNames('min-w-0 flex flex-col group w-full', isUserMessage ? 'message-user' : 'message-agent')}
+        style={{ '--author-sticky': isTallMessage ? 'sticky' : 'static' } as React.CSSProperties}
       >
         {cronMeta && <MessageCronBadge meta={cronMeta} />}
         {showAuthor && (

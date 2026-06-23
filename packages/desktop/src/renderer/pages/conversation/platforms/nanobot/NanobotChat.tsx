@@ -22,7 +22,7 @@ const NanobotChat: React.FC<{
   emptySlot?: React.ReactNode;
   loadedSkills?: string[];
 }> = ({ conversation_id, workspace, cron_job_id, hideSendBox, emptySlot, loadedSkills }) => {
-  useMessageLstCache(conversation_id);
+  const { loadMore, isLoadingMore, hasMore, prependedCount } = useMessageLstCache(conversation_id);
   const updateLocalImage = LocalImageView.useUpdateLocalImage();
   useEffect(() => {
     updateLocalImage({ root: workspace });
@@ -33,7 +33,14 @@ const NanobotChat: React.FC<{
     >
       <div className='flex-1 flex flex-col px-20px min-h-0'>
         <FlexFullContainer>
-          <MessageList className='flex-1' emptySlot={emptySlot}></MessageList>
+          <MessageList
+            className='flex-1'
+            emptySlot={emptySlot}
+            loadMore={loadMore}
+            isLoadingMore={isLoadingMore}
+            hasMore={hasMore}
+            prependedCount={prependedCount}
+          ></MessageList>
         </FlexFullContainer>
         <LiveActivityBand />
         {!hideSendBox && <NanobotSendBox conversation_id={conversation_id} />}

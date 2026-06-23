@@ -23,7 +23,6 @@ const RemoteChat: React.FC<{
   emptySlot?: React.ReactNode;
   loadedSkills?: string[];
   session_mode?: string;
-  modelSelector?: React.ReactNode;
   /** Phase 4b: whether the OpenCode transcript has already been
    *  mirrored into the local messages table. When false on mount, we
    *  trigger `backfillHistory` once and re-load the message list. */
@@ -41,11 +40,10 @@ const RemoteChat: React.FC<{
   emptySlot,
   loadedSkills,
   session_mode,
-  modelSelector,
   history_loaded,
   extra,
 }) => {
-  const loadMessages = useMessageLstCache(conversation_id);
+  const { loadMessages, loadMore, isLoadingMore, hasMore, prependedCount } = useMessageLstCache(conversation_id);
   const updateLocalImage = LocalImageView.useUpdateLocalImage();
   useEffect(() => {
     updateLocalImage({ root: workspace });
@@ -98,11 +96,18 @@ const RemoteChat: React.FC<{
     >
       <div className='flex-1 flex flex-col px-20px min-h-0'>
         <FlexFullContainer>
-          <MessageList className='flex-1' emptySlot={emptySlot}></MessageList>
+          <MessageList
+            className='flex-1'
+            emptySlot={emptySlot}
+            loadMore={loadMore}
+            isLoadingMore={isLoadingMore}
+            hasMore={hasMore}
+            prependedCount={prependedCount}
+          ></MessageList>
         </FlexFullContainer>
         <LiveActivityBand />
         {!hideSendBox && (
-          <RemoteSendBox conversation_id={conversation_id} session_mode={session_mode} modelSelector={modelSelector} />
+          <RemoteSendBox conversation_id={conversation_id} session_mode={session_mode} />
         )}
       </div>
     </ConversationProvider>

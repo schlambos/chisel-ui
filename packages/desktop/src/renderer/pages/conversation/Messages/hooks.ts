@@ -12,7 +12,7 @@ import {
   mergeTextMessageContent,
   preferTextMessageVersion,
 } from '@/common/chat/chatLib';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createContext } from '@renderer/utils/ui/createContext';
 
 const [useMessageList, MessageListProvider, useUpdateMessageList] = createContext([] as TMessage[]);
@@ -24,6 +24,7 @@ const beforeUpdateMessageListStack: Array<(list: TMessage[]) => TMessage[]> = []
 // 消息索引缓存类型定义
 // Message index cache type definitions
 type MessageIndex = {
+  idIndex: Map<string, number>; // message.id -> index (O(1) lookup replacing findIndex)
   msgIdIndex: Map<string, number>; // msg_id -> index
   call_idIndex: Map<string, number>; // tool_call.call_id -> index
   tool_call_idIndex: Map<string, number>; // acp_tool_call.update.tool_call_id -> index
@@ -53,6 +54,7 @@ const indexCache = new WeakMap<TMessage[], MessageIndex>();
 // 构建消息索引
 // Build message index
 function buildMessageIndex(list: TMessage[]): MessageIndex {
+  const idIndex = new Map<string, number>();
   const msgIdIndex = new Map<string, number>();
   const call_idIndex = new Map<string, number>();
   const tool_call_idIndex = new Map<string, number>();
@@ -60,6 +62,7 @@ function buildMessageIndex(list: TMessage[]): MessageIndex {
 
   for (let i = 0; i < list.length; i++) {
     const msg = list[i];
+    if (msg.id) idIndex.set(msg.id, i);
     if (msg.msg_id) {
       if (msg.type === 'thinking') {
         msgIdIndex.set(`thinking:${msg.msg_id}`, i);
@@ -79,7 +82,7 @@ function buildMessageIndex(list: TMessage[]): MessageIndex {
     }
   }
 
-  return { msgIdIndex, call_idIndex, tool_call_idIndex, permission_call_idIndex };
+  return { idIndex, msgIdIndex, call_idIndex, tool_call_idIndex, permission_call_idIndex };
 }
 
 // 获取或构建索引（带缓存）
@@ -114,6 +117,7 @@ function composeMessageWithIndex(message: TMessage, list: TMessage[], index: Mes
     if (result !== list) {
       // Rebuild index maps from the new list to keep them in sync
       const rebuilt = buildMessageIndex(result);
+      index.idIndex = rebuilt.idIndex;
       index.msgIdIndex = rebuilt.msgIdIndex;
       index.call_idIndex = rebuilt.call_idIndex;
       index.tool_call_idIndex = rebuilt.tool_call_idIndex;
@@ -239,6 +243,7 @@ function composeMessageWithIndex(message: TMessage, list: TMessage[], index: Mes
       newList.push(updated);
       // Rebuild index after splice
       const rebuilt = buildMessageIndex(newList);
+      index.idIndex = rebuilt.idIndex;
       index.msgIdIndex = rebuilt.msgIdIndex;
       index.call_idIndex = rebuilt.call_idIndex;
       index.tool_call_idIndex = rebuilt.tool_call_idIndex;
@@ -488,14 +493,27 @@ function normalizeDbMessage(msg: TMessage): TMessage {
 
 export const useMessageLstCache = (key: string) => {
   const update = useUpdateMessageList();
+  const oldestPageRef = useRef(0);
+  const conversationIdRef = useRef(key);
+  conversationIdRef.current = key;
+  const prependedCountRef = useRef(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   const loadMessages = useCallback(async (): Promise<TMessage[]> => {
     const result = await ipcBridge.database.getConversationMessages.invoke({
       conversation_id: key,
       page: 0,
-      page_size: 10000,
+      page_size: 200,
+      order: 'DESC' as const,
     });
+    // GUARD: check conversation hasn't changed during the async fetch
+    if (conversationIdRef.current !== key) return [];
     const messages = result?.items?.map(normalizeDbMessage);
     if (messages && Array.isArray(messages)) {
+      messages.reverse();
+      oldestPageRef.current = 0;
+      setHasMore(result.has_more ?? result.total > result.items.length);
       update((currentList) => {
         if (!currentList.length) return messages;
         const sameConversation = currentList.filter((m) => m.conversation_id === key);
@@ -530,16 +548,60 @@ export const useMessageLstCache = (key: string) => {
     return [];
   }, [key, update]);
 
+  const loadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMore || !key) return;
+    setIsLoadingMore(true);
+    try {
+      const nextPage = oldestPageRef.current + 1;
+      const result = await ipcBridge.database.getConversationMessages.invoke({
+        conversation_id: key,
+        page: nextPage,
+        page_size: 200,
+        order: 'DESC' as const,
+      });
+      // GUARD: check conversation hasn't changed
+      if (conversationIdRef.current !== key) return;
+
+      const olderMessages = result.items.map(normalizeDbMessage);
+      olderMessages.reverse();
+      oldestPageRef.current = nextPage;
+      setHasMore(result.has_more ?? result.total > (nextPage + 1) * 200);
+
+      // DEDUP: prepend only messages not already in the list
+      update((currentList) => {
+        const existingIds = new Set(currentList.map((m) => m.id));
+        const existingMsgIds = new Set(currentList.map((m) => m.msg_id).filter(Boolean));
+        const newMessages = olderMessages.filter(
+          (m) => !existingIds.has(m.id) && !(m.msg_id && existingMsgIds.has(m.msg_id))
+        );
+        prependedCountRef.current += newMessages.length;
+        return [...newMessages, ...currentList];
+      });
+    } catch (error) {
+      if ((error as { name?: string })?.name === 'AbortError') return;
+      console.error('[useMessageLstCache] Failed to load more messages:', error);
+    } finally {
+      if (conversationIdRef.current === key) {
+        setIsLoadingMore(false);
+      }
+    }
+  }, [key, isLoadingMore, hasMore, update]);
+
   useEffect(() => {
     if (!key) return;
+    oldestPageRef.current = 0;
+    prependedCountRef.current = 0;
+    setHasMore(false);
+    setIsLoadingMore(false);
     void loadMessages().catch((error) => {
+      if ((error as { name?: string })?.name === 'AbortError') return;
       console.error('[useMessageLstCache] Failed to load messages from database:', error);
     });
   }, [key, loadMessages]);
 
   // Exposed so callers (e.g. Phase 4b backfill in RemoteChat) can force
   // a re-read once new rows have been written to the DB out-of-band.
-  return loadMessages;
+  return { loadMessages, loadMore, isLoadingMore, hasMore, prependedCount: prependedCountRef };
 };
 
 export const beforeUpdateMessageList = (fn: (list: TMessage[]) => TMessage[]) => {
@@ -695,8 +757,9 @@ export const isItemInactive = (
   // Raw TMessage: index in the raw list determines activity.
   const msg = item as TMessage;
   if (msg.id) {
-    const rawIndex = rawList.findIndex((m) => m.id === msg.id);
-    if (rawIndex === -1) return false;
+    const { idIndex } = getOrBuildIndex(rawList);
+    const rawIndex = idIndex.get(msg.id);
+    if (rawIndex === undefined) return false;
     return rawIndex >= firstInactiveIndex;
   }
   return false;
@@ -726,8 +789,9 @@ export const isItemCompactionStart = (
   // Raw TMessage: check if this message is at the compaction start index
   const msg = item as TMessage;
   if (msg.id) {
-    const rawIndex = rawList.findIndex((m) => m.id === msg.id);
-    if (rawIndex === -1) return false;
+    const { idIndex } = getOrBuildIndex(rawList);
+    const rawIndex = idIndex.get(msg.id);
+    if (rawIndex === undefined) return false;
     return rawIndex === compactionStartIndex;
   }
   return false;

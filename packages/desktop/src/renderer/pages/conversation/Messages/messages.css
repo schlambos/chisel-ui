@@ -7,7 +7,7 @@
   position: relative;
   width: 100%;
   padding-left: 16px;
-  border-left: 2px solid var(--msg-agent-edge, var(--brand));
+  border-left: 3px solid var(--msg-agent-edge, var(--brand));
   background: transparent;
   color: var(--text-primary);
 }
@@ -33,7 +33,7 @@
  * Colors use !important so no inherited or vendor cascade can paint the
  * author label in a hard-coded value that loses contrast under a theme. */
 .message-author {
-  position: sticky;
+  position: var(--author-sticky, sticky);
   top: 0;
   z-index: 1;
   display: flex;
@@ -159,6 +159,24 @@
   margin-top: 8px;
 }
 
+/* Compact variant: inline row, no card chrome */
+.tool-shell--compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 2px 0;
+  margin: 1px 0;
+  border-radius: 0;
+}
+
+.tool-shell__title--compact {
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
 /* Status pill breathing pulse for running state. */
 @keyframes status-pill-breathe {
   0%,
@@ -178,6 +196,16 @@
   );
   animation: status-pill-breathe var(--status-pill-breathe-duration) var(--motion-ease-standard) infinite;
   box-shadow: 0 0 4px color-mix(in srgb, var(--brand) 50%, transparent);
+}
+
+/* Thinking blocks: italic, muted, no card chrome */
+.tool-shell--thinking {
+  font-style: italic;
+}
+
+.tool-shell--thinking .tool-shell__title {
+  color: var(--text-tertiary);
+  font-style: italic;
 }
 
 /* Tool-shell — when nested inside a message, drop our own outer border
@@ -341,4 +369,51 @@
   .message-item .whitespace-pre-wrap {
     line-height: 1.4 !important;
   }
+}
+
+/* ─────────────────────── Turn Grouping ─────────────────────── */
+
+/* First message in a turn: top padding + author label visible */
+.message-item[data-turn-position="first"] {
+  margin-top: 12px;
+}
+
+/* Middle messages: no extra top margin, author label hidden */
+.message-item[data-turn-position="middle"] {
+  margin-top: 2px;
+}
+.message-item[data-turn-position="middle"] .message-author {
+  display: none;
+}
+
+/* Last message in a turn: bottom padding */
+.message-item[data-turn-position="last"] {
+  margin-bottom: 4px;
+}
+
+/* Solo message: both top and bottom padding */
+.message-item[data-turn-position="solo"] {
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+/* Subtle horizontal divider between turns */
+.message-item[data-turn-position="first"]::before,
+.message-item[data-turn-position="solo"]::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--border-light, var(--bg-3));
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+/* ─────────────────────── Message Padding Override ─────────────────────── */
+
+/* Override UnoCSS px-6px utility (applied in the TSX) with 12px horizontal
+ * padding for more breathing room inside each message row. !important is
+ * required to win against the generated utility class. */
+.message-item {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
 }

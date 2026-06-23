@@ -20,7 +20,7 @@ export const useAutoTitle = () => {
         const messagesResult = await ipcBridge.database.getConversationMessages.invoke({
           conversation_id: conversation_id,
           page: 0,
-          page_size: 1000,
+          page_size: 50,
         });
         const newTitle = deriveAutoTitleFromMessages(messagesResult.items, fallbackContent);
         if (!newTitle) {

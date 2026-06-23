@@ -17,7 +17,8 @@ const POPUP_Z_INDEX = 1050;
 type AnchoredPopupStyle = {
   position: 'fixed';
   left: number;
-  bottom: number;
+  bottom?: number;
+  top?: number;
   width: number;
   maxHeight: number;
   zIndex: number;
@@ -29,12 +30,16 @@ function computePopupStyle(trigger: HTMLElement): AnchoredPopupStyle {
   const viewportHeight = window.innerHeight;
   const width = Math.min(PANEL_WIDTH_PX, viewportWidth - VIEWPORT_MARGIN_PX * 2);
   const left = Math.max(VIEWPORT_MARGIN_PX, Math.min(rect.left, viewportWidth - width - VIEWPORT_MARGIN_PX));
-  const maxHeight = Math.max(160, Math.min(PANEL_MAX_HEIGHT_PX, rect.top - VIEWPORT_MARGIN_PX - MENU_GAP_PX));
+  const spaceBelow = viewportHeight - rect.bottom - VIEWPORT_MARGIN_PX;
+  const spaceAbove = rect.top - VIEWPORT_MARGIN_PX - MENU_GAP_PX;
+  const maxHeight = Math.max(160, Math.min(PANEL_MAX_HEIGHT_PX, Math.max(spaceBelow, spaceAbove)));
+  const renderAbove = spaceBelow < spaceAbove && spaceAbove > 160;
 
   return {
     position: 'fixed',
     left,
-    bottom: viewportHeight - rect.top + MENU_GAP_PX,
+    bottom: renderAbove ? viewportHeight - rect.top + MENU_GAP_PX : undefined,
+    top: renderAbove ? undefined : rect.bottom + MENU_GAP_PX,
     width,
     maxHeight,
     zIndex: POPUP_Z_INDEX,

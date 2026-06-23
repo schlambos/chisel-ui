@@ -36,7 +36,7 @@ const AionrsChat: React.FC<{
   loadedSkills,
   agent_name,
 }) => {
-  useMessageLstCache(conversation_id);
+  const { loadMore, isLoadingMore, hasMore, prependedCount } = useMessageLstCache(conversation_id);
   const updateLocalImage = LocalImageView.useUpdateLocalImage();
   useEffect(() => {
     updateLocalImage({ root: workspace });
@@ -50,7 +50,14 @@ const AionrsChat: React.FC<{
       <ConversationArtifactProvider conversation_id={conversation_id}>
         <div className='flex-1 flex flex-col px-20px min-h-0'>
           <FlexFullContainer>
-            <MessageList className='flex-1' emptySlot={emptySlot} />
+            <MessageList
+              className='flex-1'
+              emptySlot={emptySlot}
+              loadMore={loadMore}
+              isLoadingMore={isLoadingMore}
+              hasMore={hasMore}
+              prependedCount={prependedCount}
+            />
           </FlexFullContainer>
           <LiveActivityBand />
           <AionrsSendBox

@@ -20,26 +20,22 @@ const AcpChat: React.FC<{
   conversation_id: string;
   workspace?: string;
   backend: string;
-  session_mode?: string;
   agent_name?: string;
   cron_job_id?: string;
   hideSendBox?: boolean;
   emptySlot?: React.ReactNode;
   loadedSkills?: string[];
-  modelSelector?: React.ReactNode;
 }> = ({
   conversation_id,
   workspace,
   backend,
-  session_mode,
   agent_name,
   cron_job_id,
   hideSendBox,
   emptySlot,
   loadedSkills,
-  modelSelector,
 }) => {
-  useMessageLstCache(conversation_id);
+  const { loadMore, isLoadingMore, hasMore, prependedCount } = useMessageLstCache(conversation_id);
   const teamPermission = useTeamPermission();
   const messageState = useAcpMessage(conversation_id, { skipWarmup: Boolean(teamPermission) });
 
@@ -50,18 +46,23 @@ const AcpChat: React.FC<{
       <ConversationArtifactProvider conversation_id={conversation_id}>
         <div className='flex-1 flex flex-col px-20px min-h-0'>
           <FlexFullContainer>
-            <MessageList className='flex-1' emptySlot={emptySlot} />
+            <MessageList
+              className='flex-1'
+              emptySlot={emptySlot}
+              loadMore={loadMore}
+              isLoadingMore={isLoadingMore}
+              hasMore={hasMore}
+              prependedCount={prependedCount}
+            />
           </FlexFullContainer>
           <LiveActivityBand />
           {!hideSendBox && (
             <AcpSendBox
               conversation_id={conversation_id}
               backend={backend}
-              session_mode={session_mode}
               agent_name={agent_name}
               workspacePath={workspace}
               messageState={messageState}
-              modelSelector={modelSelector}
             ></AcpSendBox>
           )}
         </div>
