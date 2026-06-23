@@ -29,13 +29,7 @@ type ErrorBannerProps = {
   className?: string;
 };
 
-const ErrorBanner: React.FC<ErrorBannerProps> = ({
-  title,
-  message,
-  onRetry,
-  severity = 'error',
-  className,
-}) => {
+const ErrorBanner: React.FC<ErrorBannerProps> = ({ title, message, onRetry, severity = 'error', className }) => {
   const severityClass = severity === 'warning' ? styles.warning : styles.error;
   const classes = [styles.root, severityClass, className].filter(Boolean).join(' ');
 

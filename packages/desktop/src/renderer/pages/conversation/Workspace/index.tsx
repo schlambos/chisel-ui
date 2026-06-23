@@ -848,15 +848,18 @@ const ChatWorkspace: React.FC<WorkspaceProps> = ({
         )}
 
         {/* Pending Edits tab content — suppressed in dedicated changes pane */}
-        {!isChangesMode && !isWorkspaceCollapsed && activeTab === 'pendingEdits' && pendingEditsHook.hasPendingEdits && (
-          <FlexFullContainer containerClassName='overflow-hidden'>
-            <PendingEditsPanel
-              pendingEdits={pendingEditsHook.pendingEdits}
-              revertFile={pendingEditsHook.revertFile}
-              revertHunk={pendingEditsHook.revertHunk}
-            />
-          </FlexFullContainer>
-        )}
+        {!isChangesMode &&
+          !isWorkspaceCollapsed &&
+          activeTab === 'pendingEdits' &&
+          pendingEditsHook.hasPendingEdits && (
+            <FlexFullContainer containerClassName='overflow-hidden'>
+              <PendingEditsPanel
+                pendingEdits={pendingEditsHook.pendingEdits}
+                revertFile={pendingEditsHook.revertFile}
+                revertHunk={pendingEditsHook.revertHunk}
+              />
+            </FlexFullContainer>
+          )}
       </div>
     </>
   );

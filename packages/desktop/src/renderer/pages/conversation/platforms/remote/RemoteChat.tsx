@@ -106,9 +106,7 @@ const RemoteChat: React.FC<{
           ></MessageList>
         </FlexFullContainer>
         <LiveActivityBand />
-        {!hideSendBox && (
-          <RemoteSendBox conversation_id={conversation_id} session_mode={session_mode} />
-        )}
+        {!hideSendBox && <RemoteSendBox conversation_id={conversation_id} session_mode={session_mode} />}
       </div>
     </ConversationProvider>
   );

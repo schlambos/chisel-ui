@@ -43,11 +43,7 @@ const StreamingCode: React.FC<Record<string, unknown>> = (props) => {
   const { children, className } = props as { children?: React.ReactNode; className?: string };
   const text = String(children ?? '');
   if (!text.includes('\n')) {
-    return (
-      <code className={classNames(className, codeStyles.inlineCode)}>
-        {text}
-      </code>
-    );
+    return <code className={classNames(className, codeStyles.inlineCode)}>{text}</code>;
   }
   return (
     <pre className={styles.streamingCodeBlock}>

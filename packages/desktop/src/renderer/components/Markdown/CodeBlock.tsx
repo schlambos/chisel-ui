@@ -131,17 +131,11 @@ function CodeBlockImpl(props: CodeBlockProps) {
   } as React.CSSProperties;
 
   return (
-    <div
-      ref={containerRef}
-      style={dynamicStyles}
-      className={`group ${styles.container}`}
-    >
+    <div ref={containerRef} style={dynamicStyles} className={`group ${styles.container}`}>
       <div className={styles.block}>
         {/* Header */}
         <div className={styles.header}>
-          <span className={styles.language}>
-            {language.toLocaleLowerCase()}
-          </span>
+          <span className={styles.language}>{language.toLocaleLowerCase()}</span>
           {/* Buttons: always visible on touch devices, hover-only on pointer devices */}
           <div className={`opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ${styles.actions}`}>
             {canCollapse && (
@@ -151,7 +145,7 @@ function CodeBlockImpl(props: CodeBlockProps) {
                     theme='outline'
                     size='14'
                     className={styles.icon}
-                    fill="var(--text-secondary)"
+                    fill='var(--text-secondary)'
                     onClick={toggleExpanded}
                   />
                 ) : (
@@ -159,7 +153,7 @@ function CodeBlockImpl(props: CodeBlockProps) {
                     theme='outline'
                     size='14'
                     className={styles.icon}
-                    fill="var(--text-secondary)"
+                    fill='var(--text-secondary)'
                     onClick={toggleExpanded}
                   />
                 )}
@@ -170,7 +164,7 @@ function CodeBlockImpl(props: CodeBlockProps) {
                 theme='outline'
                 size='14'
                 className={styles.icon}
-                fill="var(--text-secondary)"
+                fill='var(--text-secondary)'
                 onClick={handleCopy}
               />
             </span>
@@ -200,9 +194,7 @@ function CodeBlockImpl(props: CodeBlockProps) {
               className: styles.syntaxCode,
             }}
           />
-          {canCollapse && !expanded && (
-            <div className={styles.gradient} />
-          )}
+          {canCollapse && !expanded && <div className={styles.gradient} />}
         </div>
 
         {/* Footer */}
@@ -212,9 +204,9 @@ function CodeBlockImpl(props: CodeBlockProps) {
               {expanded ? t('common.collapse') : t('common.viewMoreLines', { count: totalLines - PREVIEW_LINES })}
             </span>
             {expanded ? (
-              <Up theme='outline' size='12' fill="var(--text-tertiary)" />
+              <Up theme='outline' size='12' fill='var(--text-tertiary)' />
             ) : (
-              <Down theme='outline' size='12' fill="var(--text-tertiary)" />
+              <Down theme='outline' size='12' fill='var(--text-tertiary)' />
             )}
           </div>
         )}

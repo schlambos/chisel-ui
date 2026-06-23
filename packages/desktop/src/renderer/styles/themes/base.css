@@ -27,7 +27,7 @@
   --radius-panel: 10px; /* preview, editor, workspace, modals */
   --radius-card: 12px; /* card surfaces (aligned to de-facto 12px usage) */
 
-  /* Spacing scale (Phase 3) — for raw CSS files; complements UnoCSS p-*/m-* utilities. */
+  /* Spacing scale (Phase 3) — for raw CSS files; complements UnoCSS p-* / m-* utilities. */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;

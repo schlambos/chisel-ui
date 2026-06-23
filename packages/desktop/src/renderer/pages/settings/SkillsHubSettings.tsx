@@ -288,10 +288,7 @@ const SkillsHubSettings: React.FC<SkillsHubSettingsProps> = ({ withWrapper = tru
               ))}
             </div>
           ) : loading ? (
-            <div
-              data-testid='my-skills-loading-skeletons'
-              className='w-full flex flex-col gap-6px relative z-10'
-            >
+            <div data-testid='my-skills-loading-skeletons' className='w-full flex flex-col gap-6px relative z-10'>
               {Array.from({ length: 4 }, (_, i) => (
                 <Skeleton key={i} variant='pill' width='100%' height={72} />
               ))}

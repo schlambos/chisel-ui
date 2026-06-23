@@ -40,7 +40,7 @@ const UndoToolCall: React.FC<UndoToolCallProps> = ({ conversationId, toolCallId,
       if (disabled) return;
       setOpen(true);
     },
-    [disabled],
+    [disabled]
   );
 
   const handleCancel = useCallback(() => {

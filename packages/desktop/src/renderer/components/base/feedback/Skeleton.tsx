@@ -46,13 +46,7 @@ const getReducedMotionServerSnapshot = (): boolean => false;
 const usePrefersReducedMotion = (): boolean =>
   React.useSyncExternalStore(subscribeReducedMotion, getReducedMotionSnapshot, getReducedMotionServerSnapshot);
 
-const Skeleton: React.FC<SkeletonProps> = ({
-  variant = 'block',
-  width,
-  height,
-  count = 1,
-  className,
-}) => {
+const Skeleton: React.FC<SkeletonProps> = ({ variant = 'block', width, height, count = 1, className }) => {
   const reduced = usePrefersReducedMotion();
   const safeCount = Math.max(1, Math.floor(count));
   const style: React.CSSProperties = { width, height };

@@ -381,7 +381,10 @@ const AionModal: React.FC<AionModalProps> = ({
       style={finalStyle}
       getPopupContainer={() => document.body}
     >
-      <div className='aionui-modal-wrapper rounded-[var(--modal-radius)]' style={{ '--modal-radius': borderRadiusVal } as React.CSSProperties}>
+      <div
+        className='aionui-modal-wrapper rounded-[var(--modal-radius)]'
+        style={{ '--modal-radius': borderRadiusVal } as React.CSSProperties}
+      >
         {renderHeader()}
         <div className='aionui-modal-body-content' style={bodyInlineStyle}>
           {children}

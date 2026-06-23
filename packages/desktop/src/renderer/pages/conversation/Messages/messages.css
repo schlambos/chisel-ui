@@ -376,32 +376,32 @@
 /* ─────────────────────── Turn Grouping ─────────────────────── */
 
 /* First message in a turn: top padding + author label visible */
-.message-item[data-turn-position="first"] {
+.message-item[data-turn-position='first'] {
   margin-top: var(--space-md);
 }
 
 /* Middle messages: no extra top margin, author label hidden */
-.message-item[data-turn-position="middle"] {
+.message-item[data-turn-position='middle'] {
   margin-top: 2px;
 }
-.message-item[data-turn-position="middle"] .message-author {
+.message-item[data-turn-position='middle'] .message-author {
   display: none;
 }
 
 /* Last message in a turn: bottom padding */
-.message-item[data-turn-position="last"] {
+.message-item[data-turn-position='last'] {
   margin-bottom: var(--space-xs);
 }
 
 /* Solo message: both top and bottom padding */
-.message-item[data-turn-position="solo"] {
+.message-item[data-turn-position='solo'] {
   margin-top: var(--space-md);
   margin-bottom: var(--space-xs);
 }
 
 /* Subtle horizontal divider between turns */
-.message-item[data-turn-position="first"]::before,
-.message-item[data-turn-position="solo"]::before {
+.message-item[data-turn-position='first']::before,
+.message-item[data-turn-position='solo']::before {
   content: '';
   display: block;
   height: 1px;

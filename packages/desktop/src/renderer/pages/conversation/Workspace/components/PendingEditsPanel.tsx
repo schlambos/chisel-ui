@@ -74,7 +74,7 @@ const PendingEditsPanel: React.FC<PendingEditsPanelProps> = ({ pendingEdits, rev
         });
       }
     },
-    [revertFile],
+    [revertFile]
   );
 
   const handleRevertHunk = useCallback(
@@ -91,7 +91,7 @@ const PendingEditsPanel: React.FC<PendingEditsPanelProps> = ({ pendingEdits, rev
         });
       }
     },
-    [revertHunk],
+    [revertHunk]
   );
 
   if (pendingEdits.length === 0) {

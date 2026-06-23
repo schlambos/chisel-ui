@@ -58,7 +58,13 @@ const ChatLayout: React.FC<{
   /** Optional override for the leading icon shown before the title (e.g. team Peoples icon) */
   headerLeading?: React.ReactNode;
 }> = (props) => {
-  const { conversation_id, workspacePath, isTemporaryWorkspace, workspaceEnabled = true, workspacePreferenceKey } = props;
+  const {
+    conversation_id,
+    workspacePath,
+    isTemporaryWorkspace,
+    workspaceEnabled = true,
+    workspacePreferenceKey,
+  } = props;
   const layout = useLayoutContext();
   const isMacRuntime = isMacEnvironment();
   const isWindowsRuntime = isWindowsEnvironment();
@@ -79,8 +85,6 @@ const ChatLayout: React.FC<{
 
   // --- Hook B: container width ---
   const { containerRef, containerWidth } = useContainerWidth();
-
-
 
   const {
     splitRatio: workspaceWidthPxPref,
@@ -207,21 +211,20 @@ const ChatLayout: React.FC<{
         }
       }}
     >
-
-       <div className='flex items-center gap-8px' onClick={(e) => e.stopPropagation()}>
-         {props.headerExtra}
-         {isWindowsRuntime && workspaceEnabled && !WORKSPACE_PANE_GHOSTED && (
-           <button
-             type='button'
-             className='workspace-header__toggle hover:bg-color-fill-2 rounded-4px p-4px transition-colors'
-             aria-label='Toggle workspace'
-             onClick={() => dispatchWorkspaceToggleEvent()}
-           >
-             {rightSiderCollapsed ? <ExpandRight size={16} /> : <ExpandLeft size={16} />}
-           </button>
-         )}
-       </div>
-     </ArcoLayout.Header>
+      <div className='flex items-center gap-8px' onClick={(e) => e.stopPropagation()}>
+        {props.headerExtra}
+        {isWindowsRuntime && workspaceEnabled && !WORKSPACE_PANE_GHOSTED && (
+          <button
+            type='button'
+            className='workspace-header__toggle hover:bg-color-fill-2 rounded-4px p-4px transition-colors'
+            aria-label='Toggle workspace'
+            onClick={() => dispatchWorkspaceToggleEvent()}
+          >
+            {rightSiderCollapsed ? <ExpandRight size={16} /> : <ExpandLeft size={16} />}
+          </button>
+        )}
+      </div>
+    </ArcoLayout.Header>
   );
 
   const headerBlock = (

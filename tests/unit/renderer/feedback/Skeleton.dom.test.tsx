@@ -66,15 +66,14 @@ describe('Skeleton', () => {
     expect(screen.getAllByTestId('skeleton').length).toBe(1);
   });
 
-  it.each([
-    ['block' as const],
-    ['pill' as const],
-    ['circle' as const],
-  ])('applies variant data attribute for %s', (variant) => {
-    render(<Skeleton variant={variant} />);
-    const node = screen.getByTestId('skeleton');
-    expect(node.getAttribute('data-variant')).toBe(variant);
-  });
+  it.each([['block' as const], ['pill' as const], ['circle' as const]])(
+    'applies variant data attribute for %s',
+    (variant) => {
+      render(<Skeleton variant={variant} />);
+      const node = screen.getByTestId('skeleton');
+      expect(node.getAttribute('data-variant')).toBe(variant);
+    }
+  );
 
   it('defaults to the block variant', () => {
     render(<Skeleton />);

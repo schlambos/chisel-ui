@@ -56,9 +56,7 @@ const useRemoteSendBoxDraft = getSendBoxDraftHook('remote', {
 const EMPTY_AT_PATH: Array<string | FileOrFolderItem> = [];
 const EMPTY_UPLOAD_FILES: string[] = [];
 
-const RemoteSendBox: React.FC<{ conversation_id: string }> = ({
-  conversation_id,
-}) => {
+const RemoteSendBox: React.FC<{ conversation_id: string }> = ({ conversation_id }) => {
   const [workspacePath, setWorkspacePath] = useState('');
   const { t } = useTranslation();
   const teamPermission = useTeamPermission();
@@ -478,11 +476,11 @@ const RemoteSendBox: React.FC<{ conversation_id: string }> = ({
           <div className='flex items-center gap-8px'>
             {/* Self-hides until the backend reports usage (OpenCode emits it on
                 turn finish; other remote protocols may not — then it stays hidden). */}
-             <ContextUsageIndicator
-               tokenUsage={tokenUsage}
-               context_limit={context_limit > 0 ? context_limit : undefined}
-             />
-             {protocol === 'opencode' ? (
+            <ContextUsageIndicator
+              tokenUsage={tokenUsage}
+              context_limit={context_limit > 0 ? context_limit : undefined}
+            />
+            {protocol === 'opencode' ? (
               <RemoteSkillsPicker
                 available={availableSkills}
                 selected={selectedSkills}

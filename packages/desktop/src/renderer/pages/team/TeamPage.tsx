@@ -180,10 +180,10 @@ const TeamToolbarExtra: React.FC<{
         conversation_id={activeAgent.conversation_id}
         compact
         initialMode={(conversation?.extra as { session_mode?: string } | undefined)?.session_mode}
-         compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-         modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
-         compactLabelPrefix={t('agentMode.agent')}
-         hideCompactLabelPrefixOnMobile
+        compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
+        modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
+        compactLabelPrefix={t('agentMode.agent')}
+        hideCompactLabelPrefixOnMobile
         onModeChanged={
           teamPermission && activeAgent.conversation_id === teamPermission.leaderConversationId
             ? teamPermission.propagateMode

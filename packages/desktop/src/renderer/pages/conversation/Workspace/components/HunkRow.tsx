@@ -43,11 +43,7 @@ const HunkRow: React.FC<HunkRowProps> = ({ hunkIndex, hunkText, reverting, onRev
           {bodyLines.map((line, i) => {
             const kind = diffLineKind(line);
             const className =
-              kind === 'added'
-                ? styles.lineAdded
-                : kind === 'removed'
-                  ? styles.lineRemoved
-                  : styles.lineContext;
+              kind === 'added' ? styles.lineAdded : kind === 'removed' ? styles.lineRemoved : styles.lineContext;
             return (
               <div key={i} className={className}>
                 {line}

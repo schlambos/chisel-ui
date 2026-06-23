@@ -117,12 +117,9 @@ const WorkspaceTabBar: React.FC<WorkspaceTabBarProps> = ({
           title={
             <span className='flex items-center'>
               Edits
-              {pendingEditsCount !== undefined &&
-                pendingEditsCount > 0 && (
-                  <span className='ml-2px text-t-tertiary'>
-                    ({pendingEditsCount > 99 ? '99+' : pendingEditsCount})
-                  </span>
-                )}
+              {pendingEditsCount !== undefined && pendingEditsCount > 0 && (
+                <span className='ml-2px text-t-tertiary'>({pendingEditsCount > 99 ? '99+' : pendingEditsCount})</span>
+              )}
             </span>
           }
         />

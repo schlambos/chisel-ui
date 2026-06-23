@@ -119,7 +119,9 @@ const RemoteSessionDetailsPanel: React.FC<{
                   <Tag size='small' color={currentIsHealthy === false ? 'red' : 'arcoblue'}>
                     <span className='flex items-center gap-4px'>
                       <LinkCloud theme='outline' size='12' />
-                      <Typography.Ellipsis className='max-w-[200px]'>{currentAgentName || t('common.unknown')}</Typography.Ellipsis>
+                      <Typography.Ellipsis className='max-w-[200px]'>
+                        {currentAgentName || t('common.unknown')}
+                      </Typography.Ellipsis>
                     </span>
                   </Tag>
                   {latency && (
@@ -171,8 +173,8 @@ const RemoteSessionDetailsPanel: React.FC<{
                                 agentHealth === 'loading'
                                   ? 'bg-[var(--brand)]'
                                   : isHealthy === false
-                                  ? 'bg-[rgb(var(--danger-6))]'
-                                  : 'bg-[rgb(var(--success-6))]'
+                                    ? 'bg-[rgb(var(--danger-6))]'
+                                    : 'bg-[rgb(var(--success-6))]'
                               }`}
                             />
                             <Typography.Ellipsis className='max-w-[140px]'>{agent.name}</Typography.Ellipsis>
@@ -215,9 +217,7 @@ const BgProcessIndicatorForDetails: React.FC<{ remoteAgentId: string | null }> =
   return (
     <Tag size='small' color='arcoblue'>
       <span className='flex items-center gap-4px'>
-        {processCount > 0 && (
-          <span className='text-10px'>{processCount}</span>
-        )}
+        {processCount > 0 && <span className='text-10px'>{processCount}</span>}
         <span>{t('conversation.session.processesRunning', { defaultValue: 'processes running' })}</span>
       </span>
     </Tag>
@@ -587,19 +587,19 @@ const RemoteSessionActions: React.FC<{ conversation: TChatConversation }> = ({ c
             break;
         }
       }}
-      >
-        <Menu.Item key='sessionDetails'>
-          <div className='flex items-center gap-8px'>
-            <LinkCloud theme='outline' size='14' fill={iconColors.secondary} />
-            <span>{t('conversation.session.remoteSessionDetails', { defaultValue: 'Remote session details' })}</span>
-          </div>
-        </Menu.Item>
-        <Menu.Item key='fork'>
-          <div className='flex items-center gap-8px'>
-            <Branch theme='outline' size='14' fill={iconColors.secondary} />
-            <span>{t('conversation.session.fork', { defaultValue: 'Fork session' })}</span>
-          </div>
-        </Menu.Item>
+    >
+      <Menu.Item key='sessionDetails'>
+        <div className='flex items-center gap-8px'>
+          <LinkCloud theme='outline' size='14' fill={iconColors.secondary} />
+          <span>{t('conversation.session.remoteSessionDetails', { defaultValue: 'Remote session details' })}</span>
+        </div>
+      </Menu.Item>
+      <Menu.Item key='fork'>
+        <div className='flex items-center gap-8px'>
+          <Branch theme='outline' size='14' fill={iconColors.secondary} />
+          <span>{t('conversation.session.fork', { defaultValue: 'Fork session' })}</span>
+        </div>
+      </Menu.Item>
       <Menu.Item key='changes'>
         <div className='flex items-center gap-8px'>
           <FileText theme='outline' size='14' fill={iconColors.secondary} />

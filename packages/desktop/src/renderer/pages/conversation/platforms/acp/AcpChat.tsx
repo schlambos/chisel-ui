@@ -25,16 +25,7 @@ const AcpChat: React.FC<{
   hideSendBox?: boolean;
   emptySlot?: React.ReactNode;
   loadedSkills?: string[];
-}> = ({
-  conversation_id,
-  workspace,
-  backend,
-  agent_name,
-  cron_job_id,
-  hideSendBox,
-  emptySlot,
-  loadedSkills,
-}) => {
+}> = ({ conversation_id, workspace, backend, agent_name, cron_job_id, hideSendBox, emptySlot, loadedSkills }) => {
   const { loadMore, isLoadingMore, hasMore, prependedCount } = useMessageLstCache(conversation_id);
   const teamPermission = useTeamPermission();
   const messageState = useAcpMessage(conversation_id, { skipWarmup: Boolean(teamPermission) });
