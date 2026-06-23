@@ -6,7 +6,7 @@
   --titlebar-btn-size: 28px;
   /* Independent of UI scale: multiplies font-size in chat/markdown/sendbox.
      Wired by useChatFontScale hook. */
-  --chat-font-scale: 1;
+  --chat-font-scale: 1.08;
 
   /* Motion tokens */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -185,10 +185,14 @@ body,
 }
 
 ::-webkit-scrollbar-thumb {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.08);
   /* intentional: 3px scrollbar — kept per Phase 0 audit */
   border-radius: 3px;
   transition: background 0.3s;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 ::-webkit-scrollbar-thumb:hover {
