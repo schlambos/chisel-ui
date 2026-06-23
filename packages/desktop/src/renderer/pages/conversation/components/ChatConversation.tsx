@@ -12,7 +12,7 @@ import { usePresetAssistantInfo, resolveAssistantConfigId } from '@/renderer/hoo
 import { iconColors } from '@/renderer/styles/colors';
 import { useTeamPermission } from '@/renderer/pages/team/hooks/TeamPermissionContext';
 import { Button, Dropdown, Menu, Tooltip, Typography } from '@arco-design/web-react';
-import { History, Shield } from '@icon-park/react';
+import { History, Shield, More } from '@icon-park/react';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -362,28 +362,60 @@ const ChatConversation: React.FC<{
     <div className='chat-header-controls flex items-center'>
       {/* Remote conversation: session badges group */}
       {conversation?.type === 'remote' && conversation && (
-        <div className='chat-header-control-group'>
-          <div className='shrink-0'>
-            <RemoteSessionBadge conversation={conversation} />
+        <>
+          <div className='chat-header-control-group'>
+            <div className='shrink-0'>
+              <RemoteSessionBadge conversation={conversation} />
+            </div>
+            <div className='shrink-0'>
+              <ConversationTitleMinimap conversation_id={conversation.id} />
+            </div>
+            <div className='shrink-0'>
+              <RemoteToolHostBadge conversation_id={conversation.id} />
+            </div>
+            <div className='shrink-0'>
+              <RemoteVcsBadge conversation_id={conversation.id} />
+            </div>
+            <div className='shrink-0'>
+              <RemoteLspBadge conversation_id={conversation.id} />
+            </div>
+            <div className='shrink-0'>
+              <RemoteSessionActions conversation={conversation} />
+            </div>
           </div>
-          <div className='shrink-0'>
-            <ConversationTitleMinimap conversation_id={conversation.id} />
+          <div className='chat-header-overflow-toggle shrink-0'>
+            <Dropdown
+              droplist={
+                <Menu>
+                  <Menu.Item key='session-badge'>
+                    <RemoteSessionBadge conversation={conversation} />
+                  </Menu.Item>
+                  <Menu.Item key='minimap'>
+                    <ConversationTitleMinimap conversation_id={conversation.id} />
+                  </Menu.Item>
+                  <Menu.Item key='tool-host'>
+                    <RemoteToolHostBadge conversation_id={conversation.id} />
+                  </Menu.Item>
+                  <Menu.Item key='vcs'>
+                    <RemoteVcsBadge conversation_id={conversation.id} />
+                  </Menu.Item>
+                  <Menu.Item key='lsp'>
+                    <RemoteLspBadge conversation_id={conversation.id} />
+                  </Menu.Item>
+                  <Menu.Item key='actions'>
+                    <RemoteSessionActions conversation={conversation} />
+                  </Menu.Item>
+                </Menu>
+              }
+              trigger='click'
+              position='br'
+            >
+              <Button size='mini' icon={<More />} />
+            </Dropdown>
           </div>
-          <div className='shrink-0'>
-            <RemoteToolHostBadge conversation_id={conversation.id} />
-          </div>
-          <div className='shrink-0'>
-            <RemoteVcsBadge conversation_id={conversation.id} />
-          </div>
-          <div className='shrink-0'>
-            <RemoteLspBadge conversation_id={conversation.id} />
-          </div>
-          <div className='shrink-0'>
-            <RemoteSessionActions conversation={conversation} />
-          </div>
-        </div>
+        </>
       )}
-      
+
       {/* Primary controls group: permission + model selector */}
       <div className='chat-header-primary-controls'>
         {(conversation?.type === 'acp' || conversation?.type === 'remote') && conversation && (
@@ -393,10 +425,10 @@ const ChatConversation: React.FC<{
               conversation_id={conversation.id}
               compact
               initialMode={(conversation.extra as { session_mode?: string } | undefined)?.session_mode}
-               compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-               modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
-               compactLabelPrefix={t('agentMode.agent')}
-               hideCompactLabelPrefixOnMobile
+              compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
+              modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
+              compactLabelPrefix={t('agentMode.agent')}
+              hideCompactLabelPrefixOnMobile
               onModeChanged={
                 teamPermission && conversation.id === teamPermission.leaderConversationId
                   ? teamPermission.propagateMode
@@ -414,14 +446,14 @@ const ChatConversation: React.FC<{
           conversation?.type !== 'gemini' &&
           conversation?.type !== 'codex' && <div className='shrink-0'>{modelSelector}</div>}
       </div>
-      
+
       {/* ACP minimap */}
       {conversation?.type === 'acp' && conversation && (
         <div className='shrink-0'>
           <ConversationTitleMinimap conversation_id={conversation.id} />
         </div>
       )}
-      
+
       {/* StarOfficeMonitorCard for openclaw-gateway */}
       {conversation?.type === 'openclaw-gateway' && conversation && (
         <div className='shrink-0'>

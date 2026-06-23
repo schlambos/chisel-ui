@@ -169,3 +169,18 @@
   padding-left: 8px;
   border-left: 1px solid var(--color-border-2);
 }
+
+@media (max-width: 899px) {
+  .chat-header-control-group {
+    display: none;
+  }
+  .chat-header-overflow-toggle {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 900px) {
+  .chat-header-overflow-toggle {
+    display: none;
+  }
+}

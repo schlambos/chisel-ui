@@ -5,10 +5,10 @@ import { useExtI18n } from '@/renderer/hooks/system/useExtI18n';
 import { useExtensionSettingsTabs } from '@/renderer/hooks/system/useExtensionSettingsTabs';
 import { Communication, Computer, Earth, Info, Puzzle, Shield, Speed, System } from '@icon-park/react';
 import classNames from 'classnames';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Tooltip } from '@arco-design/web-react';
+import { Tooltip, Input } from '@arco-design/web-react';
 import { getSiderTooltipProps } from '@/renderer/utils/ui/siderTooltip';
 
 /** Builtin settings tab IDs in display order (must match router paths). */
@@ -59,7 +59,7 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
   const extensionTabs = useExtensionSettingsTabs();
   const { resolveExtTabName } = useExtI18n();
 
-  const { menus, groupHeaderAt } = useMemo(() => {
+  const { menus, itemGroupMap } = useMemo(() => {
     // Build builtin items
     const builtinMap: Record<string, SiderItem> = {
       agent: {
@@ -159,8 +159,31 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
       headerAt.set(builtinIdx - beforeCount, headerKey);
     }
 
-    return { menus: result, groupHeaderAt: headerAt };
+    const groupMap = new Map<string, string>();
+    let currentHeaderKey: string | undefined = undefined;
+    for (let i = 0; i < result.length; i++) {
+      if (headerAt.has(i)) {
+        currentHeaderKey = headerAt.get(i);
+      }
+      if (currentHeaderKey) {
+        groupMap.set(result[i].id, currentHeaderKey);
+      }
+    }
+
+    return { menus: result, itemGroupMap: groupMap };
   }, [t, isDesktop, extensionTabs, resolveExtTabName]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    setSearchQuery('');
+  }, [pathname]);
+
+  const filteredMenus = useMemo(() => {
+    if (!searchQuery.trim()) return menus;
+    const q = searchQuery.toLowerCase();
+    return menus.filter((item) => item.label.toLowerCase().includes(q));
+  }, [menus, searchQuery]);
 
   const siderTooltipProps = getSiderTooltipProps(tooltipEnabled);
   return (
@@ -169,13 +192,27 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
         'settings-sider--collapsed': collapsed,
       })}
     >
-      {menus.map((item, index) => {
+      {!collapsed && (
+        <div className='px-8px pb-8px'>
+          <Input
+            size='small'
+            placeholder='Filter settings...'
+            allowClear
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
+        </div>
+      )}
+      {filteredMenus.map((item, index) => {
         const isSelected = pathname.includes(item.path);
-        const groupHeaderKey = groupHeaderAt.get(index);
+        const currentGroupHeaderKey = itemGroupMap.get(item.id);
+        const prevGroupHeaderKey = index > 0 ? itemGroupMap.get(filteredMenus[index - 1].id) : undefined;
+        const showHeader = currentGroupHeaderKey && currentGroupHeaderKey !== prevGroupHeaderKey;
+
         const groupHeader =
-          groupHeaderKey && !collapsed ? (
+          showHeader && !collapsed ? (
             <div className='settings-sider__group-header px-8px mt-3px h-18px flex items-center text-11px font-[500] text-t-tertiary select-none uppercase tracking-wider'>
-              {t(groupHeaderKey)}
+              {t(currentGroupHeaderKey)}
             </div>
           ) : null;
         return (
