@@ -14,6 +14,7 @@ import AgentPillBar from './components/AgentPillBar';
 import { AgentPillBarSkeleton } from './components/GuidSkeleton';
 import GuidActionRow from './components/GuidActionRow';
 import RemoteSkillsPicker from '@/renderer/components/agent/RemoteSkillsPicker';
+import EmptyState from '@/renderer/components/base/feedback/EmptyState';
 import { useRemoteSkills } from '@/renderer/hooks/chat/useRemoteSkills';
 import GuidInputCard from './components/GuidInputCard';
 import GuidModelSelector from './components/GuidModelSelector';
@@ -749,7 +750,18 @@ const GuidPage: React.FC = () => {
                 onReorder={agentSelection.reorderAgents}
                 suppressSelectionAnimation={resetAssistantRequested}
               />
-            ) : null
+            ) : (
+              <EmptyState
+                icon={<Robot theme='outline' size={32} fill='currentColor' />}
+                title='No agents available'
+                description='Add an agent in Settings to get started.'
+                action={
+                  <Button type='primary' size='small' onClick={() => navigate('/settings/agent')}>
+                    Open agent settings
+                  </Button>
+                }
+              />
+            )
           ) : null}
 
           <GuidInputCard
