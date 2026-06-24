@@ -22,10 +22,10 @@ import fs from 'fs';
  */
 const getNotificationIcon = (): string | undefined => {
   try {
-    const resourcesPath = getPlatformServices().paths.isPackaged()
-      ? process.resourcesPath
-      : path.join(process.cwd(), 'resources');
-    const iconPath = path.join(resourcesPath, 'app.png');
+    const iconPath = path.join(
+      process.cwd(),
+      'packages/desktop/src/renderer/assets/logos/brand/app.png',
+    );
     if (fs.existsSync(iconPath)) {
       return iconPath;
     }

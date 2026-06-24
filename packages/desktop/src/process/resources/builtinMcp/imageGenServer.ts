@@ -17,6 +17,23 @@ import { BUILTIN_IMAGE_GEN_ID, BUILTIN_IMAGE_GEN_NAME } from './constants';
 import { executeImageGeneration } from '@/common/chat/imageGenCore';
 import type { TProviderWithModel } from '@/common/config/storage';
 
+type ImageGenerationArgs = {
+  prompt: string;
+  image_uris?: string[];
+  workspace_dir?: string;
+};
+
+type ImageGenerationToolResult = {
+  content: Array<{ type: 'text'; text: string }>;
+  isError?: boolean;
+};
+
+type RegisterImageGenerationTool = (
+  name: string,
+  config: { description: string; inputSchema: z.ZodType<unknown> },
+  callback: (args: ImageGenerationArgs) => Promise<ImageGenerationToolResult>,
+) => void;
+
 // Read provider config from environment variables
 function getProviderFromEnv(): TProviderWithModel | null {
   const platform = process.env.AIONUI_IMG_PLATFORM;
@@ -44,9 +61,12 @@ async function main() {
     version: '1.0.0',
   });
 
-  server.tool(
-    'aionui_image_generation',
-    `REQUIRED tool for generating or editing images. You MUST use this tool for ANY image generation request.
+  const registerImageGenerationTool = server.registerTool.bind(server) as unknown as RegisterImageGenerationTool;
+
+  registerImageGenerationTool(
+    'chisl_image_generation',
+    {
+      description: `REQUIRED tool for generating or editing images. You MUST use this tool for ANY image generation request.
 
 CRITICAL: You (the AI assistant) CANNOT generate images directly. You MUST call this tool for:
 - Creating/generating any new images from text descriptions
@@ -75,24 +95,25 @@ Output:
 - Returns image path and AI description/analysis
 
 IMPORTANT: When user provides multiple images, ALWAYS pass ALL images to the image_uris parameter as an array.`,
-    {
-      prompt: z
-        .string()
-        .describe(
-          'The text prompt in English that must clearly specify the operation type: "Generate image: [description]" for creating new images, "Analyze image: [what to analyze]" for image recognition/analysis, or "Edit image: [modifications]" for image editing.'
-        ),
-      image_uris: z
-        .array(z.string())
-        .optional()
-        .describe(
-          'Optional: Array of paths to existing local image files or HTTP/HTTPS URLs to edit/modify. Examples: ["test.jpg", "https://example.com/img.png"]. For single image, use array format: ["test.jpg"].'
-        ),
-      workspace_dir: z
-        .string()
-        .optional()
-        .describe(
-          'Optional: Working directory for resolving relative paths and saving output images. Defaults to current working directory.'
-        ),
+      inputSchema: z.object({
+        prompt: z
+          .string()
+          .describe(
+            'The text prompt in English that must clearly specify the operation type: "Generate image: [description]" for creating new images, "Analyze image: [what to analyze]" for image recognition/analysis, or "Edit image: [modifications]" for image editing.',
+          ),
+        image_uris: z
+          .array(z.string())
+          .optional()
+          .describe(
+            'Optional: Array of paths to existing local image files or HTTP/HTTPS URLs to edit/modify. Examples: ["test.jpg", "https://example.com/img.png"]. For single image, use array format: ["test.jpg"].',
+          ),
+        workspace_dir: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: Working directory for resolving relative paths and saving output images. Defaults to current working directory.',
+          ),
+      }),
     },
     async ({ prompt, image_uris, workspace_dir }) => {
       const provider = getProviderFromEnv();

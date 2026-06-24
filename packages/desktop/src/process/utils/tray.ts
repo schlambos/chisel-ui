@@ -42,8 +42,9 @@ export const setIsQuitting = (quitting: boolean): void => {
  * macOS uses Template image to adapt to dark/light menu bar.
  */
 const getTrayIcon = (): Electron.NativeImage => {
-  const resourcesPath = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), 'resources');
-  const icon = nativeImage.createFromPath(path.join(resourcesPath, 'app.png'));
+  const icon = nativeImage.createFromPath(
+    path.join(process.cwd(), 'packages/desktop/src/renderer/assets/logos/brand/app.png'),
+  );
   if (process.platform === 'darwin') {
     return icon.resize({ width: 16, height: 16 });
   }
