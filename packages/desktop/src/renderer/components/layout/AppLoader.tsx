@@ -2,7 +2,7 @@ import { Spin } from '@arco-design/web-react';
 import React from 'react';
 import brandWordmark from '@renderer/assets/logos/brand/wordmark.png';
 
-const TAGLINE = 'Chisl — shape your agents.';
+const TAGLINE = 'Chisl — forge your ideas into code.';
 
 const AppLoader: React.FC = () => {
   return (

@@ -112,7 +112,7 @@ const AboutModalContent: React.FC = () => {
               Chisl
             </Typography.Title>
             <Typography.Text className='text-14px text-t-secondary mb-12px text-center'>
-              Chisl — shape your agents.
+              Chisl — forge your ideas into code.
             </Typography.Text>
             <Typography.Text className='text-14px text-t-secondary mb-12px text-center'>
               {t('settings.appDescription')}
