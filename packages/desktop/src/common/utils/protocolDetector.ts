@@ -203,23 +203,17 @@ export const PROTOCOL_SIGNATURES: ProtocolSignature[] = [
       /api\.openai\.com/, // OpenAI 官方
       /\.openai\.azure\.com/, // Azure OpenAI
       /api\.deepseek\.com/, // DeepSeek
-      /api\.moonshot\.cn/, // Moonshot/Kimi China
       /api\.moonshot\.ai/, // Moonshot/Kimi Global
       /api\.mistral\.ai/, // Mistral AI
       /api\.groq\.com/, // Groq
       /openrouter\.ai/, // OpenRouter
       /api\.together\.xyz/, // Together AI
       /api\.perplexity\.ai/, // Perplexity
-      /dashscope\.aliyuncs\.com/, // 阿里云 DashScope
-      /aip\.baidubce\.com/, // 百度千帆
-      /ark\.cn-beijing\.volces\.com/, // 火山引擎
-      /open\.bigmodel\.cn/, // 智谱 AI
-      /api\.siliconflow\.cn/, // SiliconFlow
+      /dashscope-intl\.aliyuncs\.com/, // 阿里云 DashScope (Singapore)
+      /coding-intl\.dashscope\.aliyuncs\.com/, // 阿里云 DashScope Coding Plan (Singapore)
+      /api\.z\.ai/, // 智谱 GLM (international)
       /api\.siliconflow\.com/, // SiliconFlow (.com)
-      /api\.lingyiwanwu\.com/, // 零一万物
-      /api\.minimaxi\.com/, // MiniMax China
       /api\.minimax\.io/, // MiniMax Global
-      /platform\.minimaxi\.com/, // MiniMax Platform
       /localhost/, // 本地服务
       /127\.0\.0\.1/, // 本地服务
       /0\.0\.0\.0/, // 本地服务
