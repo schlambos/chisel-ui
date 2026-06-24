@@ -113,21 +113,21 @@ describe('utils', () => {
   });
 
   describe('resolveLocaleKey', () => {
-    it('resolves zh variants to zh-CN', () => {
-      expect(resolveLocaleKey('zh')).toBe('zh-CN');
-      expect(resolveLocaleKey('zh-CN')).toBe('zh-CN');
-      expect(resolveLocaleKey('zh-Hans')).toBe('zh-CN');
+    it('resolves zh variants to en-US (zh locales removed)', () => {
+      expect(resolveLocaleKey('zh')).toBe('en-US');
+      expect(resolveLocaleKey('zh-CN')).toBe('en-US');
+      expect(resolveLocaleKey('zh-Hans')).toBe('en-US');
     });
 
-    it('resolves zh-TW to zh-TW', () => {
-      expect(resolveLocaleKey('zh-TW')).toBe('zh-TW');
-      expect(resolveLocaleKey('zh-tw')).toBe('zh-TW');
-      expect(resolveLocaleKey('zh-Hant')).toBe('zh-CN'); // Falls back to CN
+    it('resolves zh-TW to en-US (zh-TW locale removed)', () => {
+      expect(resolveLocaleKey('zh-TW')).toBe('en-US');
+      expect(resolveLocaleKey('zh-tw')).toBe('en-US');
+      expect(resolveLocaleKey('zh-Hant')).toBe('en-US');
     });
 
-    it('resolves ja variants to ja-JP', () => {
-      expect(resolveLocaleKey('ja')).toBe('ja-JP');
-      expect(resolveLocaleKey('ja-JP')).toBe('ja-JP');
+    it('resolves ja variants to en-US (ja locale removed)', () => {
+      expect(resolveLocaleKey('ja')).toBe('en-US');
+      expect(resolveLocaleKey('ja-JP')).toBe('en-US');
     });
 
     it('resolves ko variants to ko-KR', () => {
@@ -149,8 +149,8 @@ describe('utils', () => {
     });
 
     it('is case-insensitive', () => {
-      expect(resolveLocaleKey('ZH')).toBe('zh-CN');
-      expect(resolveLocaleKey('JA')).toBe('ja-JP');
+      expect(resolveLocaleKey('ZH')).toBe('en-US');
+      expect(resolveLocaleKey('JA')).toBe('en-US');
       expect(resolveLocaleKey('KO')).toBe('ko-KR');
       expect(resolveLocaleKey('TR')).toBe('tr-TR');
     });

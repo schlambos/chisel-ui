@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const localesDir = path.join(__dirname, 'packages/desktop/src/renderer/services/i18n/locales');
-const langs = ['zh-CN', 'en-US', 'ja-JP', 'zh-TW', 'ko-KR', 'tr-TR', 'ru-RU', 'uk-UA'];
+const langs = ['en-US', 'ko-KR', 'tr-TR', 'ru-RU', 'uk-UA'];
 
 const newKeys = {
   expandFlyout: 'Expand diff view',

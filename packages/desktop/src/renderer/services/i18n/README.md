@@ -51,8 +51,8 @@ const LanguageSwitcher = () => {
 
   return (
     <div>
-      <button onClick={() => changeLanguage('zh-CN')}>中文</button>
       <button onClick={() => changeLanguage('en-US')}>English</button>
+      <button onClick={() => changeLanguage('ko-KR')}>한국어</button>
     </div>
   );
 };
@@ -60,8 +60,8 @@ const LanguageSwitcher = () => {
 
 ## 添加新的翻译
 
-1. 在 `src/renderer/i18n/locales/zh-CN.json` 中添加中文翻译
-2. 在 `src/renderer/i18n/locales/en-US.json` 中添加对应的英文翻译
+1. 在 `src/renderer/i18n/locales/en-US.json` 中添加英文翻译
+2. 在 `src/renderer/i18n/locales/ko-KR.json` 中添加对应的韩文翻译
 3. 在组件中使用 `t('key')` 来获取翻译
 
 ### 翻译键的命名规范

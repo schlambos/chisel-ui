@@ -14,9 +14,6 @@ import {
 
 // Static imports for all locales to ensure packaged app can always switch language.
 import enUS from './locales/en-US/index';
-import zhCN from './locales/zh-CN/index';
-import jaJP from './locales/ja-JP/index';
-import zhTW from './locales/zh-TW/index';
 import koKR from './locales/ko-KR/index';
 import trTR from './locales/tr-TR/index';
 import ruRU from './locales/ru-RU/index';
@@ -32,9 +29,6 @@ export const supportedLanguages = i18nConfig.supportedLanguages;
 
 const localeData: LocaleData = {
   'en-US': enUS,
-  'zh-CN': zhCN,
-  'ja-JP': jaJP,
-  'zh-TW': zhTW,
   'ko-KR': koKR,
   'tr-TR': trTR,
   'ru-RU': ruRU,

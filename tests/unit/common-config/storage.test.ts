@@ -48,9 +48,9 @@ describe('storage runtime exports', () => {
     });
 
     it('set/get roundtrip with language key', async () => {
-      await ConfigStorage.set('language', 'zh-CN');
+      await ConfigStorage.set('language', 'en-US');
       const result = await ConfigStorage.get('language');
-      expect(result).toBe('zh-CN');
+      expect(result).toBe('en-US');
     });
   });
 

@@ -55,7 +55,7 @@ describe('configMigration', () => {
     it('collects multiple legacy keys and sends one PUT with merge strategy', async () => {
       const configFile: ConfigFile = {
         get: vi.fn((key: string) => {
-          if (key === 'language') return Promise.resolve('zh-CN');
+          if (key === 'language') return Promise.resolve('en-US');
           if (key === 'theme') return Promise.resolve('dark');
           return Promise.reject(new Error('not found'));
         }),
@@ -70,7 +70,7 @@ describe('configMigration', () => {
       await migrateConfigStorage(configFile);
 
       expect(httpRequest).toHaveBeenCalledWith('PUT', '/api/settings/client', {
-        language: 'zh-CN',
+        language: 'en-US',
         theme: 'dark',
       });
       expect(configFile.set).not.toHaveBeenCalled();
