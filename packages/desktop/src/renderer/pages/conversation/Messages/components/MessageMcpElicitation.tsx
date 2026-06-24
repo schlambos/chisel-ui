@@ -17,7 +17,7 @@ const { Text } = Typography;
 /**
  * MCP elicitation prompt: a free-form, schema-driven input request raised by a
  * tool mid-call. Mirrors the MCP `elicitation/create` flow but folded onto the
- * existing `IMessagePermission` carrier because aioncore parks elicitations on
+ * existing `IMessagePermission` carrier because chislcore parks elicitations on
  * the same Confirmation queue as shell approvals (the HTTP-only MCP server
  * can't do server→client reverse calls natively).
  *

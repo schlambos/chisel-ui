@@ -1,5 +1,5 @@
 /**
- * Lifecycle manager for the aioncore subprocess (web-host version).
+ * Lifecycle manager for the chislcore subprocess (web-host version).
  *
  * Migrated from packages/desktop/src/process/backend/lifecycleManager.ts in M4.
  * Electron dependency removed: `app.*` replaced with constructor-injected
@@ -117,7 +117,7 @@ export function buildSpawnEnv(dirs: BackendDirConfig): NodeJS.ProcessEnv {
 /** Default AionCore HTTP port — stable across Chisl restarts. */
 export const DEFAULT_BACKEND_PORT = 25808;
 
-/** Fixed plugin dial-back port forwarded to the aioncore child. */
+/** Fixed plugin dial-back port forwarded to the chislcore child. */
 export const DEFAULT_PLUGIN_PORT = 64921;
 
 function tryListenOnPort(port: number): Promise<number> {
@@ -208,7 +208,7 @@ export class BackendLifecycleManager {
       binaryPath = this.resolveBackend();
     } catch (error) {
       throw new BackendStartupError(
-        'aioncore startup failed while resolving backend binary',
+        'chislcore startup failed while resolving backend binary',
         {
           stage: 'resolve_binary',
           appVersion,
@@ -224,7 +224,7 @@ export class BackendLifecycleManager {
       this._port = await resolveBackendPort();
     } catch (error) {
       throw new BackendStartupError(
-        'aioncore startup failed while finding an available port',
+        'chislcore startup failed while finding an available port',
         {
           stage: 'find_port',
           appVersion,
@@ -277,7 +277,7 @@ export class BackendLifecycleManager {
       appVersion,
       isPackaged: this.appMeta.isPackaged,
     });
-    console.log(`[aioncore] starting: ${binaryPath} ${args.join(' ')}`);
+    console.log(`[chislcore] starting: ${binaryPath} ${args.join(' ')}`);
 
     try {
       this.childProcess = spawn(binaryPath, args, {
@@ -286,7 +286,7 @@ export class BackendLifecycleManager {
       });
     } catch (error) {
       this._status = 'error';
-      throw makeStartupError('spawn', 'aioncore process spawn threw before startup', error);
+      throw makeStartupError('spawn', 'chislcore process spawn threw before startup', error);
     }
 
     this.childProcess.stdin?.end();
@@ -307,7 +307,7 @@ export class BackendLifecycleManager {
       this.childProcess?.once('error', (error) => {
         if (startupSettled) return;
         this._status = 'error';
-        reject(makeStartupError('spawn_error', 'aioncore process emitted an error before startup', error));
+        reject(makeStartupError('spawn_error', 'chislcore process emitted an error before startup', error));
       });
 
       this.childProcess?.once('exit', (code, signal) => {
@@ -315,7 +315,7 @@ export class BackendLifecycleManager {
         if (!startupSettled) {
           this._status = 'error';
           reject(
-            makeStartupError('early_exit', 'aioncore exited before health check passed', undefined, {
+            makeStartupError('early_exit', 'chislcore exited before health check passed', undefined, {
               exitCode: code ?? undefined,
               signal: signal ?? undefined,
             })
@@ -329,14 +329,14 @@ export class BackendLifecycleManager {
     this.childProcess.stdout?.on('data', (data: Buffer) => {
       stdoutTail = appendOutputTail(stdoutTail, data);
       for (const line of data.toString().split('\n')) {
-        if (line.trim()) console.log(`[aioncore] ${line}`);
+        if (line.trim()) console.log(`[chislcore] ${line}`);
       }
     });
 
     this.childProcess.stderr?.on('data', (data: Buffer) => {
       stderrTail = appendOutputTail(stderrTail, data);
       for (const line of data.toString().split('\n')) {
-        if (line.trim()) console.error(`[aioncore] ${line}`);
+        if (line.trim()) console.error(`[chislcore] ${line}`);
       }
     });
 
@@ -346,13 +346,13 @@ export class BackendLifecycleManager {
       this.childProcess?.kill('SIGKILL');
       this.childProcess = null;
       this._status = 'error';
-      throw makeStartupError('health_timeout', 'aioncore failed to start within timeout');
+      throw makeStartupError('health_timeout', 'chislcore failed to start within timeout');
     }
 
     startupSettled = true;
     this._status = 'running';
     this.restartCount = 0;
-    console.log(`[aioncore] listening on port ${this._port}, data-dir: ${dbPath}`);
+    console.log(`[chislcore] listening on port ${this._port}, data-dir: ${dbPath}`);
     return this._port;
   }
 

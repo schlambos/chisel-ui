@@ -31,7 +31,7 @@
  * racing an agent write — can never interleave a read-modify-write of the
  * same `meta.json`. Operations across DIFFERENT files run concurrently.
  *
- * The service performs local IO only and is fully decoupled from aioncore.
+ * The service performs local IO only and is fully decoupled from chislcore.
  */
 
 import { createHash, randomBytes } from 'node:crypto';

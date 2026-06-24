@@ -5,7 +5,7 @@
   "description": "Shared build scripts for Chisl packages",
   "type": "commonjs",
   "exports": {
-    "./prepare-aioncore": "./src/prepare-aioncore.js"
+    "./prepare-chislcore": "./src/prepare-chislcore.js"
   },
   "scripts": {
     "test": "vitest run",

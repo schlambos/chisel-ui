@@ -8,7 +8,7 @@
  * IPC Bridge → HTTP/WS adapter.
  *
  * This file replaces the original IPC bridge calls with HTTP REST and WebSocket
- * calls routed to aioncore. Electron-native operations (window controls,
+ * calls routed to chislcore. Electron-native operations (window controls,
  * native dialogs, auto-update, devtools, zoom, CDP, deep links) remain as IPC.
  */
 
@@ -316,7 +316,7 @@ export const conversation = {
   remove: httpDelete<boolean, { id: string }>((p) => `/api/conversations/${p.id}`),
   /**
    * M07: delete a message on a remote OpenCode conversation. `message_id` is the
-   * local message row id; aioncore resolves the OpenCode `messageID` from it,
+   * local message row id; chislcore resolves the OpenCode `messageID` from it,
    * deletes it server-side, removes the local row, and broadcasts
    * `message.removed`. Only valid for OpenCode remote conversations.
    */
@@ -325,7 +325,7 @@ export const conversation = {
   ),
   /**
    * M07: edit the text of a message on a remote OpenCode conversation. Sends the
-   * new text; aioncore PATCHes the underlying OpenCode text part.
+   * new text; chislcore PATCHes the underlying OpenCode text part.
    */
   editRemoteMessage: httpPut<void, { conversation_id: string; message_id: string; text: string }>(
     (p) => `/api/conversations/${p.conversation_id}/opencode-message/${p.message_id}`,
@@ -772,13 +772,13 @@ export const application = {
 
 // ---------------------------------------------------------------------------
 // Git — stays IPC (system git binary is owned by the Electron main process).
-// Fully decoupled from aioncore: GitService (simple-git) lives in the main
+// Fully decoupled from chislcore: GitService (simple-git) lives in the main
 // process and is reached only through these channels.
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // Git — stays IPC (system git binary is owned by the Electron main process).
-// Fully decoupled from aioncore: GitService (simple-git) lives in the main
+// Fully decoupled from chislcore: GitService (simple-git) lives in the main
 // process and is reached only through these channels.
 // ---------------------------------------------------------------------------
 
@@ -1336,7 +1336,7 @@ export const remoteAgent = {
   ),
   /**
    * Fetch available models from a remote OpenCode agent's `/provider`
-   * endpoint.  aioncore performs the upstream call so it can decrypt the
+   * endpoint.  chislcore performs the upstream call so it can decrypt the
    * stored `auth_token` (the plaintext never leaves the Rust process).
    * Used by the Guid (New Chat) page to populate the model selector
    * before any session exists.
@@ -1348,7 +1348,7 @@ export const remoteAgent = {
    * Fetch the selectable agent catalog (`GET /agent`) from a remote OpenCode
    * agent. Used by the Guid (New Chat) page to populate the mode selector with
    * server-discovered agents (build/plan plus custom agents) before any
-   * conversation/session exists. aioncore performs the upstream call so it can
+   * conversation/session exists. chislcore performs the upstream call so it can
    * decrypt the stored `auth_token`.
    */
   listAgents: httpGet<Array<{ id: string; name?: string; description?: string }>, { id: string }>(
@@ -1357,7 +1357,7 @@ export const remoteAgent = {
   /**
    * M10: fetch the selectable skill catalog (`GET /skill`) from a remote
    * OpenCode agent. Used by the Guid (New Chat) page so the user can pick
-   * server-side skills before any conversation exists. aioncore performs the
+   * server-side skills before any conversation exists. chislcore performs the
    * upstream call so it can decrypt the stored `auth_token`. Non-OpenCode
    * agents return an error (the picker is gated to protocol === 'opencode'
    * so this is never called for them in practice).
@@ -1368,7 +1368,7 @@ export const remoteAgent = {
   /**
    * List active sessions on a remote OpenCode agent. Used internally by
    * the Phase 4a background sync to mirror server-side sessions into
-   * Chisl conversation rows. aioncore proxies the upstream
+   * Chisl conversation rows. chislcore proxies the upstream
    * `GET /session` call so the renderer never sees the auth_token.
    */
   listSessions: httpGet<import('@/common/types/agent/remoteAgentTypes').RemoteSession[], { id: string }>(

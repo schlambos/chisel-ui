@@ -4,7 +4,7 @@ WebUI host package for Chisl - zero Electron dependency.
 
 ## Responsibilities
 
-- **backend-launcher**: spawn or reuse existing aioncore process
+- **backend-launcher**: spawn or reuse existing chislcore process
 - **static-server**: serve out/renderer SPA + reverse proxy /api and /ws to backend
 - **auth**: password reset, change, verify, config I/O (bcrypt + session)
 
@@ -23,7 +23,7 @@ const handle = await startWebHost({
   staticDir: '/path/to/out/renderer',
   backend: {
     kind: 'ownBackend',
-    resolveBackend: () => '/path/to/aioncore',
+    resolveBackend: () => '/path/to/chislcore',
   },
 });
 

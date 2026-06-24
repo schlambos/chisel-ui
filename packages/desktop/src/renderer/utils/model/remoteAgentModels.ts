@@ -13,8 +13,8 @@ export const REMOTE_AGENT_MODELS_SWR_KEY = 'remote-agent-models';
 /**
  * Fetcher for {@link REMOTE_AGENT_MODELS_SWR_KEY}.
  *
- * Iterates all registered remote agents and asks aioncore for each one's
- * model list (`GET /api/remote-agents/{id}/models`).  aioncore performs the
+ * Iterates all registered remote agents and asks chislcore for each one's
+ * model list (`GET /api/remote-agents/{id}/models`).  chislcore performs the
  * upstream call to the OpenCode daemon's `/provider` endpoint because it
  * holds the decrypted `auth_token` — the plaintext is never exposed to
  * the renderer.

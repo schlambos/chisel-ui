@@ -91,8 +91,8 @@ export async function captureBackendStartupFailure(error: unknown): Promise<void
       scope.setTag('aionui.backend_startup.stage', details.stage);
     }
     if (details) {
-      scope.setContext('aioncore_startup', details);
-      scope.setExtra('aioncore_startup', details);
+      scope.setContext('chislcore_startup', details);
+      scope.setExtra('chislcore_startup', details);
     }
     Sentry.captureException(capturedError);
   });
@@ -135,10 +135,10 @@ export async function captureBackendStartupDiagnosticReport(error: unknown): Pro
         'aionui.failure': 'backend_startup',
         ...(typeof details?.stage === 'string' ? { 'aionui.backend_startup.stage': details.stage } : {}),
       },
-      contexts: details ? { aioncore_startup: details } : undefined,
+      contexts: details ? { chislcore_startup: details } : undefined,
       extra: {
         errorMessage,
-        description: 'User opted to send a startup diagnostic report after aioncore failed to start.',
+        description: 'User opted to send a startup diagnostic report after chislcore failed to start.',
       },
     },
     { attachments }

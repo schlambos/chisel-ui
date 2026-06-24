@@ -54,7 +54,7 @@ export async function startBackendOrExit(options: StartBackendOrExitOptions): Pr
     options.onStarted(port);
     return { ok: true, port };
   } catch (error) {
-    options.logError?.('[AionUi] Failed to start aioncore:', error);
+    options.logError?.('[AionUi] Failed to start chislcore:', error);
     await options.captureFailure(error);
     await options.showFailureDialog?.(error);
     options.exitApp(1);

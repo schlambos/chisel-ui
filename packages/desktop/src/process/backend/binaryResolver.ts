@@ -1,5 +1,5 @@
 /**
- * Resolve the aioncore binary path.
+ * Resolve the chislcore binary path.
  *
  * Search order:
  *  1. Bundled with app (production)
@@ -10,14 +10,14 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 
-const BINARY_NAME = 'aioncore';
+const BINARY_NAME = 'chislcore';
 
 function getBinaryName(): string {
   return process.platform === 'win32' ? `${BINARY_NAME}.exe` : BINARY_NAME;
 }
 
 /**
- * Resolve the aioncore binary path.
+ * Resolve the chislcore binary path.
  * Returns the absolute path to the binary, or throws if not found.
  */
 export function resolveBinaryPath(): string {
@@ -45,14 +45,14 @@ function devWorkspacePath(): string | null {
 
 /**
  * Check bundled binary in resources directory.
- * Layout: bundled-aioncore/{platform}-{arch}/aioncore[.exe]
+ * Layout: bundled-chislcore/{platform}-{arch}/chislcore[.exe]
  */
 function bundledPath(): string | null {
   const resourcesPath = (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath;
   if (!resourcesPath) return null;
 
   const runtimeKey = `${process.platform}-${process.arch}`;
-  const candidate = join(resourcesPath, 'bundled-aioncore', runtimeKey, getBinaryName());
+  const candidate = join(resourcesPath, 'bundled-chislcore', runtimeKey, getBinaryName());
 
   if (existsSync(candidate)) return candidate;
   return null;

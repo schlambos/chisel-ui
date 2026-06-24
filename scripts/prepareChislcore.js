@@ -1,11 +1,11 @@
 /**
- * CLI wrapper for prepare-aioncore.
+ * CLI wrapper for prepare-chislcore.
  *
  * Reads environment variables and invokes the shared module.
  *
  * Version resolution order:
  *  1. AIONUI_BACKEND_VERSION env (for ad-hoc overrides)
- *  2. "aioncoreVersion" field in repo-root package.json (the pin)
+ *  2. "chislcoreVersion" field in repo-root package.json (the pin)
  *  3. 'latest' (fallback; not recommended for reproducible builds)
  *
  * Environment variables:
@@ -15,27 +15,27 @@
  */
 
 const path = require('path');
-const { prepareAioncore } = require('../packages/shared-scripts/src/prepare-aioncore.js');
-const { resolveAioncoreVersion } = require('./resolveAioncoreVersion.js');
+const { prepareChislcore } = require('../packages/shared-scripts/src/prepare-chislcore.js');
+const { resolveChislcoreVersion } = require('./resolveChislcoreVersion.js');
 
 const projectRoot = path.resolve(__dirname, '..');
 const platform = process.platform;
 // Support cross-compilation: AIONUI_BACKEND_ARCH > npm_config_target_arch > process.arch
 const arch = process.env.AIONUI_BACKEND_ARCH || process.env.npm_config_target_arch || process.arch;
-const version = resolveAioncoreVersion(projectRoot);
+const version = resolveChislcoreVersion(projectRoot);
 
 try {
-  prepareAioncore({ projectRoot, platform, arch, version });
+  prepareChislcore({ projectRoot, platform, arch, version });
 } catch (error) {
-  console.error('❌ prepareAioncore failed:', error.message);
+  console.error('❌ prepareChislcore failed:', error.message);
   process.exit(1);
 }
 
 module.exports = function () {
   try {
-    return prepareAioncore({ projectRoot, platform, arch, version });
+    return prepareChislcore({ projectRoot, platform, arch, version });
   } catch (error) {
-    console.error('❌ prepareAioncore failed:', error.message);
+    console.error('❌ prepareChislcore failed:', error.message);
     throw error;
   }
 };

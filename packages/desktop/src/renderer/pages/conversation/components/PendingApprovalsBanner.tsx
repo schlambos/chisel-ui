@@ -57,7 +57,7 @@ function previewOf(content: PermissionContent | undefined): string {
   return flat.length > MAX_PREVIEW_CHARS ? `${flat.slice(0, MAX_PREVIEW_CHARS - 1)}…` : flat;
 }
 
-// Pull the directory-tree path that aioncore stamped onto the "Allow this
+// Pull the directory-tree path that chislcore stamped onto the "Allow this
 // directory tree" option's `params.path`. When present, blessing this path
 // auto-resolves not just THIS request but every subsequent one whose target
 // path is a descendant — see backend `auto_accept_paths`. Banner uses this
@@ -152,7 +152,7 @@ const PendingApprovalsBanner: React.FC<{ conversation_id: string }> = ({ convers
 
   // If every pending card carries an allow_dir option, compute the deepest
   // common directory ancestor. Blessing it through a single allow_dir POST
-  // on the first card resolves the entire batch via aioncore's `drain_now`
+  // on the first card resolves the entire batch via chislcore's `drain_now`
   // loop AND silently auto-resolves every future request under the same
   // tree — turning a 14-prompt cascade into one click.
   //

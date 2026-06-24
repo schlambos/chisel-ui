@@ -204,7 +204,7 @@ patch.js
 patch-*.js
 .omo/
 resources/bundled-bun
-resources/bundled-aioncore
+resources/bundled-chislcore
 resources/hub
 
 # Server build output

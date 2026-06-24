@@ -491,7 +491,7 @@ const handleAppReady = async (): Promise<void> => {
     return;
   }
 
-  // Start aioncore only after initializeProcess(). initStorage may open
+  // Start chislcore only after initializeProcess(). initStorage may open
   // the legacy Electron SQLite catalog for a one-shot v26 migration and must
   // close it before the backend touches the same file.
   const backendStartup = await startBackendOrExit({
@@ -641,7 +641,7 @@ const handleAppReady = async (): Promise<void> => {
             // Spawning a second backend here would race the first on SQLite.
             const port = (globalThis as typeof globalThis & { __backendPort?: number }).__backendPort;
             if (!port) {
-              throw new Error('[WebUI] Cannot start: aioncore is not running (globalThis.__backendPort unset)');
+              throw new Error('[WebUI] Cannot start: chislcore is not running (globalThis.__backendPort unset)');
             }
             return port;
           })(),
@@ -822,7 +822,7 @@ app.on('before-quit', async () => {
       console.error('[App] Failed to dispose git service:', err);
     }
 
-    // Stop aioncore subprocess — backend shutdown kills all agent
+    // Stop chislcore subprocess — backend shutdown kills all agent
     // children transitively (no separate frontend workerTaskManager remains)
     await backendManager.stop().catch((err) => console.error('[App] Failed to stop backend:', err));
 
@@ -834,7 +834,7 @@ app.on('before-quit', async () => {
       /* pet not initialized */
     }
 
-    // Web Server lifecycle is managed by aioncore subprocess
+    // Web Server lifecycle is managed by chislcore subprocess
     // Office/PPT preview spawns also live in the backend; frontend no longer owns those sessions.
   };
 

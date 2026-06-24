@@ -1,12 +1,12 @@
 /**
- * Prepare aioncore binary for packaging.
+ * Prepare chislcore binary for packaging.
  *
  * Resolution order:
  *  1. GitHub release download (requires version or defaults to "latest")
  *
- * Output: {projectRoot}/resources/bundled-aioncore/{platform}-{arch}/aioncore[.exe]
+ * Output: {projectRoot}/resources/bundled-chislcore/{platform}-{arch}/chislcore[.exe]
  *
- * @module prepare-aioncore
+ * @module prepare-chislcore
  */
 
 const { execSync, execFileSync } = require('child_process');
@@ -48,7 +48,7 @@ function writeJson(filePath, payload) {
 }
 
 function getBinaryName(platform) {
-  return platform === 'win32' ? 'aioncore.exe' : 'aioncore';
+  return platform === 'win32' ? 'chislcore.exe' : 'chislcore';
 }
 
 // ---------------------------------------------------------------------------
@@ -92,7 +92,7 @@ function resolveLatestTag() {
  * Build the release asset filename for the given platform/arch/tag.
  *
  * Expected asset naming convention:
- *   aioncore-v0.1.0-aarch64-apple-darwin.tar.gz
+ *   chislcore-v0.1.0-aarch64-apple-darwin.tar.gz
  */
 function getAssetName(platform, arch, tag) {
   const archMap = { x64: 'x86_64', arm64: 'aarch64' };
@@ -105,7 +105,7 @@ function getAssetName(platform, arch, tag) {
   const normalizedPlatform = platformMap[platform];
   if (!normalizedArch || !normalizedPlatform) return null;
   const ext = platform === 'win32' ? '.zip' : '.tar.gz';
-  return `aioncore-${tag}-${normalizedArch}-${normalizedPlatform}${ext}`;
+  return `chislcore-${tag}-${normalizedArch}-${normalizedPlatform}${ext}`;
 }
 
 function getDownloadUrl(assetName, tag) {
@@ -113,7 +113,7 @@ function getDownloadUrl(assetName, tag) {
 }
 
 function downloadFile(url, outputPath) {
-  console.log(`  Downloading aioncore from ${url}`);
+  console.log(`  Downloading chislcore from ${url}`);
   if (process.platform === 'win32') {
     const ps = `$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -Uri '${url}' -OutFile '${outputPath.replace(/'/g, "''")}'`;
     execFileSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', ps], {
@@ -169,7 +169,7 @@ function resolveLocalBinary(platform, projectRoot) {
     console.warn(`  AIONUI_BACKEND_BINARY set but not found: ${resolved}`);
   }
 
-  // 2. Sibling AionCore workspace: ../AionCore/target/{release,debug}/aioncore
+  // 2. Sibling AionCore workspace: ../AionCore/target/{release,debug}/chislcore
   const siblingRoot = path.join(projectRoot, '..', 'AionCore', 'target');
   for (const profile of ['release', 'debug']) {
     const candidate = path.join(siblingRoot, profile, binaryName);
@@ -185,11 +185,11 @@ function resolveLocalBinary(platform, projectRoot) {
 function downloadAndExtract(platform, arch, tag) {
   const assetName = getAssetName(platform, arch, tag);
   if (!assetName) {
-    throw new Error(`Unsupported aioncore target: ${platform}-${arch}`);
+    throw new Error(`Unsupported chislcore target: ${platform}-${arch}`);
   }
 
   const url = getDownloadUrl(assetName, tag);
-  const tempDir = path.join(os.tmpdir(), 'aioncore-prepare', tag, `${platform}-${arch}`);
+  const tempDir = path.join(os.tmpdir(), 'chislcore-prepare', tag, `${platform}-${arch}`);
   const archivePath = path.join(tempDir, assetName);
   const extractDir = path.join(tempDir, 'extracted');
 
@@ -213,7 +213,7 @@ function downloadAndExtract(platform, arch, tag) {
 // ---------------------------------------------------------------------------
 
 /**
- * Prepare aioncore binary for packaging.
+ * Prepare chislcore binary for packaging.
  *
  * @param {object} options - Configuration options
  * @param {string} options.projectRoot - Project root directory
@@ -222,7 +222,7 @@ function downloadAndExtract(platform, arch, tag) {
  * @param {string} options.version - Backend version (default: 'latest')
  * @returns {{ prepared: true; dir: string; sourceType: string }}
  */
-function prepareAioncore(options) {
+function prepareChislcore(options) {
   const { projectRoot, platform, arch, version = 'latest' } = options;
   const runtimeKey = `${platform}-${arch}`;
 
@@ -231,19 +231,19 @@ function prepareAioncore(options) {
   if (version === 'latest') {
     const resolved = resolveLatestTag();
     if (!resolved) {
-      throw new Error('Failed to resolve latest aioncore release tag from GitHub API');
+      throw new Error('Failed to resolve latest chislcore release tag from GitHub API');
     }
     tag = resolved;
-    console.log(`Resolved aioncore "latest" → ${tag}`);
+    console.log(`Resolved chislcore "latest" → ${tag}`);
   } else {
     tag = version.startsWith('v') ? version : `v${version}`;
   }
 
-  const targetDir = path.join(projectRoot, 'resources', 'bundled-aioncore', runtimeKey);
+  const targetDir = path.join(projectRoot, 'resources', 'bundled-chislcore', runtimeKey);
   const binaryName = getBinaryName(platform);
   const targetBinaryPath = path.join(targetDir, binaryName);
 
-  console.log(`Preparing aioncore for ${runtimeKey} (version: ${tag})`);
+  console.log(`Preparing chislcore for ${runtimeKey} (version: ${tag})`);
 
   removeDirectorySafe(targetDir);
   ensureDirectory(targetDir);
@@ -286,7 +286,7 @@ function prepareAioncore(options) {
     copyFileSafe(sourcePath, targetBinaryPath);
     ensureExecutableMode(targetBinaryPath);
 
-    // The release tag is the authoritative version — the aioncore
+    // The release tag is the authoritative version — the chislcore
     // binary does not expose a --version flag (it has --app-version which
     // takes a value, not a self-report).
     const manifest = {
@@ -301,14 +301,14 @@ function prepareAioncore(options) {
 
     writeJson(path.join(targetDir, 'manifest.json'), manifest);
     console.log(
-      `  Bundled aioncore prepared: resources/bundled-aioncore/${runtimeKey}/${binaryName} [source=${sourceType}]`
+      `  Bundled chislcore prepared: resources/bundled-chislcore/${runtimeKey}/${binaryName} [source=${sourceType}]`
     );
 
     if (tempDir) removeDirectorySafe(tempDir);
     return { prepared: true, dir: targetDir, sourceType };
   }
 
-  throw new Error(`aioncore binary not found for ${runtimeKey} (tag: ${tag})`);
+  throw new Error(`chislcore binary not found for ${runtimeKey} (tag: ${tag})`);
 }
 
-module.exports = { prepareAioncore };
+module.exports = { prepareChislcore };

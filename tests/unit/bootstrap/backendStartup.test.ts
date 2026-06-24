@@ -28,7 +28,7 @@ describe('startBackendOrExit', () => {
   });
 
   it('captures startup failure and exits without registering a backend port', async () => {
-    const error = new Error('aioncore failed to start within timeout');
+    const error = new Error('chislcore failed to start within timeout');
     const calls: string[] = [];
     const onStarted = vi.fn();
     const captureFailure = vi.fn(async () => {
@@ -56,7 +56,7 @@ describe('startBackendOrExit', () => {
     });
 
     expect(result).toEqual({ ok: false });
-    expect(logError).toHaveBeenCalledWith('[AionUi] Failed to start aioncore:', error);
+    expect(logError).toHaveBeenCalledWith('[AionUi] Failed to start chislcore:', error);
     expect(captureFailure).toHaveBeenCalledWith(error);
     expect(showFailureDialog).toHaveBeenCalledWith(error);
     expect(exitApp).toHaveBeenCalledWith(1);
@@ -79,7 +79,7 @@ describe('showBackendStartupFailureDialog', () => {
   };
 
   it('sends a diagnostic report when the user chooses the report button', async () => {
-    const error = new Error('aioncore failed to start');
+    const error = new Error('chislcore failed to start');
     const showMessageBox = vi.fn().mockResolvedValueOnce({ response: 0 }).mockResolvedValueOnce({ response: 0 });
     const captureDiagnosticReport = vi.fn(async () => {});
 
@@ -116,7 +116,7 @@ describe('showBackendStartupFailureDialog', () => {
     const showMessageBox = vi.fn().mockResolvedValueOnce({ response: 1 });
     const captureDiagnosticReport = vi.fn();
 
-    await showBackendStartupFailureDialog(new Error('aioncore failed to start'), messages, {
+    await showBackendStartupFailureDialog(new Error('chislcore failed to start'), messages, {
       showMessageBox,
       captureDiagnosticReport,
     });

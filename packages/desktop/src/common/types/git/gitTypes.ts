@@ -141,7 +141,7 @@ export type GitFileLogRequest = {
 /**
  * Emitted (debounced) by the main-process file watcher when the working tree of
  * a watched workspace changes, so the renderer can refresh its status. Decouples
- * the panel from aioncore's WS stream entirely.
+ * the panel from chislcore's WS stream entirely.
  */
 export type GitChangedEvent = {
   /** The workspace argument that registered the watch. */

@@ -1,7 +1,7 @@
 # @chisl/chisl-opencode-plugin
 
 OpenCode control-plane plugin for Chisl. The plugin connects back to an
-[AionCore](https://github.com/ioffice-ai/aioncore) instance and:
+[AionCore](https://github.com/ioffice-ai/chislcore) instance and:
 
 - Forwards tool lifecycle and other lifecycle events to AionCore for audit.
 - Receives dynamic `system` prompt context updates from AionCore and injects
@@ -21,7 +21,7 @@ In your OpenCode `opencode.json`:
       "@chisl/chisl-opencode-plugin",
       {
         // Optional — env vars AIONCORE_URL / AIONCORE_TOKEN are also read.
-        "url": "https://aioncore.example.com",
+        "url": "https://chislcore.example.com",
         "token": "sk_...",
       },
     ],

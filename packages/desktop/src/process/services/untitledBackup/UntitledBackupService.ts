@@ -32,7 +32,7 @@
  * for DIFFERENT ids run concurrently.
  *
  * The service performs local IO only and is fully decoupled from
- * aioncore.
+ * chislcore.
  */
 
 import { randomBytes } from 'node:crypto';

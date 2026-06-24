@@ -57,7 +57,7 @@ describe('selectRecentLogFiles', () => {
   it('returns every file from the N most recent non-empty days', () => {
     const files = [
       { path: '/a/2026-05-22.log', mtime: Date.UTC(2026, 4, 22, 10), size: 100 },
-      { path: '/a/2026-05-22.aioncore.log', mtime: Date.UTC(2026, 4, 22, 11), size: 200 },
+      { path: '/a/2026-05-22.chislcore.log', mtime: Date.UTC(2026, 4, 22, 11), size: 200 },
       { path: '/a/2026-05-21.log', mtime: Date.UTC(2026, 4, 21, 10), size: 50 },
       { path: '/a/2026-05-20.log', mtime: Date.UTC(2026, 4, 20, 10), size: 0 },
       { path: '/a/2026-05-19.log', mtime: Date.UTC(2026, 4, 19, 10), size: 80 },
@@ -109,12 +109,12 @@ describe('packAndCap', () => {
 
 describe('captureBackendStartupFailure', () => {
   it('captures and flushes a dedicated backend startup failure with diagnostics', async () => {
-    const error = new Error('aioncore failed to start within timeout') as Error & {
+    const error = new Error('chislcore failed to start within timeout') as Error & {
       details?: Record<string, unknown>;
     };
     error.details = {
       stage: 'health_timeout',
-      binaryPath: '/abs/path/aioncore',
+      binaryPath: '/abs/path/chislcore',
       port: 33334,
       stderrTail: 'database is locked',
     };
@@ -129,7 +129,7 @@ describe('captureBackendStartupFailure', () => {
 
 describe('captureBackendStartupDiagnosticReport', () => {
   it('captures a user-feedback startup diagnostic report with recent logs', async () => {
-    const error = new Error('aioncore failed to start within timeout') as Error & {
+    const error = new Error('chislcore failed to start within timeout') as Error & {
       details?: Record<string, unknown>;
     };
     error.details = {
@@ -151,7 +151,7 @@ describe('captureBackendStartupDiagnosticReport', () => {
           'aionui.backend_startup.stage': 'health_timeout',
         }),
         extra: expect.objectContaining({
-          errorMessage: 'aioncore failed to start within timeout',
+          errorMessage: 'chislcore failed to start within timeout',
         }),
       }),
       {

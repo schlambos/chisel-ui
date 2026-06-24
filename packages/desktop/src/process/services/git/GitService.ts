@@ -17,7 +17,7 @@
  *   - Working-tree file watching (debounced chokidar) that emits `'changed'`
  *     events so the renderer can refresh.
  *
- * The service is fully decoupled from aioncore — every method uses local IO
+ * The service is fully decoupled from chislcore — every method uses local IO
  * only. Methods that take a `file_path` accept either an absolute path or a
  * repo-relative POSIX path; both are normalized to an absolute path against
  * the resolved root.
