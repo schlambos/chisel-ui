@@ -29,14 +29,14 @@ import { initializeProcess } from './process';
 import { showBackendStartupFailureDialog, startBackendOrExit } from './process/startup/backendStartup';
 import { ProcessConfig } from './process/utils/initStorage';
 import { registerWindowMaximizeListeners } from '@process/bridge';
-import { BackendLifecycleManager } from '@aionui/web-host';
+import { BackendLifecycleManager } from '@chisl/web-host';
 import { resolveBinaryPath } from '@process/backend';
 import './process/bridge/feedbackBridge';
 import { wasLaunchedAtLogin } from '@process/bridge/applicationBridge';
 import { onLanguageChanged } from './process/bridge/systemSettingsBridge';
 import i18n, { i18nReady, setInitialLanguage } from '@process/services/i18n';
 import { setupApplicationMenu } from './process/utils/appMenu';
-import { startWebHost } from '@aionui/web-host';
+import { startWebHost } from '@chisl/web-host';
 import { initializeZoomFactor, setupZoomForWindow } from './process/utils/zoom';
 import {
   MIN_WINDOW_WIDTH,
@@ -609,7 +609,7 @@ const handleAppReady = async (): Promise<void> => {
       const { getDataPath } = await import('./process/utils/utils');
       const { getSystemDir } = await import('./process/utils/initStorage');
       const sysDirWebUI = getSystemDir();
-      // M6: Switch to @aionui/web-host
+    // M6: Switch to @chisl/web-host
       const handle = await startWebHost({
         app: {
           version: app.getVersion(),

@@ -22,7 +22,7 @@ the terms of any third-party license.
 
 ### monaco-vscode-api (CodinGame)
 
-- **Packages:** `@codingame/monaco-vscode-api`, `@codingame/monaco-vscode-*-service-override`, and related `@codingame/monaco-vscode-*` packages; `@aionui/editor-monaco` (npm alias to `@codingame/monaco-vscode-editor-api`)
+- **Packages:** `@codingame/monaco-vscode-api`, `@codingame/monaco-vscode-*-service-override`, and related `@codingame/monaco-vscode-*` packages; `@chisl/editor-monaco` (npm alias to `@codingame/monaco-vscode-editor-api`)
 - **Copyright:** CodinGame and contributors
 - **License:** MIT
 - **Repository:** https://github.com/CodinGame/monaco-vscode-api

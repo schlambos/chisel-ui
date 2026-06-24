@@ -113,10 +113,10 @@ export default defineConfig(({ mode }) => {
       plugins: [
         // externalizeDepsPlugin replaces our custom getExternalDeps() + pluginExternalizeDynamicImports.
         // 'fix-path' excluded so it gets bundled inline (only 3KB).
-        // '@aionui/web-host' excluded so its TS sources (which use ESM ".js" import specifiers)
-        // are bundled by esbuild rather than left as `require('@aionui/web-host')`, which Node
+        // '@chisl/web-host' excluded so its TS sources (which use ESM ".js" import specifiers)
+        // are bundled by esbuild rather than left as `require('@chisl/web-host')`, which Node
         // cannot resolve because the package ships no compiled .js files (workspace-only).
-        externalizeDepsPlugin({ exclude: ['fix-path', '@aionui/web-host'] }),
+        externalizeDepsPlugin({ exclude: ['fix-path', '@chisl/web-host'] }),
         ...(isDevelopment
           ? [
               {
@@ -226,10 +226,10 @@ export default defineConfig(({ mode }) => {
           '@renderer': resolve('packages/desktop/src/renderer'),
           '@process': resolve('packages/desktop/src/process'),
           '@worker': resolve('packages/desktop/src/process/worker'),
-          '@aionui/editor-monaco': resolve('node_modules/@aionui/editor-monaco'),
+          '@chisl/editor-monaco': resolve('node_modules/@chisl/editor-monaco'),
           // `monaco-languageclient` imports the real package name; map it to the
-          // same 25.1.2 build as `@aionui/editor-monaco` so there's one copy.
-          '@codingame/monaco-vscode-editor-api': resolve('node_modules/@aionui/editor-monaco'),
+          // same 25.1.2 build as `@chisl/editor-monaco` so there's one copy.
+          '@codingame/monaco-vscode-editor-api': resolve('node_modules/@chisl/editor-monaco'),
           vscode: resolve('node_modules/vscode'),
           // Force ESM version of streamdown
           streamdown: resolve('node_modules/streamdown/dist/index.js'),
@@ -241,7 +241,7 @@ export default defineConfig(({ mode }) => {
           'react-router-dom',
           '@codingame/monaco-vscode-api',
           '@codingame/monaco-vscode-editor-api',
-          '@aionui/editor-monaco',
+          '@chisl/editor-monaco',
           'vscode',
         ],
       },
@@ -298,7 +298,7 @@ export default defineConfig(({ mode }) => {
               if (
                 id.includes('/monaco-editor/') ||
                 id.includes('/@monaco-editor/') ||
-                id.includes('/@aionui/editor-monaco/') ||
+                id.includes('/@chisl/editor-monaco/') ||
                 id.includes('/@codingame/monaco-vscode') ||
                 id.includes('/monaco-languageclient/') ||
                 id.includes('/vscode/') ||

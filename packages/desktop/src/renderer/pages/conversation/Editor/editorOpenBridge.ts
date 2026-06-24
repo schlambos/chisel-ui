@@ -21,7 +21,7 @@
  * already-open files by checking `monaco.editor.getEditors()` directly.
  */
 
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 import type {
   OpenEditor,
   IEditorOptions,
@@ -72,7 +72,7 @@ export const editorOpenProxy: OpenEditor = async (
   const existingEditor = findEditorWithUri(uri);
   if (existingEditor) {
     modelRef.dispose();
-    // Cast through unknown: @aionui/editor-monaco and @codingame/monaco-vscode-api
+  // Cast through unknown: @chisl/editor-monaco and @codingame/monaco-vscode-api
     // expose structurally identical ICodeEditor but from different type packages.
     return existingEditor as unknown as ICodeEditor;
   }

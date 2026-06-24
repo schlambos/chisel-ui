@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 import type { OpenBuffer } from './types';
 
 const PATH_SEPARATOR_RE = /[\\:]/g;

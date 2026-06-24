@@ -1,5 +1,5 @@
 {
-  "name": "@aionui/web-cli",
+  "name": "@chisl/web-cli",
   "version": "1.9.26",
   "private": true,
   "description": "Chisl WebUI CLI - standalone web runtime (no Electron)",
@@ -16,8 +16,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aionui/shared-scripts": "workspace:*",
-    "@aionui/web-host": "workspace:*"
+    "@chisl/shared-scripts": "workspace:*",
+    "@chisl/web-host": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

@@ -13,7 +13,7 @@
  * null for non-abbreviation text so Tab falls through to default behavior.
  */
 
-import type * as monaco from '@aionui/editor-monaco';
+import type * as monaco from '@chisl/editor-monaco';
 import expandAbbreviation, { extract, resolveConfig } from 'emmet';
 
 /** Language IDs where Emmet expansion is supported. */

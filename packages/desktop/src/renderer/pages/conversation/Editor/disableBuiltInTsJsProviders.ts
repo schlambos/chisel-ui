@@ -9,7 +9,7 @@
  *
  * The `monaco.languages.typescript` namespace (with `typescriptDefaults` /
  * `javascriptDefaults`) is a standalone-`monaco-editor` feature and is NOT
- * guaranteed to exist at runtime. The `@aionui/editor-monaco` package uses
+ * guaranteed to exist at runtime. The `@chisl/editor-monaco` package uses
  * `@codingame/monaco-vscode-editor-api` (the VSCode-API flavor), where this
  * namespace is absent. When it is absent, there are no built-in providers to
  * disable, so this function is a defensive no-op.
@@ -18,10 +18,10 @@
  * or diagnostics. This is by design — the app always targets LSP-backed projects.
  */
 
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 
 /**
- * Cast through unknown: @aionui/editor-monaco does not re-export
+ * Cast through unknown: @chisl/editor-monaco does not re-export
  * `languages.typescript` in its type declarations. The namespace may
  * exist at runtime when standalone `monaco-editor` loads the TS worker
  * contribution, but is absent in the VSCode-API build.

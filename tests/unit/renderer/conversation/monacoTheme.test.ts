@@ -85,7 +85,7 @@ const state = vi.hoisted(() => {
   };
 });
 
-vi.mock('@aionui/editor-monaco', () => ({
+vi.mock('@chisl/editor-monaco', () => ({
   editor: {
     defineTheme: (...args: unknown[]) => state.defineThemeMock(...args),
     setTheme: (...args: unknown[]) => state.setThemeMock(...args),

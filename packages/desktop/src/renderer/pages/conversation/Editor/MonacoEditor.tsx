@@ -12,7 +12,7 @@
 
 import { useThemeContext } from '@/renderer/hooks/context/ThemeContext';
 import { ipcBridge } from '@/common';
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { emitter } from '@/renderer/utils/emitter';

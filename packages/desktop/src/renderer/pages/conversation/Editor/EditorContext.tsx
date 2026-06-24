@@ -6,7 +6,7 @@
 
 import { ipcBridge } from '@/common';
 import { useRemoteWorkspaceChanged } from '@/renderer/hooks/agent/useRemoteWorkspaceEvents';
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { mutate } from 'swr';
 import { isEditorAccessibleInLayoutMode } from '@renderer/utils/layout/layoutModeStorage';

@@ -32,7 +32,7 @@
  */
 
 import { Button, Empty, Message, Spin } from '@arco-design/web-react';
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 import type { GitFileLogEntry } from '@/common/types/git/gitTypes';
 import type { LocalHistoryEntry } from '@/common/types/localHistory/localHistoryTypes';
 import type { OpenBuffer } from '@renderer/pages/conversation/Editor/types';

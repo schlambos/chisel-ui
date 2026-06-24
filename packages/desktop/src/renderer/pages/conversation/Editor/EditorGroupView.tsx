@@ -10,7 +10,7 @@
  * panel-level toolbar / status bar.
  */
 
-import type * as monaco from '@aionui/editor-monaco';
+import type * as monaco from '@chisl/editor-monaco';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Close } from '@icon-park/react';

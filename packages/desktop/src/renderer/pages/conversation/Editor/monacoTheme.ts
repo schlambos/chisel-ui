@@ -36,7 +36,7 @@
  *   race and the active palette is always the one the user just selected.
  */
 
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 // Best-effort probe: Codingame deep-internal paths to the standalone
 // theme service. These imports are wrapped in a try/catch in the helper so
 // that a missing/renamed export across minor versions degrades to "unknown"

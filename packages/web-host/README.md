@@ -1,4 +1,4 @@
-# @aionui/web-host
+# @chisl/web-host
 
 WebUI host package for Chisl - zero Electron dependency.
 
@@ -11,7 +11,7 @@ WebUI host package for Chisl - zero Electron dependency.
 ## Usage
 
 ```ts
-import { startWebHost } from '@aionui/web-host';
+import { startWebHost } from '@chisl/web-host';
 
 const handle = await startWebHost({
   app: {

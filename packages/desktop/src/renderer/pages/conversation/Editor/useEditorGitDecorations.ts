@@ -26,7 +26,7 @@
  */
 
 import { ipcBridge } from '@/common';
-import * as monaco from '@aionui/editor-monaco';
+import * as monaco from '@chisl/editor-monaco';
 import { useEffect, useRef } from 'react';
 import { decorationsFromUnifiedPatch, type GitLineDecoration } from './gitDecorationsFromPatch';
 import type { OpenBuffer } from './types';
