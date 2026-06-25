@@ -99,18 +99,18 @@ Local CLI-backed agents are a secondary path.
 
 | Capability          | What it does                                                                                                                                                                                                                  |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Context injection   | AionCore pushes dynamic system-prompt strings to the plugin over SSE; the plugin injects them into the chat via `experimental.chat.system.transform`, with a defensive synthetic-part fallback.                                |
-| Tool audit          | Every `tool.execute.before` / `tool.execute.after` event and a curated set of OpenCode lifecycle events are forwarded to AionCore and stored in a per-agent ring buffer for the renderer-side status panel.                    |
-| Streaming shell     | A custom `run_shell_streaming` tool streams command output (stdout and stderr) from AionCore back to the remote OpenCode host over SSE, gated through the same shell approver the local fs MCP uses. Default timeout is 120 s. |
-| Permission routing  | OpenCode's `permission.ask` hook dials AionCore for a decision; the MVP policy is `"ask"` passthrough so OpenCode's native flow continues while AionUi shows the prompt in its Approvals queue.                               |
+| Context injection   | Chislcore pushes dynamic system-prompt strings to the plugin over SSE; the plugin injects them into the chat via `experimental.chat.system.transform`, with a defensive synthetic-part fallback.                                |
+| Tool audit          | Every `tool.execute.before` / `tool.execute.after` event and a curated set of OpenCode lifecycle events are forwarded to Chislcore and stored in a per-agent ring buffer for the renderer-side status panel.                    |
+| Streaming shell     | A custom `run_shell_streaming` tool streams command output (stdout and stderr) from Chislcore back to the remote OpenCode host over SSE, gated through the same shell approver the local fs MCP uses. Default timeout is 120 s. |
+| Permission routing  | OpenCode's `permission.ask` hook dials Chislcore for a decision; the MVP policy is `"ask"` passthrough so OpenCode's native flow continues while Chisl shows the prompt in its Approvals queue.                               |
 
-The plugin runs in-process in the OpenCode server. All shell execution happens on the AionCore side, behind the shell approver and audit ring buffer.
+The plugin runs in-process in the OpenCode server. All shell execution happens on the Chislcore side, behind the shell approver and audit ring buffer.
 
-Install it from the **Remote Agents** panel in AionUi (click **Install Plugin** on the agent card) or follow the step-by-step instructions in [`docs/opencode-plugin/install-guide.md`](docs/opencode-plugin/install-guide.md).
+Install it from the **Remote Agents** panel in Chisl (click **Install Plugin** on the agent card) or follow the step-by-step instructions in [`docs/opencode-plugin/install-guide.md`](docs/opencode-plugin/install-guide.md).
 
 ## Local Filesystem MCP (Data Plane)
 
-`local_fs_mcp` is the data plane for remote OpenCode sessions. Where the OpenCode plugin handles control-plane concerns (context injection, tool audit, permission routing), `local_fs_mcp` handles the actual file I/O and synchronous shell execution, keeping all of that work on the local host (AionCore side) rather than on the remote OpenCode server.
+`local_fs_mcp` is the data plane for remote OpenCode sessions. Where the OpenCode plugin handles control-plane concerns (context injection, tool audit, permission routing), `local_fs_mcp` handles the actual file I/O and synchronous shell execution, keeping all of that work on the local host (Chislcore side) rather than on the remote OpenCode server.
 
 | Capability         | What it does                                                                                                                                                                                  |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -120,7 +120,7 @@ Install it from the **Remote Agents** panel in AionUi (click **Install Plugin** 
 
 The `ShellApprover` gate means no shell command runs silently. You see each request in the Approvals tab, can edit and resend it, or deny it outright. Auto-approval rules apply here the same way they do for other tool calls.
 
-Keeping execution on the AionCore side is a deliberate security boundary: the remote OpenCode process gets file content and command results, but it never holds credentials, SSH keys, or raw filesystem access. The protected-paths hard-deny layer enforces this even if an allow rule would otherwise permit it.
+Keeping execution on the Chislcore side is a deliberate security boundary: the remote OpenCode process gets file content and command results, but it never holds credentials, SSH keys, or raw filesystem access. The protected-paths hard-deny layer enforces this even if an allow rule would otherwise permit it.
 
 ## Branding
 
