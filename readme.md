@@ -108,6 +108,20 @@ The plugin runs in-process in the OpenCode server. All shell execution happens o
 
 Install it from the **Remote Agents** panel in AionUi (click **Install Plugin** on the agent card) or follow the step-by-step instructions in [`docs/opencode-plugin/install-guide.md`](docs/opencode-plugin/install-guide.md).
 
+## Local Filesystem MCP (Data Plane)
+
+`local_fs_mcp` is the data plane for remote OpenCode sessions. Where the OpenCode plugin handles control-plane concerns (context injection, tool audit, permission routing), `local_fs_mcp` handles the actual file I/O and synchronous shell execution, keeping all of that work on the local host (AionCore side) rather than on the remote OpenCode server.
+
+| Capability         | What it does                                                                                                                                                                                  |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| File reads/writes  | Serves file content to the remote OpenCode instance and writes agent-produced changes back to the local filesystem, so the remote server never needs direct disk access.                       |
+| Synchronous shell  | Runs shell commands locally on behalf of the remote agent. Every invocation passes through the `ShellApprover` mechanism, which surfaces the request in the Approvals tab before execution.   |
+| Snapshot ledger    | Records a per-tool-call snapshot of every file touched during a session. This ledger is what powers the Interactive Diff revert features, letting you roll back individual hunks or whole files. |
+
+The `ShellApprover` gate means no shell command runs silently. You see each request in the Approvals tab, can edit and resend it, or deny it outright. Auto-approval rules apply here the same way they do for other tool calls.
+
+Keeping execution on the AionCore side is a deliberate security boundary: the remote OpenCode process gets file content and command results, but it never holds credentials, SSH keys, or raw filesystem access. The protected-paths hard-deny layer enforces this even if an allow rule would otherwise permit it.
+
 ## Branding
 
 Brand assets live in the repo and are shared with the application.
