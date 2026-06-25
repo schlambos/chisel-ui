@@ -62,7 +62,7 @@ return path.join(getDataPath(), 'chislui.db');
 
 **userData directory** (`src/process/utils/configureChromium.ts:18-26`):
 
-- Dev mode: `~/Library/Application Support/AionUi-Dev/` (macOS)
+- Dev mode: `~/Library/Application Support/ChislUi-Dev/` (macOS)
 - Database: `{userData}/config/chislui.db`
 - Shared by all E2E tests
 
@@ -129,11 +129,11 @@ AIONUI_CDP_PORT: '0';
 2. Modify `getDevAppName()` to return worker-specific name:
    ```typescript
    const workerId = process.env.AIONUI_E2E_TEST_WORKER_ID || '0';
-   return `AionUi-E2E-Worker-${workerId}`;
+   return `ChislUi-E2E-Worker-${workerId}`;
    ```
 3. Each worker gets isolated:
-   - `~/Library/Application Support/AionUi-E2E-Worker-0/config/chislui.db`
-   - `~/Library/Application Support/AionUi-E2E-Worker-1/config/chislui.db`
+   - `~/Library/Application Support/ChislUi-E2E-Worker-0/config/chislui.db`
+   - `~/Library/Application Support/ChislUi-E2E-Worker-1/config/chislui.db`
 4. Update `playwright.config.ts`:
    ```typescript
    workers: 2,  // or process.env.CI ? 1 : 2

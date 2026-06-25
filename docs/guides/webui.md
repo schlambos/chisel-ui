@@ -34,10 +34,10 @@ Open **Command Prompt** or **PowerShell** and run:
 
 ```cmd
 # Using full path
-"C:\Program Files\AionUi\AionUi.exe" --webui
+"C:\Program Files\ChislUi\ChislUi.exe" --webui
 
-# Or if AionUi.exe is in your PATH
-AionUi.exe --webui
+# Or if ChislUi.exe is in your PATH
+ChislUi.exe --webui
 ```
 
 ### Method 2: Create a Desktop Shortcut
@@ -45,7 +45,7 @@ AionUi.exe --webui
 1. Right-click on desktop → **New** → **Shortcut**
 2. Enter target location:
    ```
-   "C:\Program Files\AionUi\AionUi.exe" --webui
+   "C:\Program Files\ChislUi\ChislUi.exe" --webui
    ```
 3. Name it **Chisl WebUI**
 4. Click **Finish**
@@ -57,7 +57,7 @@ Create `start-aionui-webui.bat`:
 
 ```batch
 @echo off
-"C:\Program Files\AionUi\AionUi.exe" --webui
+"C:\Program Files\ChislUi\ChislUi.exe" --webui
 pause
 ```
 
@@ -73,10 +73,10 @@ Open **Terminal** and run:
 
 ```bash
 # Using full path
-/Applications/AionUi.app/Contents/MacOS/AionUi --webui
+/Applications/ChislUi.app/Contents/MacOS/ChislUi --webui
 
 # Or using open command
-open -a AionUi --args --webui
+open -a ChislUi --args --webui
 ```
 
 ### Method 2: Create Shell Script
@@ -85,7 +85,7 @@ Create `start-aionui-webui.sh`:
 
 ```bash
 #!/bin/bash
-/Applications/AionUi.app/Contents/MacOS/AionUi --webui
+/Applications/ChislUi.app/Contents/MacOS/ChislUi --webui
 ```
 
 Make it executable and run:
@@ -102,7 +102,7 @@ chmod +x start-aionui-webui.sh
 3. Add **Run Shell Script** action
 4. Enter:
    ```bash
-   /Applications/AionUi.app/Contents/MacOS/AionUi --webui
+   /Applications/ChislUi.app/Contents/MacOS/ChislUi --webui
    ```
 5. Save as **Chisl WebUI.app**
 6. Double-click to launch
@@ -126,17 +126,17 @@ chmod +x start-aionui-webui.sh
 aionui --webui
 
 # Or using full path
-/opt/AionUi/aionui --webui
+/opt/ChislUi/aionui --webui
 ```
 
 #### For AppImage
 
 ```bash
 # Make AppImage executable (first time only)
-chmod +x AionUi-*.AppImage
+chmod +x ChislUi-*.AppImage
 
 # Run with --webui flag
-./AionUi-*.AppImage --webui
+./ChislUi-*.AppImage --webui
 ```
 
 ### Method 2: Create Desktop Entry
@@ -147,7 +147,7 @@ Create `~/.local/share/applications/aionui-webui.desktop`:
 [Desktop Entry]
 Name=Chisl WebUI
 Comment=Start Chisl in WebUI mode
-Exec=/opt/AionUi/aionui --webui
+Exec=/opt/ChislUi/aionui --webui
 Icon=aionui
 Terminal=false
 Type=Application
@@ -168,7 +168,7 @@ Create `~/bin/start-aionui-webui.sh`:
 
 ```bash
 #!/bin/bash
-/opt/AionUi/aionui --webui
+/opt/ChislUi/aionui --webui
 ```
 
 Make it executable:
@@ -195,7 +195,7 @@ After=network.target
 [Service]
 Type=simple
 User=YOUR_USERNAME
-ExecStart=/opt/AionUi/aionui --webui --remote
+ExecStart=/opt/ChislUi/aionui --webui --remote
 Restart=on-failure
 RestartSec=10
 
@@ -286,23 +286,23 @@ apt install -y \
 ```bash
 # Download the ARM64 .deb package (replace VERSION with the actual version)
 # Check latest version at: https://github.com/schlambos/chisel-ui/releases
-wget https://github.com/schlambos/chisel-ui/releases/download/vVERSION/AionUi_VERSION_arm64.deb
+wget https://github.com/schlambos/chisel-ui/releases/download/vVERSION/ChislUi_VERSION_arm64.deb
 
 # Example (replace VERSION with the release tag, e.g. v1.5.2):
-wget https://github.com/schlambos/chisel-ui/releases/download/vVERSION/AionUi_VERSION_arm64.deb
+wget https://github.com/schlambos/chisel-ui/releases/download/vVERSION/ChislUi_VERSION_arm64.deb
 
 # Install the package
-apt install -y ./AionUi_*.deb
+apt install -y ./ChislUi_*.deb
 
 # Verify installation
-which AionUi
+which ChislUi
 ```
 
 #### 5. Launch Chisl WebUI
 
 ```bash
-# Start Chisl in WebUI mode with no-sandbox flag (binary is named `AionUi`)
-AionUi --no-sandbox --webui
+# Start Chisl in WebUI mode with no-sandbox flag (binary is named `ChislUi`)
+ChislUi --no-sandbox --webui
 ```
 
 **Important**: The `--no-sandbox` flag is required in Termux/proot environments.
@@ -334,8 +334,8 @@ These errors are related to D-Bus and X server, which are not needed for WebUI m
 To access Chisl from other devices on your local network:
 
 ```bash
-# Start with --remote flag (binary is named `AionUi`)
-AionUi --no-sandbox --webui --remote
+# Start with --remote flag (binary is named `ChislUi`)
+ChislUi --no-sandbox --webui --remote
 
 # Find your Android device's IP address
 # In Termux (outside proot):
@@ -352,14 +352,14 @@ If port 25808 is occupied:
 
 ```bash
 # Specify a different port
-AionUi --no-sandbox --webui --port 8080
+ChislUi --no-sandbox --webui --port 8080
 ```
 
 #### Permission Denied Errors
 
 ```bash
 # Ensure the binary has execute permissions
-chmod +x /opt/AionUi/aionui
+chmod +x /opt/ChislUi/aionui
 ```
 
 #### Out of Memory
@@ -395,7 +395,7 @@ For convenience, create a script to launch Chisl quickly:
 cat > ~/start-aionui.sh << 'EOF'
 #!/bin/bash
 echo "Starting Chisl WebUI..."
-AionUi --no-sandbox --webui --remote
+ChislUi --no-sandbox --webui --remote
 EOF
 
 # Make executable
@@ -410,7 +410,7 @@ chmod +x ~/start-aionui.sh
 From Termux main shell:
 
 ```bash
-proot-distro login ubuntu -- bash -c "AionUi --no-sandbox --webui --remote"
+proot-distro login ubuntu -- bash -c "ChislUi --no-sandbox --webui --remote"
 ```
 
 ### Feedback and Improvements
@@ -430,13 +430,13 @@ To allow access from other devices on your network, use the `--remote` flag:
 ### Windows
 
 ```cmd
-AionUi.exe --webui --remote
+ChislUi.exe --webui --remote
 ```
 
 ### macOS
 
 ```bash
-/Applications/AionUi.app/Contents/MacOS/AionUi --webui --remote
+/Applications/ChislUi.app/Contents/MacOS/ChislUi --webui --remote
 ```
 
 ### Linux
@@ -504,7 +504,7 @@ sudo ufw allow 3000/tcp
 ```
 
 **macOS:**
-Go to **System Preferences** → **Security & Privacy** → **Firewall** → **Firewall Options** → Add `AionUi.app`
+Go to **System Preferences** → **Security & Privacy** → **Firewall** → **Firewall Options** → Add `ChislUi.app`
 
 ### Application Not Found
 
@@ -513,13 +513,13 @@ Go to **System Preferences** → **Security & Privacy** → **Firewall** → **F
 **Windows:**
 
 ```cmd
-where AionUi.exe
+where ChislUi.exe
 ```
 
 **macOS:**
 
 ```bash
-mdfind -name "AionUi.app"
+mdfind -name "ChislUi.app"
 ```
 
 **Linux:**
@@ -535,7 +535,7 @@ find /opt -name "aionui" 2>/dev/null
 **Windows (PowerShell):**
 
 ```powershell
-& "C:\Program Files\AionUi\AionUi.exe" --webui 2>&1 | Tee-Object -FilePath aionui.log
+& "C:\Program Files\ChislUi\ChislUi.exe" --webui 2>&1 | Tee-Object -FilePath aionui.log
 ```
 
 **macOS/Linux:**
@@ -575,9 +575,9 @@ From v1.5.0+, you can store persistent WebUI preferences in `webui.config.json` 
 
 | Platform | Location                                                 |
 | -------- | -------------------------------------------------------- |
-| Windows  | `%APPDATA%/AionUi/webui.config.json`                     |
-| macOS    | `~/Library/Application Support/AionUi/webui.config.json` |
-| Linux    | `~/.config/AionUi/webui.config.json`                     |
+| Windows  | `%APPDATA%/ChislUi/webui.config.json`                     |
+| macOS    | `~/Library/Application Support/ChislUi/webui.config.json` |
+| Linux    | `~/.config/ChislUi/webui.config.json`                     |
 
 Example file:
 
@@ -614,20 +614,20 @@ If you forgot your admin password in WebUI mode, you can reset it using the `--r
 
 ```cmd
 # Using full path
-"C:\Program Files\AionUi\AionUi.exe" --resetpass
+"C:\Program Files\ChislUi\ChislUi.exe" --resetpass
 
 # Or for a specific user
-"C:\Program Files\AionUi\AionUi.exe" --resetpass username
+"C:\Program Files\ChislUi\ChislUi.exe" --resetpass username
 ```
 
 **macOS:**
 
 ```bash
 # Using full path
-/Applications/AionUi.app/Contents/MacOS/AionUi --resetpass
+/Applications/ChislUi.app/Contents/MacOS/ChislUi --resetpass
 
 # Or for a specific user
-/Applications/AionUi.app/Contents/MacOS/AionUi --resetpass username
+/Applications/ChislUi.app/Contents/MacOS/ChislUi --resetpass username
 ```
 
 **Linux:**
@@ -640,7 +640,7 @@ aionui --resetpass
 aionui --resetpass username
 
 # Or using full path
-/opt/AionUi/aionui --resetpass
+/opt/ChislUi/aionui --resetpass
 ```
 
 ### What happens when you run --resetpass:
