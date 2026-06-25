@@ -37,7 +37,7 @@ Supported agents:
 
 | Workflow              | What Chisl exposes                                                                                                                                                                               |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| OpenCode remote agent | Register a remote endpoint, test/handshake it, fetch model metadata, send messages, attach files, use OpenCode modes, slash commands, stop active runs, and inspect context usage when reported. |
+| OpenCode remote agent | Register a remote endpoint, test/handshake it, fetch model metadata, send messages, attach files, use OpenCode modes, slash commands, stop active runs, and inspect context usage when reported. MCP servers and skills are configured on the OpenCode server side; Chisl surfaces their output in the conversation. |
 | OpenCode local        | Use a detected local OpenCode-style agent from the same chat interface.                                                                                                                          |
 | Claude Code           | Use detected Claude Code sessions through the local-agent flow.                                                                                                                                  |
 | Gemini CLI            | Use Gemini CLI-backed sessions and Gemini modes.                                                                                                                                                 |
@@ -54,16 +54,16 @@ Supported agents:
 | Chat & context          | Send prompts with attached files and selected workspace items; see token/context usage when the agent reports it.                                                    |
 | Command queue           | Queue, reorder, pause, resume, edit, remove, or clear prompts while a run is busy.                                                                                   |
 | Run control             | Stop an active run, switch OpenCode modes, attach server-side skills (sticky across messages), and use slash commands.                                               |
-| Session actions         | Fork, revert/restore, share/unshare a link, summarize/compact, view file changes (diff), and edit the server config — all from the conversation header.              |
+| Session actions         | Fork, revert/restore, share/unshare a link, summarize/compact, and edit the server config from the conversation header. View file changes via the Interactive Diff workspace tab: revert individual hunks or whole files, and browse native workspace VCS diffs for any remote session regardless of tool-host mode. |
 | Compaction              | Get notified (with tokens reclaimed) when a session is compacted, manually or automatically.                                                                         |
 | Server-state pills      | See the connected server (with one-click switch) and tool-host mode; in server-tool-host mode, LSP status and VCS branch/changes too.                                |
 | Multi-server            | Live per-agent health in settings and a default-server preference.                                                                                                   |
-| Permissions & approvals | Approve tool and question requests via per-request cards, a pending banner, and a dedicated Approvals tab — including bulk approve.                                  |
+| Permissions & approvals | Approve tool and question requests via per-request cards, a pending banner, and a dedicated Approvals tab, including bulk approve. An auto-approval rule evaluator runs each incoming prompt against your saved allow/deny rules and responds automatically, with session-scoped rules visible in the conversation History tab. A protected-paths hard-deny layer blocks credential and SSH key paths regardless of allow rules. Shell-command cards include an "Edit and Resend" action that rejects the original and resubmits a modified command. |
 | Sub-agents              | Watch delegated child sessions as inline, collapsible subtask cards.                                                                                                 |
 | Message editing         | Edit or delete your own messages in a remote conversation.                                                                                                           |
 | Local & custom agents   | Use detected local CLIs (Claude Code, Gemini CLI, Codex, local OpenCode), or define your own ACP-style command agent.                                                |
-| MCP & tools             | Add, import, edit, enable/disable, test, authenticate, and sync MCP servers; configure speech-to-text.                                                               |
-| Skills                  | Browse built-in, custom, and extension skills; import folders or symlinks; search, refresh, and delete.                                                              |
+| Editor & LSP            | Monaco editor with LSP-powered go-to-definition, peek references, rename symbol, and quick fix; Emmet abbreviation expansion for HTML, CSS, JSX, and TSX; git change indicators on the minimap and overview ruler; inline and side-by-side diff review for agent conflicts. |
+| Settings & Layout       | Dedicated Settings shell with a full-width nav column below the titlebar; main workspace sider hides on settings routes. Responsive single-bar header chrome collapses ambient badges into an overflow menu on narrow viewports. |
 | Appearance              | Ships with Chisl's retro palette; a toggle hands control to a CSS theme preset (Catppuccin included).                                                                |
 
 ## Remote OpenCode Flow
@@ -93,15 +93,20 @@ Local CLI-backed agents are a secondary path.
 | Agent launch     | The start page restores or preselects available agents and routes to conversation creation.                           |
 | Modes and models | The start page resolves mode/model metadata from agent config, handshake data, or remote model cache where available. |
 
-## MCP, Skills, And Context
+## OpenCode Plugin
 
-Chisl includes UI for managing MCP servers and skills — this is where tools and context come from, rather than any fixed filesystem or secret layout.
+`@chisl/chisl-opencode-plugin` is the control-plane bridge between a remote OpenCode server and your local Chisl instance. Install it on the OpenCode side to unlock deeper integration.
 
-| Area        | Behavior                                                                                                |
-| ----------- | ------------------------------------------------------------------------------------------------------- |
-| MCP servers | Add, import, edit, delete, enable/disable, test, authenticate, and sync MCP servers to agents.          |
-| Skills      | Browse built-in/custom/extension skills, import skill folders, search, refresh, and delete user skills. |
-| Voice       | Configure speech-to-text providers for voice input.                                                     |
+| Capability          | What it does                                                                                                                                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Context injection   | AionCore pushes dynamic system-prompt strings to the plugin over SSE; the plugin injects them into the chat via `experimental.chat.system.transform`, with a defensive synthetic-part fallback.                                |
+| Tool audit          | Every `tool.execute.before` / `tool.execute.after` event and a curated set of OpenCode lifecycle events are forwarded to AionCore and stored in a per-agent ring buffer for the renderer-side status panel.                    |
+| Streaming shell     | A custom `run_shell_streaming` tool streams command output (stdout and stderr) from AionCore back to the remote OpenCode host over SSE, gated through the same shell approver the local fs MCP uses. Default timeout is 120 s. |
+| Permission routing  | OpenCode's `permission.ask` hook dials AionCore for a decision; the MVP policy is `"ask"` passthrough so OpenCode's native flow continues while AionUi shows the prompt in its Approvals queue.                               |
+
+The plugin runs in-process in the OpenCode server. All shell execution happens on the AionCore side, behind the shell approver and audit ring buffer.
+
+Install it from the **Remote Agents** panel in AionUi (click **Install Plugin** on the agent card) or follow the step-by-step instructions in [`docs/opencode-plugin/install-guide.md`](docs/opencode-plugin/install-guide.md).
 
 ## Branding
 
@@ -160,13 +165,6 @@ bun run lint
 bun run format:check
 bunx tsc --noEmit
 bun run test
-```
-
-If you change user-facing text or locale files, also run:
-
-```bash
-bun run i18n:types
-node scripts/check-i18n.js
 ```
 
 ## Documentation
