@@ -29,10 +29,10 @@ Deploy Chisl WebUI on headless Linux servers — cloud VMs, Kubernetes Pods, and
 
 ```bash
 # Download the latest .deb package
-wget https://github.com/schlambos/chisel-ui/releases/latest/download/AionUi-linux-amd64.deb
+wget https://github.com/schlambos/chisel-ui/releases/latest/download/ChislUi-linux-amd64.deb
 
 # Install
-sudo dpkg -i AionUi-linux-amd64.deb
+sudo dpkg -i ChislUi-linux-amd64.deb
 sudo apt-get install -f  # Fix missing dependencies
 ```
 
@@ -56,7 +56,7 @@ Xvfb is used automatically by the startup script below via `xvfb-run`.
 
 Since many cloud/container environments lack systemd, use the following nohup-based script.
 
-Create `/opt/AionUi/start-aionui.sh`:
+Create `/opt/ChislUi/start-aionui.sh`:
 
 ```bash
 #!/bin/bash
@@ -76,7 +76,7 @@ start() {
     cd "$WORKDIR"
 
     nohup xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
-        /usr/bin/AionUi --webui --remote --no-sandbox \
+        /usr/bin/ChislUi --webui --remote --no-sandbox \
         > "$LOGFILE" 2>&1 &
     echo $! > "$PIDFILE"
     sleep 3
@@ -100,7 +100,7 @@ stop() {
     kill "$PID" 2>/dev/null
     sleep 2
     kill -9 "$PID" 2>/dev/null
-    pkill -f "AionUi --webui" 2>/dev/null
+    pkill -f "ChislUi --webui" 2>/dev/null
     rm -f "$PIDFILE"
     echo "Chisl stopped."
 }
@@ -131,7 +131,7 @@ esac
 ```
 
 ```bash
-chmod +x /opt/AionUi/start-aionui.sh
+chmod +x /opt/ChislUi/start-aionui.sh
 ```
 
 > **Tip**: `WORKDIR` determines the directory Chisl can access for file operations. Set it to your project workspace.
@@ -191,7 +191,7 @@ ssh -R 7897:127.0.0.1:7897 user@YOUR_SERVER_IP
 
 Using `--proxy-server` is fragile — when the proxy goes down, **all** requests fail including the WebUI itself. Instead, use a **PAC (Proxy Auto-Configuration) file** that provides automatic fallback.
 
-Create `/opt/AionUi/proxy.pac`:
+Create `/opt/ChislUi/proxy.pac`:
 
 ```javascript
 function FindProxyForURL(url, host) {
@@ -215,8 +215,8 @@ Then update the `nohup xvfb-run ...` line in your startup script:
 
 ```bash
     nohup xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
-        /usr/bin/AionUi --webui --remote --no-sandbox \
-        --proxy-pac-url="file:///opt/AionUi/proxy.pac" \
+        /usr/bin/ChislUi --webui --remote --no-sandbox \
+        --proxy-pac-url="file:///opt/ChislUi/proxy.pac" \
         > "$LOGFILE" 2>&1 &
 ```
 
@@ -267,7 +267,7 @@ For Gemini API calls, configure the proxy inside Chisl WebUI:
 
 | Issue                                     | Solution                                                     |
 | ----------------------------------------- | ------------------------------------------------------------ |
-| `dpkg` dependency errors in containers    | `dpkg --force-all -i AionUi-linux-amd64.deb`                 |
+| `dpkg` dependency errors in containers    | `dpkg --force-all -i ChislUi-linux-amd64.deb`                 |
 | Chisl can only access `/tmp`              | Set `WORKDIR` in the startup script to your workspace path   |
 | WebUI not accessible remotely             | Check firewall rules, or use ngrok / SSH tunnel              |
 | All requests fail when proxy is down      | Use PAC file (`--proxy-pac-url`) instead of `--proxy-server` |
@@ -290,7 +290,7 @@ For Gemini API calls, configure the proxy inside Chisl WebUI:
 │       │                                          │
 │       ▼                                          │
 │  ┌────────────────────────────┐                  │
-│  │  AionUi (Electron)        │                   │
+│  │  ChislUi (Electron)        │                   │
 │  │  ├─ Chromium (port 25808) │                   │
 │  │  │  └─ proxy.pac          │──► PAC decides:   │
 │  │  │     per-request        │   PROXY or DIRECT │
@@ -330,10 +330,10 @@ For Gemini API calls, configure the proxy inside Chisl WebUI:
 
 ```bash
 # 下载最新 .deb 包
-wget https://github.com/schlambos/chisel-ui/releases/latest/download/AionUi-linux-amd64.deb
+wget https://github.com/schlambos/chisel-ui/releases/latest/download/ChislUi-linux-amd64.deb
 
 # 安装
-sudo dpkg -i AionUi-linux-amd64.deb
+sudo dpkg -i ChislUi-linux-amd64.deb
 sudo apt-get install -f  # 修复依赖
 ```
 
@@ -351,7 +351,7 @@ sudo apt-get install -y xvfb
 
 许多云/容器环境没有 systemd，使用以下基于 nohup 的管理脚本。
 
-创建 `/opt/AionUi/start-aionui.sh`：
+创建 `/opt/ChislUi/start-aionui.sh`：
 
 ```bash
 #!/bin/bash
@@ -371,7 +371,7 @@ start() {
     cd "$WORKDIR"
 
     nohup xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
-        /usr/bin/AionUi --webui --remote --no-sandbox \
+        /usr/bin/ChislUi --webui --remote --no-sandbox \
         > "$LOGFILE" 2>&1 &
     echo $! > "$PIDFILE"
     sleep 3
@@ -395,7 +395,7 @@ stop() {
     kill "$PID" 2>/dev/null
     sleep 2
     kill -9 "$PID" 2>/dev/null
-    pkill -f "AionUi --webui" 2>/dev/null
+    pkill -f "ChislUi --webui" 2>/dev/null
     rm -f "$PIDFILE"
     echo "Chisl 已停止。"
 }
@@ -442,7 +442,7 @@ ssh -R 7897:127.0.0.1:7897 user@YOUR_SERVER
 
 `--proxy-server` 的问题：代理一断，**所有请求**全挂。改用 PAC 文件实现自动回退。
 
-创建 `/opt/AionUi/proxy.pac`：
+创建 `/opt/ChislUi/proxy.pac`：
 
 ```javascript
 function FindProxyForURL(url, host) {
@@ -460,7 +460,7 @@ function FindProxyForURL(url, host) {
 }
 ```
 
-启动脚本中添加参数：`--proxy-pac-url="file:///opt/AionUi/proxy.pac"`
+启动脚本中添加参数：`--proxy-pac-url="file:///opt/ChislUi/proxy.pac"`
 
 **原理**：Chromium 原生支持 PAC，`PROXY ...; DIRECT` 表示先尝试代理，失败自动直连，每个请求实时判断。
 

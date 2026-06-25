@@ -160,7 +160,7 @@ Chisl поставляется с полноценным движком ИИ-а�
 Запускайте несколько ИИ-агентов как организованную команду: агент **Leader** получает ваши инструкции, разбивает их на подзадачи и делегирует агентам **Teammate** через встроенный Team MCP Server. Teammate-агенты выполняют задачи параллельно, обмениваются результатами через асинхронный почтовый ящик и записывают в общую доску задач.
 
 <p align="center">
-  <img src="./resources/AionUi_team.gif" alt="Team Mode overview" width="800">
+  <img src="./resources/ChislUi_team.gif" alt="Team Mode overview" width="800">
 </p>
 
 - **Параллельное выполнение нескольких агентов** — Leader разбивает задачи на подзадачи и делегирует параллельно работающим Teammate-агентам; каждый Teammate использует свою модель через ACP (Agent Communication Protocol, слой координации мультиагентности Chisl), Gemini или Aionrs
@@ -447,7 +447,7 @@ _Интеллектуальная генерация, редактировани
 
 </details>
 
-> [Руководство по конфигурации модели генерации изображений](https://github.com/schlambos/chisel-ui/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide)
+> [Руководство по конфигурации модели генерации изображений](https://github.com/schlambos/chisel-ui/wiki/ChislUi-Image-Generation-Tool-Model-Configuration-Guide)
 
 ---
 
@@ -644,7 +644,7 @@ brew install aionui
 
 - [📁 Управление файлами](https://github.com/schlambos/chisel-ui/wiki/file-management) — умная организация файлов
 - [📊 Обработка Excel](https://github.com/schlambos/chisel-ui/wiki/excel-processing) — обработка данных на базе ИИ
-- [🎨 Генерация изображений](https://github.com/schlambos/chisel-ui/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide) — создание изображений на базе ИИ
+- [🎨 Генерация изображений](https://github.com/schlambos/chisel-ui/wiki/ChislUi-Image-Generation-Tool-Model-Configuration-Guide) — создание изображений на базе ИИ
 - [📚 Больше сценариев](https://github.com/schlambos/chisel-ui/wiki/Use-Cases-Overview)
 
 **❓ Поддержка и помощь**

@@ -4,7 +4,7 @@
 > report tool calls, inject dynamic system context, stream shell output, and
 > route permissions through their local AionCore instance.
 > **Plugin package:** [`@chisl/chisl-opencode-plugin`](https://www.npmjs.com/package/@chisl/chisl-opencode-plugin) (`AionUi/packages/opencode-plugin/`, pinned at `@opencode-ai/plugin@1.16.2`).
-> **Wire protocol:** [v1 — see AionCore `PROTOCOL.md`](../../../AionCore/crates/aionui-ai-agent/src/manager/remote/PROTOCOL.md) (Chisl Plugin Channel section, last verified 2026-06-10).
+> **Wire protocol:** [v1 — see AionCore `PROTOCOL.md`](../../../AionCore/crates/chislui-ai-agent/src/manager/remote/PROTOCOL.md) (Chisl Plugin Channel section, last verified 2026-06-10).
 
 ## What the plugin does
 
@@ -64,8 +64,8 @@ side, behind the `ShellApprover` and audit ring buffer.
 
 ```bash
 # Example: AionCore runs in a container with port 4111 published as
-# https://aioncore.tail-net.ts.net on the LAN.
-export AIONUI_LOCAL_FS_MCP_PUBLIC_URL=https://aioncore.tail-net.ts.net
+# https://chislcore.tail-net.ts.net on the LAN.
+export AIONUI_LOCAL_FS_MCP_PUBLIC_URL=https://chislcore.tail-net.ts.net
 ```
 
 The AionUi **"Install Plugin"** button in the remote-agent card reads

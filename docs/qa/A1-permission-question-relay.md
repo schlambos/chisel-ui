@@ -4,7 +4,7 @@
 > Win-condition metric: **100% of permission/question prompts must reach the
 > remote OpenCode server (server acknowledgment), not merely change UI state.**
 >
-> Scope: the **OpenCode-over-HTTP/SSE** relay (Chisl ⇄ AionCore ⇄ remote
+> Scope: the **OpenCode-over-HTTP/SSE** relay (Chisl ⇄ ChislCore ⇄ remote
 > OpenCode). The legacy OpenClaw WebSocket path described in
 > `docs/prds/conversations/remote/remote-agent.md` is **not** the live path for
 > OpenCode and is corrected there (see "Defect investigation" below).
@@ -13,7 +13,7 @@
 
 ## 1. Verified round-trip trace (file / function / line per hop)
 
-Repos: `AionUi` (Electron/TS) and `AionCore` (Rust gateway). All AionCore paths
+Repos: `ChislUi` (Electron/TS) and `ChislCore` (Rust gateway). All ChislCore paths
 are under `crates/aionui-ai-agent/src/manager/remote/` unless noted.
 
 ### 1a. Inbound: OpenCode `permission.asked` → Chisl card
@@ -34,10 +34,10 @@ are under `crates/aionui-ai-agent/src/manager/remote/` unless noted.
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 8   | User clicks Allow/Always/Reject → `confirmation.confirm.invoke({ conversation_id, call_id, msg_id, data:{value,...}, always_allow })`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `MessagePermission.tsx:106`; `PendingApprovalsBanner.tsx:205/264`; `useWorkspaceApprovals.ts:119`                                                        |
 | 9   | `confirm` is an **`httpPost`** (not an Electron IPC to a TS handler) → `POST /api/conversations/{id}/confirmations/{call_id}/confirm` body `{ msg_id, data, always_allow }`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `common/adapter/ipcBridge.ts:566`                                                                                                                        |
-| 10  | AionCore HTTP route → service (ownership check) → agent dispatch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `aionui-conversation/src/routes.rs:66,257`; `service.rs:993`; `agent_task.rs:285`                                                                        |
+| 10  | ChislCore HTTP route → service (ownership check) → agent dispatch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `aionui-conversation/src/routes.rs:66,257`; `service.rs:993`; `agent_task.rs:285`                                                                        |
 | 11  | `RemoteAgentManager::confirm`: normalize reply (`once`/`always`/`reject`/`allow_dir`/`allow_session`); dedup via `recently_replied_permissions` (60s TTL); drain blessed siblings.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `agent.rs::confirm` (5343); dedup (5592)                                                                                                                 |
 | 12  | **Outbound acknowledgment** — fire-and-forget `POST {base}/permission/{call_id}/reply` body `{ "reply": <decision> }`; on 2xx logs `"OpenCode permission reply sent"` (with the endpoint in the log line) and clears the dedup stamp. **Directory scoping requirement (live-pass failure 2026-06-09):** in server-tools mode the URL **must** carry `?directory=<workspace>` — permissions live in the registry of OpenCode's _per-directory app instance_, so an unscoped reply hits the default instance and 404s with `PermissionNotFoundError` while the tool call stays parked. On non-2xx the gateway retries once via the deprecated session-scoped `POST /session/{sid}/permissions/{pid}` body `{"response":…}` (same scoping); if both fail, the confirmation card is **re-queued** (once) so the user can retry instead of facing a silent hang. | `confirm` spawn → `post_permission_reply_with_fallback`; builder `build_permission_reply_request`; scoping `opencode_context::append_v1_directory_value` |
-| 13  | OpenCode echoes `permission.replied` → AionCore drops the confirmation, stamps dedup, broadcasts `confirmation.remove` → UI removes the card.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | reconcile arm (2787); `useWorkspaceApprovals.ts:108`                                                                                                     |
+| 13  | OpenCode echoes `permission.replied` → ChislCore drops the confirmation, stamps dedup, broadcasts `confirmation.remove` → UI removes the card.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | reconcile arm (2787); `useWorkspaceApprovals.ts:108`                                                                                                     |
 
 ### 1c. Questions ("ask user") — parity path
 
@@ -70,7 +70,7 @@ call was found."
 
 - `pendingPermissions`, `exec.approval.request`, `handleApprovalRequest`, and any
   `(_response) => {}` resolve **appear only in the documentation file** — a
-  full-repo search finds **zero** occurrences in AionUi or AionCore source. They
+  full-repo search finds **zero** occurrences in ChislUi or ChislCore source. They
   describe a removed/older **OpenClaw WebSocket** design.
 - The live OpenCode acknowledgment is a real HTTP call:
   `RemoteAgentManager::confirm` → `POST /permission/{id}/reply`
@@ -116,9 +116,9 @@ Run: `cargo test -p aionui-ai-agent --lib remote::agent` (Rust) and
 ### Mock-proven vs live-proven
 
 All ✅ rows above are **mock-proven** (wiremock asserts the wire contract
-AionCore emits). The 2026-06-09 live pass demonstrated the limit of
+ChislCore emits). The 2026-06-09 live pass demonstrated the limit of
 mock-proof: the original 8 ack tests used `tool_host: "local"` and matched
-whatever path AionCore called — they pinned AionCore's belief, **not** the
+whatever path ChislCore called — they pinned ChislCore's belief, **not** the
 server's contract. In server-tools mode the real server stores permissions in
 a per-directory app instance, so the unscoped reply 404'd
 (`PermissionNotFoundError`) and the conversation hung. The new server-mode
@@ -145,11 +145,11 @@ pass). Server-tools mode is fixed and mock-proven but **awaits a live re-run**
 ## 4. How to reproduce the acknowledgment proof locally
 
 ```bash
-# AionCore — server-acknowledgment + timeout + question relay
-cd /Users/matt/chisl-full/AionCore
+# ChislCore — server-acknowledgment + timeout + question relay
+cd /Users/matt/chisl-full/ChislCore
 cargo test -p aionui-ai-agent --lib remote::agent
 
-# AionUi — turn-boundary clear + MCP-elicitation exclusion
-cd /Users/matt/chisl-full/AionUi
+# ChislUi — turn-boundary clear + MCP-elicitation exclusion
+cd /Users/matt/chisl-full/ChislUi
 bun run test tests/unit/renderer/conversation/useWorkspaceApprovals.dom.test.ts
 ```

@@ -72,7 +72,7 @@
 **正常流程**（用户视角）：
 
 1. 用户点击"+ 添加"按钮
-2. 弹出"添加远程 Agent"弹窗（AionModal + 遮罩层）
+2. 弹出"添加远程 Agent"弹窗（ChislModal + 遮罩层）
 3. 弹窗顶部显示黄色警告 banner（说明文案 + "查看配置指南"链接）
 4. 用户填写表单：
    - **Avatar**：点击头像区域打开 Emoji 选择器（8 个分类 Tab），选中后立即应用。默认值 `🤖`（`\u{1F916}`，固定值非随机）
@@ -127,7 +127,7 @@ UI 当前不暴露协议选择器，新建 Agent 硬编码为 `'openclaw'` 协�
 **正常流程**（用户视角）：
 
 1. 用户点击卡片底部"编辑"按钮
-2. 弹出"编辑远程 Agent"弹窗（AionModal）
+2. 弹出"编辑远程 Agent"弹窗（ChislModal）
 3. 所有已保存数据完整回填：
    - Avatar emoji
    - 名称
@@ -177,7 +177,7 @@ Bridge 端逐字段映射到 DB 列名（仅更新 `updates` 中不为 `undefine
 **正常流程**（用户视角）：
 
 1. 用户点击卡片底部"删除"按钮（红色 danger 样式）
-2. 弹出确认对话框（Arco 原生 `Modal.confirm`，区别于创建/编辑使用的 AionModal 封装）：
+2. 弹出确认对话框（Arco 原生 `Modal.confirm`，区别于创建/编辑使用的 ChislModal 封装）：
    - 标题：`settings.remoteAgent.deleteConfirm`（"删除远程 Agent"）
    - 正文：`settings.remoteAgent.deleteConfirmContent`（"确定要删除「{agent名称}」吗？"，使用直角引号包裹名称）
    - 按钮："取消" / "确定"（确定按钮为 danger 样式）
@@ -589,13 +589,13 @@ Gateway 通过 `agent` / `agent.event` 事件推送工具调用信息：
 
 > ⚠️ **协议区分（A1 审计修正）**：本节早期版本描述的是已弃用的 **OpenClaw**
 > WebSocket 路径（`exec.approval.request` / `pendingPermissions` Map /
-> `handleApprovalRequest` / 无操作 `resolve`）。这些符号在当前 AionUi 与
-> AionCore 源码中**已不存在**（全仓库搜索结果为零），仅残留于本文档。
+> `handleApprovalRequest` / 无操作 `resolve`）。这些符号在当前 ChislUi 与
+> ChislCore 源码中**已不存在**（全仓库搜索结果为零），仅残留于本文档。
 > 远端 **OpenCode** 的真实审批中继路径如下，逐跳证据见
 > `docs/qa/A1-permission-question-relay.md`。
 
 1. 远端 OpenCode 通过 SSE 发出 `permission.asked`（问题为 `question.asked`）。
-2. AionCore 的 SSE reader (`run_event_reader`) → `handle_opencode_sse_event`
+2. ChislCore 的 SSE reader (`run_event_reader`) → `handle_opencode_sse_event`
    （`crates/aionui-ai-agent/src/manager/remote/agent.rs`）解析事件，构造
    `Confirmation`，登记 `prompt_expiries`（超时预算
    `DEFAULT_PROMPT_TIMEOUT_MS = 60_000`），并 emit
@@ -606,7 +606,7 @@ Gateway 通过 `agent` / `agent.event` 事件推送工具调用信息：
 4. 用户选择后：`ipcBridge.conversation.confirmation.confirm.invoke` 是一个
    **`httpPost`**（非 Electron IPC），命中
    `POST /api/conversations/{id}/confirmations/{call_id}/confirm`。
-5. AionCore 路由 (`aionui-conversation/src/routes.rs`) →
+5. ChislCore 路由 (`aionui-conversation/src/routes.rs`) →
    `service.confirm` → `AgentInstance::confirm` →
    `RemoteAgentManager::confirm`（`agent.rs`）。
 
@@ -626,7 +626,7 @@ Gateway 通过 `agent` / `agent.event` 事件推送工具调用信息：
 **验收标准**：
 
 - [ ] 权限请求正确展示工具信息和选项
-- [ ] 用户选择后 UI 层正确响应，并经 AionCore 回传 OpenCode（server acknowledgment）
+- [ ] 用户选择后 UI 层正确响应，并经 ChislCore 回传 OpenCode（server acknowledgment）
 - [ ] 60 秒超时自动拒绝（`DEFAULT_PROMPT_TIMEOUT_MS = 60_000`；早期文档误记为 70 秒）
 - [ ] 多个并发权限请求互不干扰（各自独立回传 OpenCode）
 
@@ -698,7 +698,7 @@ Gateway 通过 `agent` / `agent.event` 事件推送工具调用信息：
 │  RemoteAgentManagement.tsx                                        │
 │    ├─ useSWR → ipcBridge.remoteAgent.list.invoke()   → 列表     │
 │    │                                                              │
-│    └─ RemoteAgentFormModal (AionModal)                            │
+│    └─ RemoteAgentFormModal (ChislModal)                            │
 │       ├─ ipcBridge.remoteAgent.create.invoke()       → 创建     │
 │       ├─ ipcBridge.remoteAgent.update.invoke()       → 编辑     │
 │       ├─ ipcBridge.remoteAgent.testConnection.invoke()→ 连接测试 │
@@ -766,7 +766,7 @@ Gateway 通过 `agent` / `agent.event` 事件推送工具调用信息：
 | 10,000 ms         | Bridge testConnection                  | WebSocket 连接测试超时 | 含 handshakeTimeout            |
 | 15,000 ms         | Bridge handshake                       | 握手超时               |                                |
 | 30,000 ms         | RemoteAgentCore.waitForConnection      | 等待连接建立超时       | 默认参数值                     |
-| 60,000 ms         | AionCore `DEFAULT_PROMPT_TIMEOUT_MS`   | 权限/问题请求超时      | `agent.rs:553`；80% 发 warning |
+| 60,000 ms         | ChislCore `DEFAULT_PROMPT_TIMEOUT_MS`   | 权限/问题请求超时      | `agent.rs:553`；80% 发 warning |
 | 750 ms            | OpenClawGatewayConnection.queueConnect | connect challenge 等待 |                                |
 | 1s → 30s          | OpenClawGatewayConnection 重连退避     | 指数退避               | 每次翻倍                       |
 | 10 次             | OpenClawGatewayConnection 最大重连     | 重连上限               |                                |
@@ -789,8 +789,8 @@ Gateway 通过 `agent` / `agent.event` 事件推送工具调用信息：
 | 9   | F-RAGENT-08    | `waitForConnection` 使用 100ms 轮询检测状态（busy-wait），非事件驱动                                                                                                                                                        |
 | 10  | F-RAGENT-09    | `sendMessage` 在连接断开时自动重新 `start()`，可能导致意外重连和会话重置                                                                                                                                                    |
 | 11  | F-RAGENT-10    | 工具类型推断基于子串匹配而非单词边界，组合命名的工具可能误判（如 'Breadcrumb' 匹配 'read'）                                                                                                                                 |
-| 12  | F-RAGENT-11    | (已验证) 远端 OpenCode 审批选择经 AionCore `RemoteAgentManager::confirm` 通过 `POST /permission/\{id\}/reply` 可靠回传，详见 `docs/qa/A1-permission-question-relay.md`；旧 OpenClaw 无操作 `resolve` 缺陷在当前代码中不存在 |
-| 13  | F-RAGENT-11    | 权限请求超时 **60 秒**（`DEFAULT_PROMPT_TIMEOUT_MS`，AionCore 侧；早期文档误记为 70 秒），80% 时发出 warning，100% 自动 reject 并回传 OpenCode                                                                              |
+| 12  | F-RAGENT-11    | (已验证) 远端 OpenCode 审批选择经 ChislCore `RemoteAgentManager::confirm` 通过 `POST /permission/\{id\}/reply` 可靠回传，详见 `docs/qa/A1-permission-question-relay.md`；旧 OpenClaw 无操作 `resolve` 缺陷在当前代码中不存在 |
+| 13  | F-RAGENT-11    | 权限请求超时 **60 秒**（`DEFAULT_PROMPT_TIMEOUT_MS`，ChislCore 侧；早期文档误记为 70 秒），80% 时发出 warning，100% 自动 reject 并回传 OpenCode                                                                              |
 | 14  | F-RAGENT-12    | 事件序列 gap 仅打印 warn，不做重新同步                                                                                                                                                                                      |
 
 ---
@@ -808,7 +808,7 @@ Gateway 通过 `agent` / `agent.event` 事件推送工具调用信息：
 | 7   | Capabilities           | `caps: ['tool-events']` — 必须声明以接收 tool call 事件            |
 | 8   | DB 存储                | SQLite `remote_agents` 表，字段 snake_case                         |
 | 9   | 数据加载               | 使用 SWR（key: `'remote-agents.list'`），支持自动重验证            |
-| 10  | 弹窗组件               | 创建/编辑使用 AionModal 封装，删除确认使用 Arco 原生 Modal.confirm |
+| 10  | 弹窗组件               | 创建/编辑使用 ChislModal 封装，删除确认使用 Arco 原生 Modal.confirm |
 
 ---
 

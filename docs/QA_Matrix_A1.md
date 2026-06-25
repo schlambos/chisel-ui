@@ -16,7 +16,7 @@
 
 1. OpenCode server sends SSE `permission.asked` containing `request_id`, `tool`, `patterns`, etc.
 2. AionCore `agent.rs:handle_opencode_sse_event` receives it and enqueues a `Confirmation` (unless path is `auto_accept_paths`). Emits `AgentStreamEvent::AcpPermission` to UI.
-3. AionUi `useWorkspaceApprovals.ts` adds to `approvals` state. `PendingApprovalsBanner.tsx` and inline message cards render it.
+3. ChislUi `useWorkspaceApprovals.ts` adds to `approvals` state. `PendingApprovalsBanner.tsx` and inline message cards render it.
 4. User clicks action (e.g. "Allow once"). `MessagePermission.tsx` calls `ipcBridge.conversation.confirmation.confirm.invoke({ call_id, data: { value: "once" } })`.
 5. AionCore `agent.rs:confirm` (`RemoteAgentManager::confirm`) strips confirmation from state.
 6. AionCore calls `spawn_permission_response`, hitting `POST /permission/{request_id}/reply` with `{"reply":"once"}`.

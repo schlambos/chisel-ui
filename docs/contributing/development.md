@@ -114,7 +114,7 @@ bun run start:multi
 This sets `AIONUI_MULTI_INSTANCE=1`, which:
 
 - Skips the Electron single-instance lock
-- Uses a separate userData directory (`AionUi-Dev-2`) to avoid database and config conflicts
+- Uses a separate userData directory (`ChislUi-Dev-2`) to avoid database and config conflicts
 - Isolates data/config symlink paths (`~/.aionui-dev-2`, `~/.aionui-config-dev-2`)
 - Vite renderer, CDP, and WebUI proxy ports auto-increment to avoid collisions
 

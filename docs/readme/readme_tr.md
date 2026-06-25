@@ -107,10 +107,10 @@ Zaten Claude Code, Codex, Hermes Agent veya OpenClaw kullanıyorsanız, Chisl bu
 Birden fazla AI Agent'ı organize bir ekip olarak çalıştırın: bir **Leader** Agent talimatlarınızı alır, bunları alt görevlere böler ve yerleşik Team MCP Server aracılığıyla **Teammate** Agent'lara devreder. Teammate'ler paralel olarak çalışır, asenkron posta kutusu üzerinden sonuçları paylaşır ve paylaşılan görev panosuna yazar.
 
 <p align="center">
-  <img src="../../resources/AionUi_team.gif" alt="Team Mode overview" width="800">
+  <img src="../../resources/ChislUi_team.gif" alt="Team Mode overview" width="800">
 </p>
 
-- **Paralel çoklu agent çalıştırma** — Leader görevleri alt görevlere bölerek paralel çalışan Teammate Agent'lara devreder; her Teammate ACP (Agent Communication Protocol, Chisl'nin çoklu agent koordinasyon katmanı), Gemini veya Aionrs aracılığıyla kendi modelini kullanır
+- **Paralel çoklu agent çalıştırma** — Leader görevleri alt görevlere bölerek paralel çalışan Teammate Agent'lara devreder; her Teammate ACP (Agent Communication Protocol, Chisl'nin çoklu agent koordinasyon katmanı), Gemini veya Chislrs aracılığıyla kendi modelini kullanır
 - **Leader orkestrasyonu** — Leader atar, izler ve sonuçları toplar; desteklenen arka uçlar: Claude Code, Codex, Hermes Agent, Gemini, Snow CLI ve aionrs
 - **Ekip izole çalışma alanı** — tüm Agent'lar aynı klasörü paylaşır; her birinin bekleyen onaylar için kenar çubuğu rozeti ile kendi izin onay iletişim kutusu vardır
 
@@ -394,7 +394,7 @@ _Gemini tarafından desteklenen akıllı görüntü oluşturma, düzenleme ve ta
 
 </details>
 
-> [Görüntü oluşturma modeli yapılandırma kılavuzu](https://github.com/schlambos/chisel-ui/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide)
+> [Görüntü oluşturma modeli yapılandırma kılavuzu](https://github.com/schlambos/chisel-ui/wiki/ChislUi-Image-Generation-Tool-Model-Configuration-Guide)
 
 ---
 
@@ -591,7 +591,7 @@ brew install aionui
 
 - [📁 Dosya Yönetimi](https://github.com/schlambos/chisel-ui/wiki/file-management) — Akıllı dosya organizasyonu
 - [📊 Excel İşleme](https://github.com/schlambos/chisel-ui/wiki/excel-processing) — AI destekli veri işleme
-- [🎨 Görüntü Oluşturma](https://github.com/schlambos/chisel-ui/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide) — AI görüntü oluşturma
+- [🎨 Görüntü Oluşturma](https://github.com/schlambos/chisel-ui/wiki/ChislUi-Image-Generation-Tool-Model-Configuration-Guide) — AI görüntü oluşturma
 - [📚 Daha Fazla Kullanım Senaryosu](https://github.com/schlambos/chisel-ui/wiki/Use-Cases-Overview)
 
 **❓ Destek ve Yardım**

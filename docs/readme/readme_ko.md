@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../../resources/aionui-banner-1.png" alt="Chisl - Cowork with AI Agents" width="100%">
+  <img src="../../resources/chislui-banner-1.png" alt="Chisl - Cowork with AI Agents" width="100%">
 </p>
 
 <p align="center">
@@ -90,7 +90,7 @@ Chisl는 완전한 AI Agent 엔진을 내장하고 있습니다. CLI Agent를 �
 
 이미 Claude Code, Codex, Hermes Agent 또는 OpenClaw를 사용 중이라면, Chisl가 자동으로 감지하여 모두와 Cowork할 수 있게 해줍니다——내장 Agent와 함께.
 
-**지원되는 Agent:** 내장 Agent(제로 설정) • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • aionrs (Chisl에 번들된 Rust 기반 백엔드 서비스) • Snow CLI • Kiro • Hermes Agent • Cursor Agent 등
+**지원되는 Agent:** 내장 Agent(제로 설정) • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • chislrs (Chisl에 번들된 Rust 기반 백엔드 서비스) • Snow CLI • Kiro • Hermes Agent • Cursor Agent 등
 
 <p align="center">
   <img src="../../resources/multi-agent支持openclaw.gif" alt="Multi-Agent Cowork" width="800">
@@ -111,7 +111,7 @@ Chisl는 완전한 AI Agent 엔진을 내장하고 있습니다. CLI Agent를 �
 </p>
 
 - **병렬 멀티 에이전트 실행** — Leader가 작업을 서브태스크로 분리하여 병렬 실행하는 Teammate Agent에게 위임; 각 Teammate는 ACP(Agent Communication Protocol, Chisl의 멀티 에이전트 조정 레이어), Gemini 또는 Aionrs를 통해 자체 모델 사용
-- **Leader 오케스트레이션** — Leader가 할당, 추적, 집계; 지원 백엔드: Claude Code, Codex, Hermes Agent, Gemini, Snow CLI, aionrs
+- **Leader 오케스트레이션** — Leader가 할당, 추적, 집계; 지원 백엔드: Claude Code, Codex, Hermes Agent, Gemini, Snow CLI, chislrs
 - **팀 격리 워크스페이스** — 모든 Agent가 같은 폴더 공유; 각 Agent에 독립적인 권한 확인 다이얼로그가 있으며 사이드바 배지로 승인 대기 표시
 
 <details>
@@ -120,7 +120,7 @@ Chisl는 완전한 AI Agent 엔진을 내장하고 있습니다. CLI Agent를 �
 <br>
 
 - **공유 워크스페이스** — 모든 Agent가 같은 폴더 읽기/쓰기; 파일 패널이 항상 표시
-- **지원 백엔드** — Claude Code, Codex, Gemini, Snow CLI, aionrs; `mcpCapabilities.stdio`를 가진 다른 ACP 백엔드도 자동 지원
+- **지원 백엔드** — Claude Code, Codex, Gemini, Snow CLI, chislrs; `mcpCapabilities.stdio`를 가진 다른 ACP 백엔드도 자동 지원
 - **동적 스케일링** — 팀 실행 중 Teammate 추가/제거 가능; 응답 없는 Agent는 자동으로 실패 상태로 전환되고 원클릭 제거 지원
 - **세밀한 권한** — 각 Agent에 독립적인 권한 확인 다이얼로그; 사이드바 배지로 승인 대기 표시
 - **파일 공유** — Leader가 Teammate에게 파일 첨부 전달 가능
@@ -322,7 +322,7 @@ _10+ 형식: PDF, Word, Excel, PPT, 코드, Markdown, 이미지, HTML, Diff — 
 _일괄 이름 변경, 자동 정리, 스마트 분류, 파일 병합——Cowork Agent가 여러분을 위해 처리합니다._
 
 <p align="center">
-  <img src="../../resources/aionui sort file 2.gif" alt="Smart File Management" width="800">
+  <img src="../../resources/chislui sort file 2.gif" alt="Smart File Management" width="800">
 </p>
 
 <details>
@@ -563,7 +563,7 @@ A: 모든 데이터는 로컬 SQLite 데이터베이스에 저장됩니다. 어�
 
 ```bash
 # Alternatively, macOS via Homebrew
-brew install aionui
+brew install chislui
 ```
 
 ### 3단계로 시작하기

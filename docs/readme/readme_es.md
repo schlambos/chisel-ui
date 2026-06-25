@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../../resources/aionui-banner-1.png" alt="Chisl - Cowork with AI Agents" width="100%">
+  <img src="../../resources/chislui-banner-1.png" alt="Chisl - Cowork with AI Agents" width="100%">
 </p>
 
 <p align="center">
@@ -90,7 +90,7 @@ Chisl viene con un motor de Agent AI completo. A diferencia de las herramientas 
 
 Si ya usas Claude Code, Codex, Hermes Agent u OpenClaw, Chisl los detecta automáticamente y te permite hacer Cowork con todos ellos — junto con el Agent integrado.
 
-**Agents compatibles:** Agent integrado (configuración cero) • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • aionrs (el servicio backend en Rust incluido con Chisl) • Snow CLI • Kiro • Hermes Agent • Cursor Agent y más
+**Agents compatibles:** Agent integrado (configuración cero) • Claude Code • Codex • Qwen Code • Goose AI • OpenClaw • Augment Code • CodeBuddy • Kimi CLI • OpenCode • Factory Droid • GitHub Copilot • Qoder CLI • Mistral Vibe • Nanobot • chislrs (el servicio backend en Rust incluido con Chisl) • Snow CLI • Kiro • Hermes Agent • Cursor Agent y más
 
 <p align="center">
   <img src="../../resources/multi-agent支持openclaw.gif" alt="Multi-Agent Cowork" width="800">
@@ -107,11 +107,11 @@ Si ya usas Claude Code, Codex, Hermes Agent u OpenClaw, Chisl los detecta autom�
 Ejecuta múltiples AI Agents como un equipo organizado: un agente **Leader** recibe tus instrucciones, las divide en subtareas y las delega a agentes **Teammate** a través de un Team MCP Server integrado. Los Teammates se ejecutan en paralelo, comparten resultados a través de un buzón asíncrono y escriben en un tablero de tareas compartido.
 
 <p align="center">
-  <img src="../../resources/AionUi_team.gif" alt="Team Mode overview" width="800">
+  <img src="../../resources/ChislUi_team.gif" alt="Team Mode overview" width="800">
 </p>
 
-- **Ejecución paralela multi-agent** — Leader divide las tareas en subtareas y las delega a agentes Teammate que se ejecutan en paralelo; cada Teammate usa su propio modelo a través de ACP (Agent Communication Protocol, la capa de coordinación multi-agent de Chisl), Gemini o Aionrs
-- **Orquestación del Leader** — Leader asigna, rastrea y agrega resultados; backends compatibles: Claude Code, Codex, Hermes Agent, Gemini, Snow CLI y aionrs
+- **Ejecución paralela multi-agent** — Leader divide las tareas en subtareas y las delega a agentes Teammate que se ejecutan en paralelo; cada Teammate usa su propio modelo a través de ACP (Agent Communication Protocol, la capa de coordinación multi-agent de Chisl), Gemini o Chislrs
+- **Orquestación del Leader** — Leader asigna, rastrea y agrega resultados; backends compatibles: Claude Code, Codex, Hermes Agent, Gemini, Snow CLI y chislrs
 - **Espacio de trabajo aislado por equipo** — todos los Agents comparten la misma carpeta; cada uno tiene su propio diálogo de permisos con badge en la barra lateral para aprobaciones pendientes
 
 <details>
@@ -120,7 +120,7 @@ Ejecuta múltiples AI Agents como un equipo organizado: un agente **Leader** rec
 <br>
 
 - **Espacio de trabajo compartido** — todos los Agents leen/escriben en la misma carpeta; el panel de archivos permanece visible durante todo el proceso
-- **Backends compatibles** — Claude Code, Codex, Gemini, Snow CLI, aionrs; otros backends ACP con `mcpCapabilities.stdio` son compatibles automáticamente
+- **Backends compatibles** — Claude Code, Codex, Gemini, Snow CLI, chislrs; otros backends ACP con `mcpCapabilities.stdio` son compatibles automáticamente
 - **Escalado dinámico** — agrega o elimina Teammates mientras el equipo está en ejecución; los agentes silenciosos se escalan automáticamente a fallido con eliminación en un clic
 - **Permisos granulares** — cada Agent tiene su propio diálogo de confirmación de permisos; el badge en la barra lateral muestra aprobaciones pendientes
 - **Compartir archivos** — Leader puede pasar archivos adjuntos a los Teammates
@@ -322,7 +322,7 @@ _10+ formatos: PDF, Word, Excel, PPT, código, Markdown, imágenes, HTML, Diff �
 _Renombrado por lotes, organización automática, clasificación inteligente, fusión de archivos — el Cowork Agent lo maneja por ti._
 
 <p align="center">
-  <img src="../../resources/aionui sort file 2.gif" alt="Smart File Management" width="800">
+  <img src="../../resources/chislui sort file 2.gif" alt="Smart File Management" width="800">
 </p>
 
 <details>
@@ -394,7 +394,7 @@ _Generación, edición y reconocimiento inteligente de imágenes, impulsado por 
 
 </details>
 
-> [Guía de configuración del modelo de generación de imágenes](https://github.com/schlambos/chisel-ui/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide)
+> [Guía de configuración del modelo de generación de imágenes](https://github.com/schlambos/chisel-ui/wiki/ChislUi-Image-Generation-Tool-Model-Configuration-Guide)
 
 ---
 
@@ -563,7 +563,7 @@ Haz clic en el botón de arriba para ir a la página de Releases y descargar el 
 
 ```bash
 # Alternatively, macOS via Homebrew
-brew install aionui
+brew install chislui
 ```
 
 ### Comenzar en 3 pasos
@@ -591,7 +591,7 @@ brew install aionui
 
 - [📁 Gestión de archivos](https://github.com/schlambos/chisel-ui/wiki/file-management) — Organización inteligente de archivos
 - [📊 Procesamiento de Excel](https://github.com/schlambos/chisel-ui/wiki/excel-processing) — Procesamiento de datos impulsado por AI
-- [🎨 Generación de imágenes](https://github.com/schlambos/chisel-ui/wiki/AionUi-Image-Generation-Tool-Model-Configuration-Guide) — Creación de imágenes AI
+- [🎨 Generación de imágenes](https://github.com/schlambos/chisel-ui/wiki/ChislUi-Image-Generation-Tool-Model-Configuration-Guide) — Creación de imágenes AI
 - [📚 Más casos de uso](https://github.com/schlambos/chisel-ui/wiki/Use-Cases-Overview)
 
 **❓ Soporte y ayuda**
