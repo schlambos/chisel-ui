@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Chisl (AionUi) includes or redistributes components from the projects below. This
+Chisl includes or redistributes components from the projects below. This
 list covers **direct dependencies** that are materially bundled into the desktop
 application (editor, diff UI, terminal, and core UI). Additional transitive
 libraries are included in the shipped build; their licenses apply as stated in
